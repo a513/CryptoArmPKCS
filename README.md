@@ -5,9 +5,9 @@
 
 При работе с защищенным контейнером PKCS#12 используется [СКЗИ "ЛИРССЛ-CSP"](http://soft.lissi.ru/ls_product/skzi/skzi_lirssl_csp/).
 
-Утилита функционирует на платформах Linux, OS X, Windows. В настоящее время утилита портируется на платформу Android
+Утилита функционирует на платформах Linux, OS X, Windows и Android
 
 Автор - [Орлов Владимир](http://museum.lissi-crypto.ru/)
 
 Email: vorlov@lissi.ru
-Copyright(C) [LISSI-Soft Ltd](http://soft.lissi.ru) 2019-2019
+Copyright(C) [LISSI-Soft Ltd](http://soft.lissi.ru) 2019-2020
