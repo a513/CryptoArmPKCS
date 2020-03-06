@@ -6103,7 +6103,7 @@ proc readca {url} {
       } elseif {$code == 301 || $code == 302} {
         #Сертификат перемещен в другое место, получаем его
 	update
-        set newURL [dict get [http::meta $token] Location]
+        set newURL [dict get [http::meta $token] location]
         #puts "newURL=$newURL"
         #Читаем сертификат с другого сервера
         set cer [readca $newURL]
@@ -10502,7 +10502,7 @@ proc contentabout {w} {
   {        Утилита cryptoarmpkcs функционирует на ОС Linux, MS Windows, MacOC, Android и др.} tagAbout
   $w.text insert end \n
   $w.text insert end \
-  {        Загрузить дистрибуты для платформ Linux, MS Windows, OS X можно }
+  {        Загрузить дистрибуты для платформ Linux, MS Windows, OS X, Android можно }
   $w.text tag configure tagLoad -foreground blue -font {Times 10 bold italic}
   $w.text tag configure tagLoad1 -foreground blue -font {Times 9 bold italic}
   foreach tag {d1 d2 d3 d4 d5 d6 d7 d8 d9 d10 d11 d12 d13 d14 d15} {
@@ -10691,13 +10691,13 @@ proc contentcreatetok {w} {
   $w.text insert end {LS11CLOUD} d8
   $w.text insert end ".\n\n"
   $w.text insert end \
-  {   Утилита guils11cloud_conf функционирует на ОС Linux, MS Windows, MacOS и др.} tagAbout
+  {   Утилита guils11cloud_conf функционирует на ОС Linux, MS Windows, MacOS, Android и др.} tagAbout
   $w.text insert end \n
   $w.text insert end \
-  {   Загрузить дистрибутивыы для платформ Linux, MS Windows, OS X можно }
+  {   Загрузить дистрибутивыы для платформ Linux, MS Windows, OS X, Android можно }
   $w.text tag configure tagLoad -foreground blue -font {Times 12 bold italic}
   $w.text tag configure tagLoad1 -foreground blue -font {Times 10 bold italic}
-  foreach tag {d1 d2 d3 d4 d5 d6 d7 d8 d9 d10 d11 d12 d13} {
+  foreach tag {d1 d2 d3 d4 d5 d6 d7 d8 d9 d10 d11 d12 d13 d14 } {
     $w.text tag configure $tag  -foreground red
   }
   #     -font {Times 10 bold italic}
@@ -10717,14 +10717,13 @@ proc contentcreatetok {w} {
   $w.text insert end "\t - "
   $w.text insert end {WIN64} d13
   $w.text insert end \n
+  $w.text insert end "\t - "
+  $w.text insert end {AndroWishApp-debug.apk} d14
+  $w.text insert end \n
   $w.text insert end "   При необходимости распакуйте дистрибутив и запустите его. В дальнейшем следуйте его подсказкам. \
   Вы можете также воспользоваться "
   $w.text insert end {инструкцией} d8
   $w.text insert end ".\n"
-  $w.text insert end \
-  {   На платформе Android создание облачного токена будет доступно в следующем обновлении} tagAbout
-  $w.text insert end \n
-
 
   # Create bindings for tags.
   # d3 d4 d5 d6
@@ -10742,8 +10741,9 @@ proc contentcreatetok {w} {
   set url(d11) "https://github.com/a513/guils11cloud_config/raw/master/distr/guils11cloud_conf_mac.tar.bz2"
   set url(d12) "https://github.com/a513/guils11cloud_config/raw/master/distr/guils11cloud_conf_win32.exe"
   set url(d13) "https://github.com/a513/guils11cloud_config/raw/master/distr/guils11cloud_conf_win64.exe"
+  set url(d14) "https://github.com/a513/guils11cloud_config/raw/master/distr/AndroWishApp-debug.apk"
 
-  foreach tag {d1 d2 d3 d4 d5 d6 d7 d8 d9 d10 d11 d12 d13} {
+  foreach tag {d1 d2 d3 d4 d5 d6 d7 d8 d9 d10 d11 d12 d13 d14} {
     #	    $w.text tag bind $tag <Any-Enter> ".about.butt.lab configure -text {$url($tag)} ;$w.text tag configure $tag $bold"
     #	    $w.text tag bind $tag <Any-Leave> ".about.butt.lab configure -text {}; $w.text tag configure $tag $normal"
     $w.text tag bind $tag <Any-Enter> "set ::entryd {$url($tag)};$w.text tag configure $tag $bold"
@@ -10764,7 +10764,7 @@ proc contentcreatetok {w} {
   $w.text tag bind d11 <1> {readdistr "https://github.com/a513/guils11cloud_config/raw/master/distr/guils11cloud_conf_mac.tar.bz2" "."}
   $w.text tag bind d12 <1> {readdistr "https://github.com/a513/guils11cloud_config/raw/master/distr/guils11cloud_conf_win32.exe" "."}
   $w.text tag bind d13 <1> {readdistr "https://github.com/a513/guils11cloud_config/raw/master/distr/guils11cloud_conf_win64.exe" "."}
-
+  $w.text tag bind d14 <1> {readdistr "https://github.com/a513/guils11cloud_config/raw/master/distr/AndroWishApp-debug.apk" "."}
 }
 
 
