@@ -801,8 +801,9 @@ proc ::updatetok {} {
   set wizDatacsr(keytok) 1
 #Все ОК
   set ::pkcs11_status 0
-  set fnt {.fn1 .fn7  }
-  set fnc {.fn2 .fn4 }
+  set fnt {.fn1.fratext .fn7.fratext  }
+#  set fnt {.fn7.fratext  }
+  set fnc {.fn2.fratext .fn4.fratext }
   foreach fn $fnt {
     $fn.tok.listTok configure -state normal
     $fn.tok.listTok configure -values $::listtok
@@ -811,6 +812,17 @@ proc ::updatetok {} {
     $fn.cert.listCert configure -values $::listx509
     $fn.cert.listCert configure -state readonly
   }
+if {0} {
+  set fnt {.fn1.fratext }
+  foreach fn $fnt {
+    $fn.tok.listTok configure -state normal
+    $fn.tok.listTok configure -values $::listtok
+    $fn.tok.listTok configure -state readonly
+    $fn.cert.listCert configure -state normal
+    $fn.cert.listCert configure -values $::listx509
+    $fn.cert.listCert configure -state readonly
+  }
+}
 if {1} {
   foreach fn $fnc {
     $fn.tok.listCert configure -state normal
@@ -1861,7 +1873,7 @@ set widthrect [expr $ha / 4]
 proc butCliked {num fr} {
     pack forget  .fr1
     set ::tekFrfunc $fr
-puts "butCliked=$num"
+puts "butCliked=$num, fr=$fr"
     if {$num == 3 && $::wizpagecsr == 0} {
     #puts "MOVE wizpage=$::wizpagecsr"
 	move "csr" [lindex $::pagescsr 0]
@@ -1870,12 +1882,12 @@ puts "butCliked=$num"
 #pack forget $fr.can
 #pack $fr.can  -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0
     } elseif {$num == 6} {
-	$fr.fratext.text delete 1.0 end
+	$fr.fratext.fratext.text delete 1.0 end
 	set ::listObjs [list ]
-	$fr.frhd.lobj configure -state normal
-	$fr.frhd.lobj delete 0 end
-	$fr.frhd.lobj configure -values $::listObjs
-	$fr.frhd.lobj configure -state readonly
+	$fr.fratext.frhd.lobj configure -state normal
+	$fr.fratext.frhd.lobj delete 0 end
+	$fr.fratext.frhd.lobj configure -values $::listObjs
+	$fr.fratext.frhd.lobj configure -state readonly
 	pack $fr -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
     } else {
 	pack $fr -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
@@ -3524,34 +3536,40 @@ proc readPw ent {
   global widget
   global yespas
   global pass
-  #	puts "readPWD"
   set pass [$ent get]
+puts "readPWD= $pass"
   $ent delete 0 end
   set yespas "yes"
-  wm state .topPinPw withdraw
 }
-
 
 proc page_password {}  {
 #Widget for enter PIN or Password
-if {1} {
-    toplevel .topPinPw -borderwidth 2 -class Toplevel -relief ridge -background #39b5da -height 140 -highlightbackground gray85 -highlightcolor black
-    global icon11_24x24
-    wm minsize .topPinPw 400 100
-#    wm geometry .topPinPw +383+258
-    wm iconphoto .topPinPw icon11_24x24
-    wm state .topPinPw withdraw
-}
-#frame .topPinPw
-    labelframe .topPinPw.labFrPw -borderwidth 4 -class LabelFrame -labelanchor nw -relief groove -text "Введите PIN-код для токена и нажмите ВВОД" -foreground blue -background #eff0f1 -height 95 -width 300
-    pack .topPinPw.labFrPw -anchor nw -padx 3 -pady 3 -fill both -expand 1
+    frame .topPinPw -relief flat -bd 5
+    labelframe .topPinPw.labFrPw -borderwidth 4 -labelanchor nw -relief groove -text "Введите PIN-код для токена и нажмите ВВОД" -foreground blue -background #eff0f1 -height 95 -width 200
+    pack .topPinPw.labFrPw -in .topPinPw  -anchor nw -padx 3 -pady 3 -fill both -expand 1
     entry .topPinPw.labFrPw.entryPw -background snow -show * -highlightbackground gray85 -highlightcolor skyblue -justify left -relief sunken
     entry .topPinPw.labFrPw.entryLb -background snow -highlightbackground gray85 -highlightcolor skyblue -justify left -relief sunken
     pack .topPinPw.labFrPw.entryPw -fill x -expand 1 -padx 5 -pady 5  -ipady 2
     bind .topPinPw.labFrPw.entryPw <Key-Return> {readPw .topPinPw.labFrPw.entryPw}
     bind .topPinPw.labFrPw.entryLb <Key-Return> {readPw .topPinPw.labFrPw.entryLb}
-    ttk::button .topPinPw.labFrPw.butPw  -command {global yespas;set yespas "no"; wm state .topPinPw withdraw;} -text "Отмена"  -style My.TButton
-    pack .topPinPw.labFrPw.butPw -pady {0 5} -sid right -padx 5
+    ttk::button .topPinPw.labFrPw.butPw  -command {global yespas;set yespas "no"; } -text "Отмена"
+    ttk::button .topPinPw.labFrPw.butOk  -command {readPw .topPinPw.labFrPw.entryPw} -text "Готово"
+    ttk::button .topPinPw.labFrPw.butLbOk  -command {readPw .topPinPw.labFrPw.entryLb} -text "Готово"
+    pack .topPinPw.labFrPw.butPw .topPinPw.labFrPw.butOk -pady {0 5} -sid right -padx 5
+}
+proc page_rename {}  {
+#Widget for enter PIN or Password
+    labelframe .rename -relief flat -bd 5 -text "Token: xxxxxx"
+    labelframe .topPinPw.labFrPw -borderwidth 4 -labelanchor nw -relief groove -text "Введите PIN-код для токена и нажмите ВВОД" -foreground blue -background #eff0f1 -height 95 -width 200
+    pack .topPinPw.labFrPw -in .topPinPw  -anchor nw -padx 3 -pady 3 -fill both -expand 1
+    entry .topPinPw.labFrPw.entryPw -background snow -show * -highlightbackground gray85 -highlightcolor skyblue -justify left -relief sunken
+    entry .topPinPw.labFrPw.entryLb -background snow -highlightbackground gray85 -highlightcolor skyblue -justify left -relief sunken
+    pack .topPinPw.labFrPw.entryPw -fill x -expand 1 -padx 5 -pady 5  -ipady 2
+    bind .topPinPw.labFrPw.entryPw <Key-Return> {readPw .topPinPw.labFrPw.entryPw}
+    bind .topPinPw.labFrPw.entryLb <Key-Return> {readPw .topPinPw.labFrPw.entryLb}
+    ttk::button .topPinPw.labFrPw.butPw  -command {global yespas;set yespas "no"; } -text "Отмена"
+    ttk::button .topPinPw.labFrPw.butOk  -command {readPw .topPinPw.labFrPw.entryPw} -text "Готово"
+    pack .topPinPw.labFrPw.butPw .topPinPw.labFrPw.butOk -pady {0 5} -sid right -padx 5
 }
 
 proc ::sign_file {w typekey} {
@@ -3568,11 +3586,6 @@ proc ::sign_file {w typekey} {
   variable typesig
   variable doc_for_sign
   if {$doc_for_sign == "" } {
-
-#set ::retmes 0
-#place .canmes -in .fn1.fr0 -relx 0.5 -rely 1.0
-#vwait ::retmes
-
     tk_messageBox -title "Подписать документ" -detail "Не выбран документ для подписания" -icon error  -parent .
     return
   }
@@ -3621,18 +3634,17 @@ proc ::sign_file {w typekey} {
   if {$typekey == "pkcs11"} {
     #puts "f_sign=$f_sign"
     #Ввод PIN-кода
-wm state . withdraw
-    wm title .topPinPw "Токен: $::slotid_teklab"
-    wm state .topPinPw normal
-    wm state .topPinPw withdraw
-    wm state .topPinPw normal
-    raise .topPinPw
-    grab .topPinPw
+    pack forget .fn1.fratext
+    place .topPinPw -in .fn1 -relx 0.0 -rely 0.27 -relwidth 1.0
+#    pack .topPinPw -in .fn1 -side top
+    after 100
+    update
     focus .topPinPw.labFrPw.entryPw
     set yespass ""
     vwait yespas
-    grab release .topPinPw
-wm state . normal
+    place forget .topPinPw
+#    pack forget .topPinPw
+    pack .fn1.fratext  -side bottom
     #Ввод пароля
     if { $yespas == "no" } {
       return 0
@@ -6119,69 +6131,75 @@ proc readca {url} {
   return $cer
 }
 
-proc ::renamecert {pkcs11_id} {
+proc ::renamecert {w pkcs11_id} {
   global yespas
   global pass
   variable nickCert
   if {[llength $::listx509] < 1} {
     return
   }
-  #    puts "RENAMECERT nickTok=$::slotid_teklab"
+puts "RENAMECERT nickTok=$::slotid_teklab, w=$w"
   #Ввод МЕТКИ
   set yespas ""
   set pass ""
-  set titpin "Токен: $::slotid_teklab"
-wm state . withdraw
-  wm title .topPinPw $titpin
-  wm state .topPinPw normal
-  wm state .topPinPw withdraw
-  wm state .topPinPw normal
-  raise .topPinPw
-  grab .topPinPw
+#  set titpin "Токен: $::slotid_teklab"
+#  wm title .topPinPw $titpin
+    #Ввод PIN-кода
+    pack forget $w.fratext
   .topPinPw.labFrPw configure -text "Введите метку для сертификата"
   pack forget .topPinPw.labFrPw.entryPw
   pack forget .topPinPw.labFrPw.butPw
+  pack forget .topPinPw.labFrPw.butOk
+
   pack .topPinPw.labFrPw.entryLb -fill x -expand 1 -padx 5 -pady 5  -ipady 2
-  pack .topPinPw.labFrPw.butPw -pady {0 5} -sid right -padx 5
+  pack .topPinPw.labFrPw.butPw .topPinPw.labFrPw.butLbOk -pady {0 5} -sid right -padx 5
 
   .topPinPw.labFrPw.entryLb insert end  $nickCert
-
-  focus .topPinPw.labFrPw.entryLb
-  set yespas ""
-  vwait yespas
-  grab release .topPinPw
-  pack forget .topPinPw.labFrPw.entryLb
-  pack forget .topPinPw.labFrPw.butPw
-  pack .topPinPw.labFrPw.entryPw -fill x -expand 1 -padx 5 -pady 5  -ipady 2
-  pack .topPinPw.labFrPw.butPw -pady {0 5} -sid right -padx 5
+    place .topPinPw -in $w -relx 0.0 -rely 0.27 -relwidth 1.0
+#    pack .topPinPw -in .fn1 -side top
+    after 100
+    update
+    focus .topPinPw.labFrPw.entryPw
+    set yespass ""
+    vwait yespas
+    place forget .topPinPw
   .topPinPw.labFrPw.entryLb delete 0 end
   .topPinPw.labFrPw.entryPw delete 0 end
   .topPinPw.labFrPw.entryPw configure -show *
   .topPinPw.labFrPw configure -text "Введите PIN-код и нажмите ВВОД"
-wm state . normal
+  pack forget .topPinPw.labFrPw.entryLb
+  pack forget .topPinPw.labFrPw.butPw
+  pack forget .topPinPw.labFrPw.butLbOk
+  pack .topPinPw.labFrPw.entryPw -fill x -expand 1 -padx 5 -pady 5  -ipady 2 -sid top
+  pack .topPinPw.labFrPw.butPw .topPinPw.labFrPw.butOk -pady {0 5} -sid right -padx 5
+
+#    pack forget .topPinPw
+    pack $w.fratext  -side bottom
   if { $yespas == "no" } {
     return
   }
   set newlab $pass
+puts "MEWNICK=$newlab"
   set yesno "no"
   #    puts "RENAME=$pkcs11_id"
   #    puts "NEWLAB=$newlab"
   #Ввод PIN-кода
   set yespas ""
   set pass ""
-  set titpin "Токен: $::slotid_teklab"
-  wm title .topPinPw $titpin
-wm state . withdraw
-  wm state .topPinPw normal
-  wm state .topPinPw withdraw
-  wm state .topPinPw normal
-  raise .topPinPw
-  grab .topPinPw
-  focus .topPinPw.labFrPw.entryPw
-  set yespas ""
-  vwait yespas
-  grab release .topPinPw
-wm state . normal
+#  set titpin "Токен: $::slotid_teklab"
+#  wm title .topPinPw $titpin
+    #Ввод PIN-кода
+    pack forget $w.fratext
+    place .topPinPw -in $w -relx 0.0 -rely 0.27 -relwidth 1.0
+#    pack .topPinPw -in .fn1 -side top
+    after 100
+    update
+    focus .topPinPw.labFrPw.entryPw
+    set yespass ""
+    vwait yespas
+    place forget .topPinPw
+#    pack forget .topPinPw
+    pack $w.fratext  -side bottom
   if { $yespas == "no" } {
     return
   }
@@ -6216,12 +6234,12 @@ wm state . normal
 
 }
 
-proc ::workOpCertP11 {opnum} {
+proc ::workOpCertP11 {w opnum} {
   global yespas
   global pass
   variable nickCert
   set c ".st.fr1.fr2_list4"
-  #    puts "WORKOP:c=$c"
+     puts "WORKOPCertP11:c=$c, w=$w, opnum=$opnum"
   set i 0
   if {$nickCert == ""} {
     tk_messageBox -title "Работа с сертификатом" -icon error -message "Не выбран сертификат на токене" -parent .
@@ -6334,7 +6352,7 @@ wm state . normal
                         	
     }
     5 {
-      ::renamecert $cert_parse_der(pkcs11_id)
+      ::renamecert $w $cert_parse_der(pkcs11_id)
       return
     }
     default {
@@ -6586,7 +6604,7 @@ puts "LabPrKey id_new=$id_new_hex"
 }
 
 
-proc ::workOpP12 {} {
+proc ::workOpP12 {w} {
   variable pfx_fn
   global yespas
   global pass
@@ -6598,7 +6616,7 @@ proc ::workOpP12 {} {
   variable cert_fn
   variable nickCert
   variable file_for_sign
-#  puts "WORKOpP12:top12=$top12;typesave=$ts12"
+  puts "WORKOpP12:top12=$top12;typesave=$ts12;w=$w"
   set i 0
   if {$::certfrompfx == ""} {
     tk_messageBox -title "Работа с PKCS12" -icon error -message "Не выбран файл с контейнером" -parent .
@@ -6635,18 +6653,20 @@ proc ::workOpP12 {} {
       set yespas ""
       set pass ""
       set titpin "[mc {Token}]: $::slotid_teklab"
-      wm title .topPinPw $titpin
-wm state . withdraw
-      wm state .topPinPw normal
-      wm state .topPinPw withdraw
-      wm state .topPinPw normal
-      raise .topPinPw
-      grab .topPinPw
-      focus .topPinPw.labFrPw.entryPw
-      set yespas ""
-      vwait yespas
-      grab release .topPinPw
-wm state . normal
+#      wm title .topPinPw $titpin
+    #Ввод PIN-кода
+    pack forget $w
+    place .topPinPw -in .fn7 -relx 0.0 -rely 0.27 -relwidth 1.0
+#    pack .topPinPw -in .fn7 -side top
+    after 100
+    update
+    focus .topPinPw.labFrPw.entryPw
+    set yespass ""
+    vwait yespas
+    place forget .topPinPw
+#    pack forget .topPinPw
+    pack $w -side bottom
+    #Ввод пароля
       if { $yespas == "no" } {
         return
       }
@@ -6691,18 +6711,20 @@ wm state . normal
       set yespas ""
       set pass ""
       set titpin "[mc {Token}]: $::slotid_teklab"
-      wm title .topPinPw $titpin
-wm state . withdraw
-      wm state .topPinPw normal
-      wm state .topPinPw withdraw
-      wm state .topPinPw normal
-      raise .topPinPw
-      grab .topPinPw
-      focus .topPinPw.labFrPw.entryPw
-      set yespas ""
-      vwait yespas
-      grab release .topPinPw
-wm state . normal
+#      wm title .topPinPw $titpin
+    #Ввод PIN-кода
+    pack forget $w
+    place .topPinPw -in .fn7 -relx 0.0 -rely 0.27 -relwidth 1.0
+#    pack .topPinPw -in .fn7 -side top
+    after 100
+    update
+    focus .topPinPw.labFrPw.entryPw
+    set yespass ""
+    vwait yespas
+    place forget .topPinPw
+#    pack forget .topPinPw
+    pack $w -side bottom
+    #Ввод пароля
       if { $yespas == "no" } {
         return
       }
@@ -6813,7 +6835,7 @@ wm state . normal
   }
 }
 
-proc ::workOp {} {
+proc ::workOp {w} {
   global typesys
   variable createTimeStamp
   variable createescTS
@@ -6829,7 +6851,7 @@ proc ::workOp {} {
   variable p7s_fn
   set c ".st.fr1.fr2_list2"
   #    puts "typeop=$typeop"
-  #    puts "WORKOP:c=$c"
+    puts "WORKOP:c=$c"
   set i 0
   if {$p7s_fn == ""} {
     tk_messageBox -title [mc "Работа с PKCS7"] -icon error -message [mc "Не выбран файл с электронной подписью"] -parent .
@@ -6982,19 +7004,22 @@ proc ::workOp {} {
       #puts "sifn_file=$nickCert"
       ##################
       #Ввод PIN-кода
-      wm title .topPinPw "[mc {Token}]: $::slotid_teklab"
-      wm state .topPinPw normal
-      wm state .topPinPw withdraw
-      wm state .topPinPw normal
-      raise .topPinPw
-      grab .topPinPw
-      focus .topPinPw.labFrPw.entryPw
-      set yespass ""
-      vwait yespas
-      grab release .topPinPw
-      if { $yespas == "no" } {
-        return 0
-      }
+#      wm title .topPinPw "[mc {Token}]: $::slotid_teklab"
+    #Ввод PIN-кода
+	pack forget $w.fratext
+	place .topPinPw -in $w -relx 0.0 -rely 0.27 -relwidth 1.0
+#    pack .topPinPw -in .fn1 -side top
+	after 100
+	update
+	focus .topPinPw.labFrPw.entryPw
+	set yespass ""
+	vwait yespas
+	place forget .topPinPw
+#    pack forget .topPinPw
+	pack $w.fratext  -side bottom
+	if { $yespas == "no" } {
+    	    return 0
+        }
       set yespas "no"
       set password $pass
       set pass ""
@@ -7345,7 +7370,7 @@ proc ::verifysign {cert type} {
 
 
 proc trace_signedcert {name index op } {
-  set c ".fn2"
+  set c ".fn2.fratext"
   variable varTypeSign
   variable varescTS
   upvar 1 $name nick
@@ -7541,7 +7566,7 @@ proc trace_p7s {name index op} {
   variable varescTS
   
 #  set c ".st.fr1.fr2_list2"
-  set c ".fn2"
+  set c ".fn2.fratext"
   #    puts "TRACE_P7S"
   upvar 1 $name p7s
   #Что подписывали
@@ -7626,32 +7651,31 @@ proc trace_pfx {name index op} {
   variable ::listx509
   variable ::lcerts
   set c ".st.fr1.fr2_list8"
-  #    puts "TRACE_PFX"
+puts "TRACE_PFX=$name"
   upvar 1 $name pfx
   if {$pfx == ""} {
 
     return
   }
+puts "TRACE_PFX=$pfx"
   set file [open $pfx]
   fconfigure $file -translation binary
   set indata [read $file]
   close $file
-wm state . withdraw
-  wm title .topPinPw "Введите пароль для PKCS#12"
-  wm state .topPinPw normal
-  wm state .topPinPw withdraw
-  wm state .topPinPw normal
   .topPinPw.labFrPw configure -text "Введите пароль для \"[file tail $pfx]\""
-  raise .topPinPw
-  focus .topPinPw.labFrPw.entryPw
-  grab .topPinPw
-  set yespass ""
-  vwait yespas
-  grab release .topPinPw
-wm state . normal
-
-
-  #Ввод пароля
+    #Ввод PIN-кода
+    pack forget .fn7.fratext
+    place .topPinPw -in .fn7 -relx 0.0 -rely 0.27 -relwidth 1.0
+#    pack .topPinPw -in .fn1 -side top
+    after 100
+    update
+    focus .topPinPw.labFrPw.entryPw
+    set yespass ""
+    vwait yespas
+    place forget .topPinPw
+#    pack forget .topPinPw
+    pack .fn7.fratext  -side bottom
+    #Ввод пароля
   .topPinPw.labFrPw configure -text "Введите PIN-код и нажмите ВВОД"
   if { $yespas == "no" } {
     set pfx_fn ""
@@ -7728,7 +7752,7 @@ wm state . normal
   return
 }
 
-proc addsignature {} {
+proc addsignature {w} {
     global yespas
     global pass
     variable nickCert
@@ -7782,18 +7806,21 @@ puts "Добавляем подпись"
 #    	    return
       ##################
       #Ввод PIN-кода
-wm state . withdraw
-      wm title .topPinPw "Токен: $::slotid_teklab"
-      wm state .topPinPw normal
-      wm state .topPinPw withdraw
-      wm state .topPinPw normal
-      raise .topPinPw
-      grab .topPinPw
+#      wm title .topPinPw "Токен: $::slotid_teklab"
+      #Ввод PIN-кода
+      pack forget $w.fratext
+      place .topPinPw -in $w -relx 0.0 -rely 0.27 -relwidth 1.0
+#    pack .topPinPw -in .fn1 -side top
+      after 100
+      update
       focus .topPinPw.labFrPw.entryPw
       set yespass ""
       vwait yespas
-      grab release .topPinPw
-wm state . normal
+      place forget .topPinPw
+#    pack forget .topPinPw
+      pack $w.fratext  -side bottom
+
+
       if { $yespas == "no" } {
         return 0
       }
@@ -7940,6 +7967,10 @@ puts "PAGE1=$c, $c.tok.listTok"
 	{{PKCS12} {.p12}}
 	{{All Files} *}
     }
+  frame $c.fratext -borderwidth 0 -relief flat
+  pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
+  set c "$c.fratext"
+
     labelframe $c.tok -text "Выберите токен PKCS11"  -borderwidth 5
     ttk::combobox $c.tok.listTok -textvariable ::nickTok -values $::listtok
     set ::nickTok [lindex $::listtok 0]
@@ -8047,6 +8078,11 @@ proc func_page2 {c} {
     {{PKCS7 (PEM)} {.pem}}
     {{All Files} *}
   }
+  set corig $c
+  frame $c.fratext -borderwidth 0 -relief flat
+  pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
+  set c "$c.fratext"
+
     labelframe $c.tok -text "Сертификаты токена"  -borderwidth 5
     ttk::combobox $c.tok.listCert -textvariable nickCert -values $::listx509
 #     -state readonly
@@ -8156,7 +8192,9 @@ if {0} {
   grid $c.lfr1.ch5 -row 4 -column 1 -sticky e -padx {0 0} -pady {0 1}
     pack $c.lfr1 -fill both -side top -padx 10
     
-  ttk::button  $c.b2 -command {::workOp} -text "Выполнить операцию"
+  set cmd "ttk::button  $c.b2 -command {::workOp $corig} -text {Выполнить операцию}"
+    set cmd [subst $cmd]
+    eval $cmd
     pack $c.b2 -side top -anchor nw  -padx 5 -pady 4 
     
   labelframe $c.lfr2 -text "Добавить подписанта"
@@ -8164,7 +8202,9 @@ if {0} {
   set storage 1
   ttk::radiobutton $c.lfr2.st1 -value 0 -variable storage -text "PKCS11" -command {}
   ttk::radiobutton $c.lfr2.st2 -value 1 -variable storage -text "PKCS12" -command {}
-  ttk::button  $c.lfr2.b1 -command {addsignature} -text "Добавить ЭП"
+  set cmd "ttk::button  $c.lfr2.b1 -command {addsignature $corig} -text {Добавить ЭП}"
+    set cmd [subst $cmd]
+    eval $cmd
 #  grid $c.lfr2.st1 -row 0 -column 0 -sticky w -padx {4 0} -pady {0 0}
 #  grid $c.lfr2.st2 -row 0 -column 1 -sticky e -padx {4 0} -pady {0 0}
     pack $c.lfr2.st1 -side left -padx {4 0} -pady {0 0}
@@ -9799,6 +9839,10 @@ proc func_page4 {c} {
     {{Сертификат в PEM формате}    .crt}
     {{Любой тип}    *}
   }
+  set corig $c
+  frame $c.fratext -borderwidth 0 -relief flat
+  pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
+  set c "$c.fratext"
 
     labelframe $c.tok -text "Сертификаты токена"  -borderwidth 5
     ttk::combobox $c.tok.listCert -textvariable nickCert -state readonly -values $::listx509
@@ -9888,7 +9932,7 @@ proc func_page4 {c} {
   grid $c.lfr2.rb4 -row 3 -column 0 -sticky w -padx {4 0} -pady {0 4}
   grid $c.lfr2.rb5 -row 4 -column 0 -sticky w -padx {4 0} -pady {0 4}
   grid $c.lfr2.rb6 -row 5 -column 0 -sticky w -padx {4 0} -pady {0 4}
-  ttk::button  $c.b3 -command {::workOpCertP11 $opcertp11} -text "Выполнить операцию"
+  ttk::button  $c.b3 -command {::workOpCertP11 ".fn4" $opcertp11} -text {Выполнить операцию}
     pack $c.lfr2 -fill both -side top -padx 10
     pack $c.b3 -fill both -side top -padx 10
 }
@@ -9930,6 +9974,11 @@ proc func_page7 {c} {
 	{{PKCS12} {.p12}}
 	{{All Files} *}
     }
+#  set corig $c
+  frame $c.fratext -borderwidth 0 -relief flat
+  pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
+  set c "$c.fratext"
+
     labelframe $c.tok -text "Выберите токен PKCS11"  -borderwidth 5
     ttk::combobox $c.tok.listTok -textvariable ::nickTok -values $::listtok
     set ::nickTok [lindex $::listtok 0]
@@ -10040,10 +10089,13 @@ proc func_page7 {c} {
     grid $c.lfr1.rb3 -row 0 -column 0 -columnspan 1 -sticky wens -padx {4 0} -pady {0 2}
     grid $c.lfr1.ch1 -row 0 -column 1 -columnspan 1 -sticky wnse -padx {4 0} -pady {0 2}
     pack $c.lfr1 -fill both -side top -padx 10
-    ttk::button  $c.b3 -command {::workOpP12 } -text "Выполнить операцию"
+    
+    set cmd "ttk::button  $c.b3 -command {::workOpP12 $c} -text {Выполнить операцию}"
+    set cmd [subst $cmd]
+    eval $cmd
     pack $c.b3 -side top -anchor nw  -padx 5 -pady 4 
 
-    if {$c == ".fn7"} {
+    if {$c == ".fn7.fratext"} {
 	trace variable pfx_fn w trace_pfx
     }
 }
@@ -10885,25 +10937,26 @@ proc ::updateobj {w} {
   if {$ret != 0} {
 	return
   }
-  set c $w
+  set c $w.fratext
   $c.fratext.text delete 1.0 end
   set ::listObjs {}
   $c.frhd.lobj configure -values $::listObjs
   set ::handleObj [lindex $::listObjs 0]
   catch {::pki::pkcs11::logout $::handle $::slotid_tek}
-  wm title .topPinPw "Токен: $::slotid_teklab"
-wm state . withdraw
-  wm state .topPinPw normal
-  wm state .topPinPw withdraw
-  wm state .topPinPw normal
-  raise .topPinPw
-  grab .topPinPw
-  focus .topPinPw.labFrPw.entryPw
-  set yespass ""
-  vwait yespas
-  grab release .topPinPw
-wm state . normal
-  #Ввод пароля
+#  wm title .topPinPw "Токен: $::slotid_teklab"
+    #Ввод PIN-кода
+    pack forget $w.
+    place .topPinPw -in .fn6 -relx 0.0 -rely 0.27 -relwidth 1.0
+#    pack .topPinPw -in .fn1 -side top
+    after 100
+    update
+    focus .topPinPw.labFrPw.entryPw
+    set yespass ""
+    vwait yespas
+    place forget .topPinPw
+#    pack forget .topPinPw
+    pack $w -side bottom
+    #Ввод пароля
   if { $yespas == "no" } {
     return 0
   }
@@ -11000,6 +11053,12 @@ proc func_page6 {w} {
     pack $w.tok.listTok -side left  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
     pack $w.tok.updateTok -side right -padx {0 5} -pady 0 -expand 0 -fill none
     pack $w.tok -fill x -side top -padx 10 -pady 4
+#Общий фрейм для place
+  frame $w.fratext -borderwidth 0 -relief flat
+  pack $w.fratext  -anchor center -expand 1 -fill both -side top
+  set worig $w
+  set w "$w.fratext"
+#####################
 
   frame $w.fratext -borderwidth 0 -relief flat
   text $w.fratext.text -yscrollcommand [list $w.fratext.scr set]  \
@@ -11015,7 +11074,7 @@ proc func_page6 {w} {
   ttk::combobox $w.frhd.lobj -textvariable ::handleObj -values $::listObjs -takefocus {}   -style TCombobox
   #    -state readonly
 
-  set cmd "ttk::button $w.frhd.butdel -text {Удалить объект}  -command {::deleteObject $w} -style My.TButton -padding 1"
+  set cmd "ttk::button $w.frhd.butdel -text {Удалить объект}  -command {::deleteObject $worig} -style My.TButton -padding 1"
   set cmd [subst $cmd]
   eval $cmd 
 
@@ -11103,7 +11162,7 @@ if {$drawerCNT == 12} {
     canvas $fr.can -borderwidth 0 -height $hret -width $::scrwidth -relief flat
 #Мостим холст плиткой 
     createtile "$fr.can"  $tile
-    pack $fr.can  -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0
+    pack $fr.can  -anchor center -expand 1 -fill both -side bottom  -padx 0 -pady 0
 
     if {$titul != "" } {
 	set allfunc $titul
@@ -11265,8 +11324,6 @@ if {$drawerCNT == 12} {
 	}
     }
 }
-#Create Widget for enter PIN or Password
-page_password
 #Создаем стартовую страницу
 ttk::frame .fr$i -pad 0 -padding 0
 #frame .fr$i -padx 0 -relief flat -bd 0
@@ -11328,6 +11385,8 @@ if {$::typetlf} {
 
 #page_func ".fr$i" voda "Функционал" "but"
 page_func ".fr$i" newtile "Функционал" "but"
+#Create Widget for enter PIN or Password
+page_password
 #ЧАСЫ СТАРТ
 proc hands {} {
     global ttt
