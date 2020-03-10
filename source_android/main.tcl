@@ -1290,7 +1290,7 @@ proc butImg {img} {
 #		    if {$date == ""} {
 #			set date "31.12.2999"
 #		    }
-		    tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию:\n$::slotid_teklab\n"
+		    tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab\n"
 #		    tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию:\n$::slotid_teklab\nЛицензия до $date"
 		    set cloud 1
 		}
@@ -1391,7 +1391,7 @@ proc butImg {img} {
 		    tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует библиотека"
 		}
 		0 {
-		    tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию:\n$::slotid_teklab\n"
+		    tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab\n"
 		    set other 1
 		}
 		1	{
@@ -1469,7 +1469,7 @@ proc butImg {img} {
 		if {$date == ""} {
 		    set date "31.12.2999"
 		}
-		tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию:\n$::slotid_teklab\nЛицензия до $date"
+		tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab\nЛицензия до $date"
 	    }
 	    1	{
 		tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует подключенный токен"
@@ -1652,8 +1652,8 @@ set hc [lindex 4]
 }
 
 proc exitPKCS {} {
-    set answer [tk_dialog .dialog2 "Конец работы" "Вы действительно\nхотите выйти?" question 0 "Да" "Нет" ]
-    if {$answer == 0} {
+    set answer [tk_messageBox -title "Конец работы" -icon question -message "Вы действительно\nхотите выйти?" -type yesno]
+    if {$answer == "yes"} {
       exit
     }
 }
@@ -10438,7 +10438,7 @@ proc licinstall {} {
 		if {$date == ""} {
 		    set date "31.12.2999"
 		}
-		tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию:\n$::slotid_teklab\nЛицензия до $date"
+		tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab\nЛицензия до $date"
 	    }
 	    1	{
 		tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует подключенный токен"
@@ -11358,39 +11358,10 @@ ttk::frame .fr$i -pad 0 -padding 0
     set but(7) "Работаем с PKCS12/PFX" 
     set but(8) "Самоподписанный сертификат"
     set but(9) "Об Утилите/Дистрибутивы" 
-    set but(10) "Подключнение Токенов PKCS#11"
+    set but(10) "Подключение Токенов PKCS#11"
     set but(11) "Конфигурировние токена"
 #    set but(12) "Просмотр ASN1-структуры" 
 #parray but
-if {0} {
-set i2 0
-    set but($i2) "Стартовая страница" 
-incr i2
-    set but($i2) "Подписать документ"
-incr i2
-    set but($i2) "Работаем с ЭП (PKCS7)" 
-incr i2
-    set but($i2) "Запрос на сертификат" 
-incr i2
-    set but($i2) "Просмотр запроса/сертификата" 
-incr i2
-    set but($i2) "Список криптомеханизмов"
-incr i2
-    set but($i2) "Объекты токена" 
-incr i2
-    set but($i2) "Работаем с PKCS12/PFX" 
-incr i2
-    set but($i2) "Самоподписанный сертификат"
-incr i2
-    set but($i2) "Об Утилите/Дистрибутивы" 
-incr i2
-    set but($i2) "Подключнение Токенов PKCS#11"
-incr i2
-    set but($i2) "Конфигурировние токена"
-incr i2
-    set but($i2) "Просмотр ASN1-структуры" 
-parray but
-}
 
 if {$::typetlf} {
 	scaleImage voda 3 2
@@ -11508,7 +11479,10 @@ if {$::typetlf} {
 }
 #Всплывающая информация
 set tinfo "\n\tПодождите!\nИдет проверка облачного токена!\n"
-label .linfo -relief groove -bd 6 -fg blue  -text $tinfo -padx 0 -padx 3 -pady 3 -font "helvetica 8 bold italic" -bg #eff0f1 -justify left -wraplength $::scrwidth
-
+if {$::typetlf} {
+    label .linfo -relief groove -bd 10 -fg blue  -text $tinfo -padx 18 -pady 6 -font "helvetica 8 bold italic" -bg #eff0f1 -justify left -wraplength $::scrwidth
+} else {
+    label .linfo -relief groove -bd 3 -fg blue  -text $tinfo -padx 6 -pady 6 -font "helvetica 8 bold italic" -bg #eff0f1 -justify left -wraplength $::scrwidth
+}
 ::updatetok
 #ЧАСЫ КОНЕЦ
