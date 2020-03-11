@@ -646,6 +646,85 @@ if {[file exists $::libcloud]} {
     set ::libcloud $mm
   }
 }
+
+proc roundRect { w x0 y0 x3 y3 radius text  args } {
+#puts "$w $x0 $y0 $x3 $y3 $radius $text"
+##    canvas $w.c -width [expr $x3 - $x0] -height [expr $y3 - $y0 + 100] -relief flat -bd 0  -borderwidth 0 -bg snow
+    set r [winfo pixels $w $radius]
+    set d [expr { 2 * $r }]
+    # Make sure that the radius of the curve is less than 3/8
+    # size of the box!
+    set maxr 0.75
+
+    if { $d > $maxr * ( $x3 - $x0 ) } {
+        set d [expr { $maxr * ( $x3 - $x0 ) }]
+    }
+    if { $d > $maxr * ( $y3 - $y0 ) } {
+        set d [expr { $maxr * ( $y3 - $y0 ) }]
+    }
+set d $radius
+    set x1 [expr { $x0 + $d }]
+    set x2 [expr { $x3 - $d }]
+    set y1 [expr { $y0 + $d }]
+    set y2 [expr { $y3 - $d }]
+#puts "x1=$x1 x2=$x2 y1=$y1 y2=$y2 d=$d"
+#puts "x0=$x0 x3=$x3 y0=$y0 y3=$y3 rd=$radius"
+
+
+    set cmd [list $w.can create polygon]
+    lappend cmd $x0 $y0
+#puts "$x0 $y0"
+    lappend cmd $x1 $y0
+#puts "$x1 $y0"
+    lappend cmd $x2 $y0
+#puts "$x2 $y0"
+    lappend cmd $x3 $y0
+#puts "$x3 $y0"
+    lappend cmd $x3 $y1
+#puts "$x3 $y1"
+    lappend cmd $x3 $y2
+#puts "$x3 $y2"
+    lappend cmd $x3 $y3
+#puts "$x3 $y3"
+    lappend cmd $x2 $y3
+#puts "XA  $x2 $y3"
+
+    lappend cmd $x1 $y3
+#puts "$x1 $y3"
+
+    lappend cmd $x0 $y3
+#puts "$x0 $y3"
+    lappend cmd $x0 $y2
+#puts "$x0 $y2"
+    lappend cmd $x0 $y1
+#puts "$x0 $y1"
+    lappend cmd -smooth 1
+#################################################################
+    set cmd1 [list $w.can create polygon]
+    set df [expr $d / 2]
+    set yf [expr $y3 + $df] 
+    set xf [expr ($x3 - $x0) / 2 + $x0 ]
+
+if {1} {
+    lappend cmd1 [expr $xf + $df] $y3
+    lappend cmd1 [expr $xf + $df - $df] [expr $y3 + $df * 2]
+    lappend cmd1 [expr $xf - $df] $y3
+    lappend cmd1 [expr $xf - $df] $y3
+}
+eval $cmd1 $args
+eval $cmd $args
+set i 2
+array set aa $args
+#parray aa
+#Высота строки
+set yfont [font metrics TkDefaultFont -linespace]
+
+$w.can create text [expr $x0 + $yfont ] [expr $y0 + $yfont] -anchor nw -text "$text" -fill navy  -tag $aa(-tag)
+
+    return "$w.can"
+ }
+ 
+
 #---------------------------------------------------------------------------
 # asnT61String: encode tcl string as UTF8 String
 #----------------------------------------------------------------------------
@@ -1273,39 +1352,64 @@ proc butImg {img} {
 	set cloud 0
 	set savelib $::pkcs11_module
 	if {![file exists $::libcloud]} {
-	    tk_messageBox -title "Облачный токен" -icon info -message "В настоящее время у вас нет облачного токена."
+#	    tk_messageBox -title "Облачный токен" -icon info -message "В настоящее время у вас нет облачного токена."
+set tinfo "В настоящее время у вас \nнет облачного токена.\nНеобходимого его регистрация"
 	} else {
 	    set ::pkcs11_module $::libcloud
-	    place .linfo -in .fr1 -relx 0.05 -rely 0.4
+#Высота строки
+set yfont [font metrics TkDefaultFont -linespace]
+#Высота виджеты = высота строки * кол-во строк (\n)
+set y1 [expr $yfont * 5]
+#Центрирование инф. окна по Y
+set yoff [expr $::ycloud -  [expr $yfont * 7]]
+#Отображаемый текст
+set tinfo "\tПодождите!\nИдет проверка облачного токена!\n"
+#Длина строки 
+set x1 [font measure TkDefaultFont "Идет проверка облачного токена!"]
+#Ширина инф. окна
+set x1 [expr $x1 + 2 * $yfont]
+#Центрирование инф. окна по X
+set xoff [expr ($::scrwidth - $x1) / 2]
+set radius [expr $::scrwidth / 10]
+set round [roundRect  .fr1 $xoff $yoff [expr $x1 + $xoff ] [expr $y1 + $yoff] $radius "$tinfo"   -fill "white smoke" -tag ::rect]
 	    after 100
 	    update
 	    set ret [::updatetok]
+$round delete ::rect
+$round delete ::tt
 	    place forget .linfo
 	    switch -- $::pkcs11_status {
 		-1	{
-		    tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует библиотека"
+#		    tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует библиотека"
+set tinfo "\nОтсутствует библиотека\n"
 		}
 		0 {
 #		    set date [dateLIC]
 #		    if {$date == ""} {
 #			set date "31.12.2999"
 #		    }
-		    tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab\n"
+set tinfo "Токен готов к использованию.\nМетка облачного токена:\n\t$::slotid_teklab\n"
+#		    tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab\n"
 #		    tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию:\n$::slotid_teklab\nЛицензия до $date"
 		    set cloud 1
 		}
 		1	{
-		    tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует подключенный токен"
+#		    tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует подключенный токен"
+set tinfo "\nОтсутствует подключенный токен\n"
 		}
 		2  {
 #puts "::pkcs11_status=$::pkcs11_status \nret=$ret"
-		    tk_messageBox -title "Используемый токен"   -icon info -message "Требуется инициализация токена.\nДля инициализации токена перейдите\nна страницу\n\"Конфигурирование токена\""
+#		    tk_messageBox -title "Используемый токен"   -icon info -message "Требуется инициализация токена.\nДля инициализации токена перейдите\nна страницу\n\"Конфигурирование токена\""
 		    set cloud 1
+set tinfo "Требуется инициализация токена.\nДля инициализации токена \nперейдите на страницу\n\"Конфигурирование токена\""
 		}
 		default  {
-		    tk_messageBox -title "Используемый токен"   -icon info -message "Неизвестная ошибка.\nПодключитесь к облаку" 
+#		    tk_messageBox -title "Используемый токен"   -icon info -message "Неизвестная ошибка.\nПодключитесь к облаку" 
+set tinfo "\nНеизвестная ошибка.\nПодключитесь к облаку\n"
 		}
 	    }
+#after 4000 [list $round delete ::tt]
+
 	}
 	if {!$cloud} {
 	    set ::pkcs11_module $savelib
@@ -1328,6 +1432,34 @@ proc butImg {img} {
 	} else {
 	    set ::tektoken "cloud"
 	}
+set ltinfo [split $tinfo "\n"]
+#Вычисляем максимальныю длину текста
+	set x1 1
+	foreach ss $ltinfo {
+	    set strWidthPx [font measure TkDefaultFont $ss]
+	    if { $strWidthPx > $x1 } {
+    		set x1 $strWidthPx
+	    }
+	}
+
+set lentinfo [llength [split $tinfo "\n"]]
+#puts "lentinfo=$lentinfo"
+#Высота строки
+set yfont [font metrics TkDefaultFont -linespace]
+#Центрирование инф. окна по Y
+set yoff [expr $::ycloud -  [expr $yfont * ($lentinfo + 4)]]
+#set tinfo "Токен готов к использованию.\nМетка облачного токена:\n\t$::slotid_teklab\n"
+#set x1 [font measure TkDefaultFont "Токен готов к использованию."]
+set x1 [expr $x1 + 2 * $yfont]
+set xoff [expr ($::scrwidth - $x1) / 2]
+#Высота виджеты = высота строки * кол-во строк (\n)
+set y1 [expr $yfont * ($lentinfo + 2)]
+set radius [expr $::scrwidth / 10]
+set round [roundRect  .fr1 $xoff $yoff [expr $x1 + $xoff ] [expr $yoff + $y1] $radius "$tinfo" -fill "white smoke" -tag ::rect1]
+set cmd "$round bind ::rect1 <1>  {$round delete ::rect1}"
+set cmd [subst $cmd]
+eval $cmd
+after 5000 [list $round delete ::rect1]
     } elseif {$img == "hw"} {
 	global env
 	set typesX11 {
@@ -1399,7 +1531,7 @@ proc butImg {img} {
 		}
 		2  {
 #puts "::pkcs11_status=$::pkcs11_status \nret=$ret"
-		    tk_messageBox -title "Используемый токен"   -icon info -message "Требуется инициализация токена.\nДля инициализации токена перейдите\nна страницу\n\"Конфигурирование токена\""
+		    tk_messageBox -title "Используемый токен"   -icon info -message "Требуется инициализация токена.\nДля инициализации токена \nперейдите на страницу\n\"Конфигурирование токена\""
 		    set other 1
 		}
 		default  {
@@ -1437,6 +1569,8 @@ proc butImg {img} {
 	} else {
 	    set ::pkcs11_module "./libls11sw2016.so"
 	}
+if {$::tektoken != "sw"} {
+
 	set fr $::rfr
 	set x1 $::rx1
 	set y1 $::ry1
@@ -1458,7 +1592,7 @@ proc butImg {img} {
 		set x2 [expr $x1 + $sz]
 		set y2 [expr $y1 + $sz]
 	    create_rectangle $fr.can $::tektoken $x1 $y1 $x2 $y2  "skyblue" 0.1 $wd "#58a95a"
-
+}
 	set ret [::updatetok]
 	switch -- $::pkcs11_status {
 	    -1	{
@@ -1469,22 +1603,52 @@ proc butImg {img} {
 		if {$date == ""} {
 		    set date "31.12.2999"
 		}
-		tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab\nЛицензия до $date"
+#		tk_messageBox -title "Используемый токен" -icon info -message "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab\nЛицензия до $date"
+set tinfo "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab\nЛицензия до $date"
 	    }
 	    1	{
 		tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует подключенный токен"
 	    }
 	    2  {
 #puts "::pkcs11_status=$::pkcs11_status \nret=$ret"
-		tk_messageBox -title "Используемый токен"   -icon info -message "Требуется инициализация токена.\nДля инициализации токена перейдите\nна страницу\n\"Конфигурирование токена\""
+#		tk_messageBox -title "Используемый токен"   -icon info -message "Требуется инициализация токена.\nДля инициализации токена перейдите\nна страницу\n\"Конфигурирование токена\""
+set tinfo "Требуется инициализация токена.\nДля инициализации токена \nперейдите на страницу\n\"Конфигурирование токена\""
 	    }
 	    3  {
-		tk_messageBox -title "Используемый токен"   -icon info -message "Нет лицензии на токен.\nЗапрос на лицензию LIC.REQ хранится в папке:\n$::myHOME\n" \
-		    -detail "Для получения и установки лицензии\n перейдите на вкладку \"Конфигурирование токенов\""
+set tinfo "Нет лицензии на токен.\nЗапрос на лицензию LIC.REQ \nхранится в папке:\n$::myHOME\nДля получения и установки лицензии\n перейдите на вкладку \n\"Конфигурирование токенов\""
+#		tk_messageBox -title "Используемый токен"   -icon info -message "Нет лицензии на токен.\nЗапрос на лицензию LIC.REQ хранится в папке:\n$::myHOME\n" \
+#		    -detail "Для получения и установки лицензии\n перейдите на вкладку \"Конфигурирование токенов\""
 	    }
 	}
 	set ::tektoken "sw"
-#wm state . normal
+set ltinfo [split $tinfo "\n"]
+#Вычисляем максимальныю длину текста
+	set x1 1
+	foreach ss $ltinfo {
+	    set strWidthPx [font measure TkDefaultFont $ss]
+	    if { $strWidthPx > $x1 } {
+    		set x1 $strWidthPx
+	    }
+	}
+
+set lentinfo [llength [split $tinfo "\n"]]
+puts "lentinfo=$lentinfo"
+#Высота строки
+set yfont [font metrics TkDefaultFont -linespace]
+#Центрирование инф. окна по Y
+set yoff [expr $::ysw -  [expr $yfont * ($lentinfo + 4)]]
+#set tinfo "Токен готов к использованию.\nМетка облачного токена:\n\t$::slotid_teklab\n"
+#set x1 [font measure TkDefaultFont "Токен готов к использованию."]
+set x1 [expr $x1 + 2 * $yfont]
+set xoff [expr ($::scrwidth - $x1) / 2]
+#Высота виджеты = высота строки * кол-во строк (\n)
+set y1 [expr $yfont * ($lentinfo + 2)]
+set radius [expr $::scrwidth / 10]
+set round [roundRect  .fr1 $xoff $yoff [expr $x1 + $xoff ] [expr $yoff + $y1] $radius "$tinfo" -fill "white smoke" -tag ::rect2]
+set cmd "$round bind ::rect2 <1>  {$round delete ::rect2}"
+set cmd [subst $cmd]
+eval $cmd
+after 5000 [list $round delete ::rect2]
     } else {
 	tk_messageBox -title "Кнопка" -icon info -message "Нажали=$img" -detail "::screenwidth=$::scrwidth\n::screenheight=$::scrheight" -parent .
     }
@@ -1652,10 +1816,28 @@ set hc [lindex 4]
 }
 
 proc exitPKCS {} {
-    set answer [tk_messageBox -title "Конец работы" -icon question -message "Вы действительно\nхотите выйти?" -type yesno]
-    if {$answer == "yes"} {
-      exit
-    }
+#Высота строки
+    set yfont [font metrics TkDefaultFont -linespace]
+#Центрирование инф. окна по Y
+    set yoff [expr $::yend -  [expr $yfont * 4]]
+    set tinfo "Завершить приложение.\n"
+    set x1 [font measure TkDefaultFont "Завершить приложение."]
+    set x1 [expr $x1 + 2 * $yfont]
+    set xoff [expr ($::scrwidth - $x1) / 2]
+#Высота виджеты = высота строки * кол-во строк (\n)
+    set y1 [expr $yfont * 3]
+    set radius [expr $::scrwidth / 16]
+    set round [roundRect  .fr0 $xoff $yoff [expr $x1 + $xoff ] [expr $yoff + $y1] $radius "$tinfo" -fill "white smoke" -tag ::rectend]
+#set lc "bind $c.fscr.viewscr <Enter> {.helpview configure -text \"Просмотр запроса\";place .helpview -in $c.fscr.e1 -relx 0.77 -rely 1.0}"
+    set cmd "$round bind ::rectend <1>  {$round delete ::rectend; exit}"
+    set cmd [subst $cmd]
+    eval $cmd
+    after 5000 [list $round delete ::rectend]
+
+#    set answer [tk_messageBox -title "Конец работы" -icon question -message "Вы действительно\nхотите выйти?" -type yesno]
+#    if {$answer == "yes"} {
+#      exit
+#    }
 }
 #Создаем заголовок титульной страницы с иконкой продукта и его названием
 set name_product "CryptoArmPKCS-A" 
@@ -1854,6 +2036,7 @@ set widthrect [expr $ha / 4]
 #    set S3 [$fr.can style create -stroke skyblue -fill  $g5 -strokewidth $wd  -fillopacity 0.6]
 #    set im1 [$fr.can create prect $x1 $y1 $x2 $y2 -rx $rr -style $S3]
     set im1 [create_rectangle $fr.can "but3" $x1 $y1 $x2 $y2 "green" 0.5 $wd "skyblue"]
+set ::yend $y1
     set blogo [$fr.can bbox $im1]
     $fr.can bind $im1 <ButtonPress-1> {exitPKCS}
     set by2 [lindex $blogo 3]
@@ -10445,7 +10628,7 @@ proc licinstall {} {
 	    }
 	    2  {
 #puts "::pkcs11_status=$::pkcs11_status \nret=$ret"
-		tk_messageBox -title "Используемый токен"   -icon info -message "Требуется инициализация токена.\nДля инициализации токена перейдите\nна страницу\n\"Конфигурирование токена\""
+		tk_messageBox -title "Используемый токен"   -icon info -message "Требуется инициализация токена.\nДля инициализации токена \nперейдите на страницу\n\"Конфигурирование токена\""
 	    }
 	    3  {
 		tk_messageBox -title "Используемый токен"   -icon info -message "Нет лицензии на токен.\nЗапрос на лицензию LIC.REQ хранится в папке:\n$::myHOME\n" \
@@ -11315,18 +11498,21 @@ if {$drawerCNT == 12} {
 		set x2 [expr $x1 + $sz]
 		set y2 [expr $y1 + $sz]
 		set imt1 [create_rectangle $fr.can "sw" $x1 $y1 $x2 $y2  "#58a95a" 0.9 $wd "snow"]
+set ::ysw [expr {($y1 + $y2) / 2 }]
     		$fr.can create text $x2 [expr {($y1 + $y2) / 2 }] \
 			-anchor w -font fontTEMP_drawer -text " - программный токен" 
 		set y1 [expr {$yLineLocPx + $sz + $sz / 2}]
 		set x2 [expr $x1 + $sz]
 		set y2 [expr $y1 + $sz]
 		set imt2 [create_rectangle $fr.can "cloud" $x1 $y1 $x2 $y2  "skyblue" 0.1 $wd "#58a95a"]
+set ::ycloud [expr {($y1 + $y2) / 2 }]
     		$fr.can create text $x2 [expr {($y1 + $y2) / 2 }] \
 			-anchor w -font fontTEMP_drawer -text " - облачный токен" 
 		set y1 [expr {$yLineLocPx + $sz * 2 + $sz }]
 		set x2 [expr $x1 + $sz]
 		set y2 [expr $y1 + $sz]
 		set imt3 [create_rectangle $fr.can "hw" $x1 $y1 $x2 $y2  "skyblue" 0.1 $wd "#58a95a"]
+set ::yhw [expr {($y1 + $y2) / 2 }]
     		$fr.can create text $x2 [expr {($y1 + $y2) / 2 }] \
 			-anchor w -font fontTEMP_drawer -text " - другой токен" 
 	    } else {
