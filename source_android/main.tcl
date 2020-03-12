@@ -1322,6 +1322,8 @@ proc butImg {img} {
     } elseif {$img == "but1"} {
 	pack forget  .fr1
 	pack .fr0 -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
+    } elseif {$img == "but3"} {
+	exitPKCS
     } elseif {$img == "img1"} {
 	if {$::typetlf} {
 	    borg activity android.intent.action.VIEW http://soft.lissi.ru text/html
@@ -1669,6 +1671,7 @@ proc create_rectangle  {canv img x1 y1 x2 y2 color alfa {wbd 0} {colorline black
     image create photo $img -data $dimg -format "png -alpha $alfa"
 #    $img put [list $rgb1] -to 0 0 [expr {$x2 - $x1}] [expr {$y2 -$y1}]
 #Отображаем цветной прямоугольник
+if {1} {
     set imgr [$canv create image $x1 $y1 -image $img -anchor nw] 
     set cc [subst {butImg $img}]
     $canv bind $imgr <ButtonPress-1> $cc
@@ -1677,6 +1680,7 @@ proc create_rectangle  {canv img x1 y1 x2 y2 color alfa {wbd 0} {colorline black
 	set item [$canv create rect $x1 $y1 $x2 $y2 -outline $colorline -width $wbd ]
 	$canv bind $item <ButtonPress-1> $cc
     }
+}
    return $imgr
 }
 
@@ -11500,21 +11504,25 @@ if {$drawerCNT == 12} {
 		set imt1 [create_rectangle $fr.can "sw" $x1 $y1 $x2 $y2  "#58a95a" 0.9 $wd "snow"]
 set ::ysw [expr {($y1 + $y2) / 2 }]
     		$fr.can create text $x2 [expr {($y1 + $y2) / 2 }] \
-			-anchor w -font fontTEMP_drawer -text " - программный токен" 
+			-anchor w -font fontTEMP_drawer -text " - программный токен"  -tag sw
+		$fr.can bind sw <ButtonPress-1> {butImg sw}
 		set y1 [expr {$yLineLocPx + $sz + $sz / 2}]
 		set x2 [expr $x1 + $sz]
 		set y2 [expr $y1 + $sz]
 		set imt2 [create_rectangle $fr.can "cloud" $x1 $y1 $x2 $y2  "skyblue" 0.1 $wd "#58a95a"]
 set ::ycloud [expr {($y1 + $y2) / 2 }]
     		$fr.can create text $x2 [expr {($y1 + $y2) / 2 }] \
-			-anchor w -font fontTEMP_drawer -text " - облачный токен" 
+			-anchor w -font fontTEMP_drawer -text " - облачный токен" -tag cloud
+		$fr.can bind cloud <ButtonPress-1> {butImg cloud}
+
 		set y1 [expr {$yLineLocPx + $sz * 2 + $sz }]
 		set x2 [expr $x1 + $sz]
 		set y2 [expr $y1 + $sz]
 		set imt3 [create_rectangle $fr.can "hw" $x1 $y1 $x2 $y2  "skyblue" 0.1 $wd "#58a95a"]
 set ::yhw [expr {($y1 + $y2) / 2 }]
     		$fr.can create text $x2 [expr {($y1 + $y2) / 2 }] \
-			-anchor w -font fontTEMP_drawer -text " - другой токен" 
+			-anchor w -font fontTEMP_drawer -text " - другой токен" -tag hw
+		$fr.can bind hw <ButtonPress-1> {butImg hw}
 	    } else {
     		$fr.can create line $xLocTextPx $yLineLocPx \
         	[expr $drawerWidthPx + $xLocTextPx] $yLineLocPx \
