@@ -11173,6 +11173,16 @@ proc func_page5 {w} {
 proc ::deleteObject {w } {
   global yespas
   global pass
+    if {![info exists ::handleObj]} {
+	tk_messageBox -title "Удалить объект" -icon info -message "Список объектов не загружен" 
+        return
+    }
+    if {$::handleObj == ""} {
+	tk_messageBox -title "Удалить объект" -icon info -message "Список объектов пуст" 
+        return
+    }
+    
+
   puts "HANDLE=$::handleObj"
 
   set aa [dict create pkcs11_handle $::handle pkcs11_slotid $::slotid_tek]
