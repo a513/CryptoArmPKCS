@@ -51,23 +51,6 @@ kJKgmIRBzKK5fKQg6BCSoZQgSWstG78umtXj64fxeRja30YFgIloKpEcADoA1HujzF2jpzZszXrm5le9
 TCgncFeAaiRYsab74dhXFSJ/hxao+l8IOAAg45tX7AKwet7r+eeuxg7wOR6PKUgpZduGI731umUaUlfmf6YUcRpZVWZYhchgTQ8byqZIxOMij3X9YjUShvhh14WNkMkh
 n9c4vDj9fvba49E7548O4rui+YfmKgO/ZyDpOyd8jMf4/uPfroBMXGDKEUEAAAAASUVORK5CYII=}
 
-image create photo tiletitul -data {
-iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAC53pUWHRSYXcgcHJvZmlsZSB0eXBlIGV4aWYAAHja7ZddcuwoDIXfWcUsAUkIwXL4rbo7mOXPARN3upM7
-VZm6D/PQUDZYBkmcD9OJG3//mu4vFMoSXFBLMcfoUUIOmQs6yV/lasmHfd+Fzys8P9nd/YJhErRyPcZxxhfY9THBwrHXZ7uzdvyk4+i8+HAoK/KK1k+Sx5HwZafz7PJJ
-qcRPyzlXPZN3ZP/1ORjE6Ap/wo6HkPjrfkWS6yq4CHcWXQNF0A9oC3rxq37ulu4bAe/ei36+Hbs85LgcfSwrvuh07KTf67dV+pwR8R2ZP2dkeof4ot+cPc05rtWVEB3k
-imdRH0vZPQyskFP2tIhquBR92zWjJl98A7WOpVbnKx4yMbSeFKhToUljt40aUgw82NAyN5ZtS2KcuW0YYVWabE6ydEmg0UBOFpc7F9px84qHYAmRO2EkE5wRZjxV92r4
-r/XJ0ZxrmxP5dGuFvHhtWaSxyK07RgEIzaOpbn3JXY1/LQusgKBumRMWWHy9XFSlx96SzVm8OgwN/vpeyPpxAIkQW5EMCQj4SKIUyRuzEUHHBD4FmbMEriBA6pQ7suSA
-fQ84iVdszDHaY1n5MuN4AQiVKAY0WQpghaAh4ntL2ELFqWhQ1aimSbOWKDFEjTFaXOdUMbFgatHMkmUrSVJImmKylFJOJXMWHGPqcsyWU865FAQtocBXwfgCQ+UqNVSt
-sVpNNdfSsH1aaNpis5ZabqVzl44jwPXYraeeexk0sJVGGDrisJFGHmVir02ZYeqM02aaeZab2qH6TO2V3L9To0ONN6g1zh7UYDb7cEHrONHFDMQ4EIjbIoANzYuZTxQC
-L3KLmc8sTnBuIUtdcDotYiAYBrFOutk9yP2Wm4O6P+XG35FzC92fIOcWuk/kvnL7hlov+7iVDWh9hdAUJ6Tg8xs9psKpjCZThl9d/D79pHU/nfB29Hb0dvR29Hb0dvR2
-9L93JBN/QGT8S/UPyVSTr3xQ9kUAAAGFaUNDUElDQyBwcm9maWxlAAB4nH2RPUjDUBSFT1tFkYqDEVQcMlRxsCAq4qhVKEKFUCu06mDy0j9o0pCkuDgKrgUHfxarDi7O
-ujq4CoLgD4iTo5Oii5R4X1JoEeOFx/s4757De/cBwVqJaVbbOKDptpmMx8R0ZlXseEUAAxAwij6ZWcacJCXgW1/31E11F+VZ/n1/VreatRgQEIlnmWHaxBvE05u2wXmf
-WGAFWSU+Jx4z6YLEj1xXPH7jnHc5yDMFM5WcJxaIxXwLKy3MCqZGPEUcUTWd8oNpj1XOW5y1UoU17slfGM7qK8tcpzWEOBaxBAkiFFRQRAk2orTrpFhI0nnMxz/o+iVy
-KeQqgpFjAWVokF0/+B/8nq2Vm5zwksIxoP3FcT6GgY5doF51nO9jx6mfAKFn4Epv+ss1YOaT9GpTixwBPdvAxXVTU/aAyx2g/8mQTdmVQrSCuRzwfkbflAF6b4GuNW9u
-jXOcPgApmlXiBjg4BEbylL3u8+7O1rn929OY3w91nHKofIvzKQAAAAlwSFlzAAAOxAAADsQBlSsOGwAAAAd0SU1FB+QBGRQqJW4w0VIAAAArSURBVEjH7c1BAQBABAAw
-rqDkYuhxJfhtBZY1HZdeHBMIBAKBQCAQCARbPtk3AkGMboaWAAAAAElFTkSuQmCC
-}
-
 image create photo newtile -data {
 iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAC5HpUWHRSYXcgcHJvZmlsZSB0eXBlIGV4aWYAAHja7ZZNkhshDIX3nCJHQBJCcBx+q3KDHD8PmrE9nkkq
 k8oiC0M1NGpaEu+jsd348X26byiUhV1QSzHH6FFCDpkLbpK/ytWTD7vdhc8jjN/Z3e0BwyTo5RrGceYX2PX+goVjr+/tztrxk46j8+DNoazIK1o/SR5Hwpedztjlk1KJ
@@ -1773,7 +1756,6 @@ image create photo logo_and -file [file join $mydir "imageme" "AndTk_inv_147x173
 image create photo svitok -file [file join $mydir "imageme" "blue_svitok.png"] -format "png -alpha 1.0"
 image create photo logo_awish -file [file join $mydir "imageme" "logo_awish_152x150.png"] -format "png -alpha 1.0"
 image create photo logobic -file [file join $mydir "imageme" "logo-bic_token_96x96.png"]
-image create photo voda -file [file join $mydir "imageme" "voda_400x800.png"]
 
 set ::padls 20
 set ::padlx 15
@@ -1935,7 +1917,6 @@ proc page_titul {fr  logo_manufacturer} {
     canvas $fr.can -borderwidth 0 -height $::scrheight  -width $::scrwidth -relief flat
 #Мостим холст плиткой 
     createtile "$fr.can"  "tileand"
-#    createtile "$fr.can"  "tiletitul"
 
     pack $fr.can  -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0
 #Вычисляем координаты для логотипа производителя
@@ -11537,7 +11518,6 @@ if {$drawerCNT == 12} {
 	    set cmd [subst "$cmd"]
 	    eval $cmd 
 	    set but1(0) "Возврат в основное меню"
-#	    page_func ".fn$drawerCNT" voda "$titul" "but1"
 	    frame .fn$drawerCNT.can
 	    set frret .fn$drawerCNT.can
 	    eval "frame $frret.sep -bg #a0a0a0 -height $::intpx2mm -relief groove -bd $::intpx2mm"
@@ -11633,11 +11613,6 @@ ttk::frame .fr$i -pad 0 -padding 0
 #    set but(12) "Просмотр ASN1-структуры" 
 #parray but
 
-if {$::typetlf} {
-	scaleImage voda 3 2
-}
-
-#page_func ".fr$i" voda "Функционал" "but"
 page_func ".fr$i" newtile "Функционал" "but"
 #Create Widget for enter PIN or Password
 page_password
@@ -11649,7 +11624,6 @@ update
     catch { .topclock.c delete withtag hands }
 
     # Compute seconds since midnight
-
     set s [expr { [clock seconds] - [clock scan 00:00:00] }]
 if {$::typetlf == 0} {
     # Angle of second hand
