@@ -1,11 +1,12 @@
 package require Tk
-#package require tkpath 0.3.0
 package require textutil
 package require http
 package require ip
 package require tls
 namespace import ::msgcat::mc
 
+#variable tk_strictMotif
+#set tk_strictMotif 1
 image create photo signattach -data {
 iVBORw0KGgoAAAANSUhEUgAAADAAAAAYCAYAAAC8/X7cAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAGXRFWHRDb21tZW50AENyZWF0ZWQgd2l0aCBHSU1QV4EOFwAABl9J
 REFUWIXtlVuMXVUZx///b629z9nnnDlzepte03QgOqEXg7GxTKtlKoqdGEqpFi/gBRJfjDRqNMEnqxIwiII8lFCVolQSBzqtlIJgaiu92GJra9NWZEpoxaYdsJ3bueyz
@@ -877,7 +878,6 @@ proc ::updatetok {} {
 #Отсутствует подключенный потен
 	set ::pkcs11_status 1
 #    set ::tokeninfo "Токены отсутствуют"
-#    tk_messageBox -title "Библиотека PKCS#11" -icon info -message "Токены отсутствуют\n"
     #Автоматическое обновление токенов
 #    after 10000 updatetok
     return 0
@@ -897,13 +897,12 @@ proc ::updatetok {} {
       set ::slotid_tek $slotid
       set ::slotid_teklab $lab
     }
-    if {$oldslot == $lab } {
+    if {$oldslot == $lab || $lab != "" } {
       set ::slotid_tek $slotid
       set ::slotid_teklab $lab
       set j $i
     }
-#    set cm [string first "CKF_USER_PIN_INITIALIZED" $slotflags]
-#tk_messageBox -title [mc "FLAGS"] -icon info -message "ЛИЦЕНЗИЯ=$slotflags"
+
     incr i
   }
   set ::nickTok [lindex $::listtok 0]
@@ -991,8 +990,6 @@ global env
     set userpath $env(EXTERNAL_STORAGE)
 
     set tokpath [file join $userpath ".LS11SW2016"]
-#file delete -force $tokpath
-#exit
 tk_messageBox -title "Проверка токена" -icon info -message "Токена существует????"
 
     if {![file exists $tokpath]} {
@@ -1014,10 +1011,6 @@ tk_messageBox -title "Проверка токена" -icon info -message "Ток
     	    close $fd
     	}
     } else {
-#set dd [file join $mydir "create_sw_token"]
-#set rc [file attributes  $dd -permissions 0755]
-#set rc [exec chmod  0755  $dd]
-#set rc [eval $dd]
 
 	set frnd [file join $tokpath "prng_start.bin"]
 tk_messageBox -title "Проверка токена" -icon info -message "Токена существует=$tokpath\n$frnd"
@@ -1296,7 +1289,7 @@ load $ltclpkcs11 Tclpkcs11
     set ::scrwidth [expr {int(75 * $px2mm)}]
 #    set ::scrwidth 370
 #Высота 140 mm
-    set ::scrheight [expr int(150 * $px2mm)]
+    set ::scrheight [expr int(160 * $px2mm)]
 #    set ::scrheight 670
 #    set ::scrheight 600
     wm minsize . $::scrwidth $::scrheight
@@ -1306,24 +1299,6 @@ load $ltclpkcs11 Tclpkcs11
     append geometr "+0+0"
     wm geometry . $geometr
 }
-#::updatetok
-
-proc infotoken {} {
-    set infotok "Работа с токенами будет\nдоступна в 2020 году.\nС Новым Годом!"
-    tk_messageBox -title "Токены PKCS11" -icon info -message "$infotok"  -parent . 
-}
-
-#  load $tclpkcs11 Tclpkcs11
-#load $lcc Lcc
-#load "Lcc.so" Lcc
-#load $lrnd Lrnd
-#set pkcs11id_hex "XAXAXA"
-#set pkcs11id_bin [lcc_sha1 "XAXAXA"]
-#binary scan $pkcs11id_bin H* pkcs11id_hex
-
-#tk_messageBox -title "Грузим Lcc/Lrnd" -icon info -message "Загрузили  Lcc/Lrnd\nXAXAXA" -detail "sha1=$pkcs11id_hex" -parent .
-#wm geometry . [winfo screenwidth .]x[winfo screenheight .]+0+0
-#update idletasks               ;# updates the full-screen
 
 wm attributes . -topmost yes   ;# stays on top - needed for Linux
                                ;# on Win9x, if =no, alt-tab will malfunction
@@ -1353,8 +1328,6 @@ proc dateLIC {} {
 }
 
 proc butImg {img} {
-
-
     if {$img == "but2"} {
 	pack forget  .fr0
 	pack .fr1 -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
@@ -1691,7 +1664,7 @@ set cmd [subst $cmd]
 eval $cmd
 after 5000 [list $round delete ::rect2]
     } else {
-	tk_messageBox -title "Кнопка" -icon info -message "Нажали=$img" -detail "::screenwidth=$::scrwidth\n::screenheight=$::scrheight" -parent .
+	tk_messageBox -title "Кнопка" -icon info -message "Нажали=$img" -detail "::screenwidth=$::scrwidth\n::screenheight=$::scrheight"
     }
 }
 
@@ -1789,6 +1762,7 @@ if {[tk windowingsystem] == "win32"}  {
 #Свиток опечатанный
 	scaleImage svitok 4
 	scaleImage creator_small 3
+
 	set ::padls 50
 	set ::padlx 75
 	set ::padly 50
@@ -1801,11 +1775,10 @@ if {[tk windowingsystem] == "win32"}  {
 
 }
 
-if {$::typetlf == 0} {
-    package provide ttk::theme::Breeze 0.6
-    source [file join $mydir breeze.tcl]
-    ttk::style theme use Breeze
-}
+package provide ttk::theme::Breeze 0.6
+source [file join $mydir breeze.tcl]
+ttk::style theme use Breeze
+
 source [file join $mydir "GostPfx.tcl"]
 source [file join $mydir "alloids.tcl"]
 
@@ -3674,7 +3647,7 @@ proc ::viewCert {type nick} {
   puts "type=$type"
   if {$type == "pkcs11"} {
     if {$nick == ""} {
-      tk_messageBox -title "Просмотр сертификата на токене" -icon info -message "Нет сертификатов"  -parent .
+      tk_messageBox -title "Просмотр сертификата на токене" -icon info -message "Нет сертификатов" 
       return
     }
     #    puts "arrayCer=$::arrayCer($nick)"
@@ -3708,7 +3681,7 @@ proc ::viewCert {type nick} {
   }
   if {$type == "pkcs12"} {
     if {$nick == ""} {
-      tk_messageBox -title "Просмотр сертификата из PKCS12" -icon info -message "Не выбран файл с \nконтейнером PKCS12"  -parent .
+      tk_messageBox -title "Просмотр сертификата из PKCS12" -icon info -message "Не выбран файл с \nконтейнером PKCS12" 
       return
     }
     aboutUtil .about 6 $nick
@@ -3721,13 +3694,13 @@ proc ::viewCSR {file type} {
   #type 1 - view csr; 7 - create certificate
   variable dir_crt
   if {$file == ""} {
-    tk_messageBox -title "Просмотр запроса на сертификат" -icon info -message "Не выбран файл с запросом на сертификат"  -parent .
+    tk_messageBox -title "Просмотр запроса на сертификат" -icon info -message "Не выбран файл с запросом на сертификат" 
     return
   }
   set mes ""
   if {$type == 7 } {
     if {$dir_crt == ""} {
-      tk_messageBox -title "Выпуск сертификата" -message "Не выбран каталог для хранения сертификатов и ключей." -icon error  -parent .
+      tk_messageBox -title "Выпуск сертификата" -message "Не выбран каталог для хранения сертификатов и ключей." -icon error 
       return
     }
     set mes "\nСертификат не может быть создан\n"
@@ -3739,13 +3712,13 @@ proc ::viewCSR {file type} {
 
 # array set csr_parse [::pki::pkcs::parse_csr_gost $data]
   if {[catch {array set csr_parse [::pki::pkcs::parse_csr_gost $data]} rc]} {
-    tk_messageBox -title "Просмотр запроса на сертификат" -icon error -message "$file" -detail "Выбранный файл не содержит запроса (parse_csr_gost) на сертификат\n$rc"  -parent .
+    tk_messageBox -title "Просмотр запроса на сертификат" -icon error -message "$file" -detail "Выбранный файл не содержит запроса (parse_csr_gost) на сертификат\n$rc"
     return
   }
   #    parray csr_parse
   if {$csr_parse(verify) != 1} {
                 	
-    tk_messageBox -title "Просмотр запроса на сертификат" -icon error -message "Запрос:\n$file $mes" -detail "Подпись запроса (parse_csr_gost) на сертификат не верна или не проверялась"  -parent .
+    tk_messageBox -title "Просмотр запроса на сертификат" -icon error -message "Запрос:\n$file $mes" -detail "Подпись запроса (parse_csr_gost) на сертификат не верна или не проверялась" 
     if {$type == 7 } {
       return
     }
@@ -3821,11 +3794,11 @@ proc ::sign_file {w typekey} {
   variable typesig
   variable doc_for_sign
   if {$doc_for_sign == "" } {
-    tk_messageBox -title "Подписать документ" -detail "Не выбран документ для подписания" -icon error  -parent .
+    tk_messageBox -title "Подписать документ" -message "Не выбран документ для подписания" -icon error
     return
   }
   if {$file_for_sign == "" } {
-    tk_messageBox -title "Подписать документ" -message "Не выбрана папка для хранения ЭП" -icon error  -parent .
+    tk_messageBox -title "Подписать документ" -message "Не выбрана папка для хранения ЭП" -icon error
     return
   }
 
@@ -3844,14 +3817,14 @@ proc ::sign_file {w typekey} {
   } elseif {$typekey == "pkcs12"} {
     set cert_hex $::certfrompfx
   } else {
-    tk_messageBox -title "Подписать документ" -message "Неизвестное хранилище ключа" -icon error  -parent .
+    tk_messageBox -title "Подписать документ" -message "Неизвестное хранилище ключа" -icon error 
     return
   }
   if {$cert_hex == ""} {
     if {$typekey == "pkcs11"} {
-      tk_messageBox -title "Подписать документ" -message "На токене отсутствует (не выбран) сертификат подписанта!" -icon error  -parent .
+      tk_messageBox -title "Подписать документ" -message "На токене отсутствует (не выбран) сертификат подписанта!" -icon error 
     } else {
-      tk_messageBox -title "Подписать документ" -message "Отсутствует контейнер PKCS12 подписанта"  -icon error  -parent .
+      tk_messageBox -title "Подписать документ" -message "Отсутствует контейнер PKCS12 подписанта"  -icon error  
     }
     return
   }
@@ -3860,7 +3833,7 @@ proc ::sign_file {w typekey} {
   set content [read $fd]
   close $fd
   if {$content == "" } {
-    tk_messageBox -title "Подписать документ" -message "Попытка подписать пустой документ:" -detail "\t$doc_for_sign" -icon error  -parent .
+    tk_messageBox -title "Подписать документ" -message "Попытка подписать пустой документ:" -detail "\t$doc_for_sign" -icon error 
     return
   }
   #puts "typesig=$typesig"
@@ -3888,7 +3861,7 @@ proc ::sign_file {w typekey} {
     set pass ""
                 	
     if { [pki::pkcs11::login $::handle $::slotid_tek $password] == 0 } {
-      tk_messageBox -title "Подписать документ" -message "Документ подписать не удалось" -detail "Неверный PIN-код" -icon error  -parent .
+      tk_messageBox -title "Подписать документ" -message "Документ подписать не удалось" -detail "Неверный PIN-код" -icon error 
       return
     }
     set password ""
@@ -3918,7 +3891,7 @@ proc ::sign_file {w typekey} {
       }
     }
     if {$i == 0 } {
-      tk_messageBox -title "Подписать документ" -message "Документ подписать не удалось" -detail "У сертификата \n$nickCert\n нет закрытого ключа" -icon error  -parent .
+      tk_messageBox -title "Подписать документ" -message "Документ подписать не удалось" -detail "У сертификата \n$nickCert\n нет закрытого ключа" -icon error 
       return
     }
   }
@@ -3952,7 +3925,7 @@ set waitsign 1
     return
   }
   if {$err != 0} {
-    tk_messageBox -title "Подписать документ" -message "Документ подписать не удалось" -detail "$err" -icon error  -parent .
+    tk_messageBox -title "Подписать документ" -message "Документ подписать не удалось" -detail "$err" -icon error 
   }
   if {$waitsign} {
     place forget .topclock
@@ -3976,12 +3949,12 @@ proc keyParam {w tpage key} {
     set defaultkey $wizDatacert(typekey)
     set defaultpar $wizDatacert(parkey)
   }
-  #tk_messageBox -title "Тип ключа" -icon info -message "defaultkey=$defaultkey\ndefaultpar=$defaultpar\nw=$w"  -parent .
+  #tk_messageBox -title "Тип ключа" -icon info -message "defaultkey=$defaultkey\ndefaultpar=$defaultpar\nw=$w" 
   #Ключ генерится на Lcc и хранится в файле keytok = 0
   if {$keytok == 1 } {
     set lists [listts $::handle]
     if {[llength $lists] == 0 } {
-      tk_messageBox -title "Тип ключа" -icon info -message "Токены отсутствуют" -detail "Установлена генерация ключей в Lcc\nКлюч будет сохранен в файле" -parent .
+      tk_messageBox -title "Тип ключа" -icon info -message "Токены отсутствуют" -detail "Установлена генерация ключей в Lcc\nКлюч будет сохранен в файле" 
       set wizDatacsr(keytok) 0
       set wizDatacert(keytok) 0
       return
@@ -4185,7 +4158,7 @@ proc loadocsp {urls reqoc} {
     }
     if {[catch { ::asn::asnGetSequence res res1 } ret] } {
       #	puts "BEDA=$res"
-      tk_messageBox -title "Load OCSP" -icon info -message "Не могу получить OCSP-ответ\n$res" -detail "$ret" -parent .
+      tk_messageBox -title "Load OCSP" -icon info -message "Не могу получить OCSP-ответ\n$res" -detail "$ret"
       return ""
     }
     #    ::asn::asnGetSequence res res1
@@ -4205,7 +4178,7 @@ proc loadocsp {urls reqoc} {
     #obr OCSP Basic Response
     if {$oiddata != $oidobr} {
       puts "Error oid=$oiddata"
-      tk_messageBox -title "Load OCSP" -icon info -message "Плохой oid=$oiddate\n" -detail "OK=$oidobr" -parent .
+      tk_messageBox -title "Load OCSP" -icon info -message "Плохой oid=$oiddate\n" -detail "OK=$oidobr"
       continue
     }
     ::asn::asnGetOctetString res3 derdata
@@ -5576,7 +5549,7 @@ proc saveCert { typesave cont} {
   global macos
   global myHOME
   if {$cont == "" } {
-    tk_messageBox -title "Экспорт" -icon info -message "Нечего экспортировать" -parent .
+    tk_messageBox -title "Экспорт" -icon info -message "Нечего экспортировать" 
     return
   }
 
@@ -5958,7 +5931,7 @@ if {0} {
     #Цепочка сертификатов и crl
     set unsignattrs [create_unsignattrs [list $cert_hex $certtst] $digest_algo]
     if {[llength $unsignattrs] == 1} {
-      tk_messageBox -title "Подписание документа" -icon info -message "Проблеиы с OSCP-сервером ($unsignattrs)" -parent .
+      tk_messageBox -title "Подписание документа" -icon info -message "Проблеиы с OSCP-сервером ($unsignattrs)" 
       return ""
     }
     foreach {lchain lchainref lcrl lcrlref} $unsignattrs {}
@@ -6469,11 +6442,11 @@ proc ::workOpCertP11 {w opnum} {
      puts "WORKOPCertP11:c=$c, w=$w, opnum=$opnum"
   set i 0
   if {$nickCert == ""} {
-    tk_messageBox -title "Работа с сертификатом" -icon error -message "Не выбран сертификат на токене" -parent .
+    tk_messageBox -title "Работа с сертификатом" -icon error -message "Не выбран сертификат на токене" 
     return
   }
   if {[llength $::certs_p11] < 1} {
-    tk_messageBox -title "Работа с сертификатом" -icon error -message "Сертификаты отсутствуют на токене" -parent .
+    tk_messageBox -title "Работа с сертификатом" -icon error -message "Сертификаты отсутствуют на токене" 
     return
   }
   set cert_derhex ""
@@ -6487,7 +6460,7 @@ proc ::workOpCertP11 {w opnum} {
   }
   #parray cert_parse_der
   if {$cert_derhex == ""} {
-    tk_messageBox -title "Работа с сертификатом" -icon error -message "Проблемы с сертификатом на токене" -parent .
+    tk_messageBox -title "Работа с сертификатом" -icon error -message "Проблемы с сертификатом на токене" 
     return
   }
 
@@ -6597,7 +6570,7 @@ proc ::workOpCert {w} {
 #    puts "WORKOP:c=$c"
     set i 0
     if {$cert_fn == ""} {
-	tk_messageBox -title "Работа с сертификатом" -icon error -message "Не выбран файл с сертификатом" -parent .
+	tk_messageBox -title "Работа с сертификатом" -icon error -message "Не выбран файл с сертификатом"
 	return
     }
     set fd [open $cert_fn]
@@ -6633,7 +6606,7 @@ proc ::workOpCert {w} {
 		return
 	    }
 	    if {$err != 1} {
-#		tk_messageBox -title [mc "Работа с сертификатом"] -icon error -message [mc "Сертификат не прошел проверку"] -parent .
+#		tk_messageBox -title [mc "Работа с сертификатом"] -icon error -message [mc "Сертификат не прошел проверку"] 
 		return
 	    }
 #DER в бинарнике
@@ -6842,7 +6815,7 @@ proc ::workOpP12 {w} {
   puts "WORKOpP12:top12=$top12;typesave=$ts12;w=$w"
   set i 0
   if {$::certfrompfx == ""} {
-    tk_messageBox -title "Работа с PKCS12" -icon error -message "Не выбран файл с контейнером" -parent .
+    tk_messageBox -title "Работа с PKCS12" -icon error -message "Не выбран файл с контейнером" 
     return
   }
   set cert_hex $::certfrompfx
@@ -6860,7 +6833,7 @@ proc ::workOpP12 {w} {
         return
       }
       if {$err != 1} {
-        #		tk_messageBox -title [mc "Работа с сертификатом"] -icon error -message [mc "Сертификат не прошел проверку"] -parent .
+        #		tk_messageBox -title [mc "Работа с сертификатом"] -icon error -message [mc "Сертификат не прошел проверку"]
         return
       }
       #DER в бинарнике
@@ -7020,7 +6993,7 @@ all_enable $w
     }
     2 {
 	if {$file_for_sign == "" } {
-	    tk_messageBox -title "Экспорт сертификата" -message "Не выбрана папка для сертификата" -icon error  -parent .
+	    tk_messageBox -title "Экспорт сертификата" -message "Не выбрана папка для сертификата" -icon error 
 	    return
 	}
 	set certder [binary format H* $cert_hex]
@@ -7036,7 +7009,7 @@ all_enable $w
 	set y [catch {puts $fid "#http://soft.lissi.ru\n"}]
 	set z [catch {close $fid}]
 	if { $x || $y || $z || ![file exists $fs] || ![file isfile $fs] || ![file readable $fs] } {
-	    tk_messageBox -parent . -icon error  -message "Невозможно записать сертификат в этот файл:\n \"$fs\""
+	    tk_messageBox -icon error  -message "Невозможно записать сертификат в этот файл:\n \"$fs\""
 	    return
 	}
 	file delete -force $fs
@@ -7046,14 +7019,14 @@ all_enable $w
 	close $fd
 	set tit "Экспорт сертификатаа"
 	if {![file exists $fs]} {
-	    tk_messageBox -title $tit -icon error -message "Ошибка записи файла\n $fs" -parent .
+	    tk_messageBox -title $tit -icon error -message "Ошибка записи файла\n $fs"
 	    return
 	}
 	if {![file size $fs]} {
-	    tk_messageBox -title $tit -icon error -message "Ошибка записи файла\n $fs" -parent .
+	    tk_messageBox -title $tit -icon error -message "Ошибка записи файла\n $fs" 
 	    return
 	}
-	tk_messageBox -title $tit -icon info -message "Сертифмкат сохранен в файле" -detail "$fs" -parent .
+	tk_messageBox -title $tit -icon info -message "Сертифмкат сохранен в файле" -detail "$fs" 
 
 #      saveCert $ts12 $certder
       return
@@ -7084,7 +7057,7 @@ proc ::workOp {w} {
     puts "WORKOP:c=$c"
   set i 0
   if {$p7s_fn == ""} {
-    tk_messageBox -title [mc "Работа с PKCS7"] -icon error -message [mc "Не выбран файл с электронной подписью"] -parent .
+    tk_messageBox -title [mc "Работа с PKCS7"] -icon error -message "Не выбран файл с электронной подписью"
     return
   }
   array set p7 []
@@ -7096,24 +7069,24 @@ proc ::workOp {w} {
     }
   }
   if {$i != 1 && $typeop != 4} {
-    tk_messageBox -title [mc "Работа с PKCS7"] -icon error -message [mc "Перегрузите файл с электронной подписью"] -parent .
+    tk_messageBox -title [mc "Работа с PKCS7"] -icon error -message "Перегрузите файл с электронной подписью"
     return
   }
   switch $typeop {
     0 {
       if {$src_fn == "" } {
-        tk_messageBox -title "Проверка подписи" -icon info -message [mc "Не выбран документ для проверки"] -parent .
+        tk_messageBox -title "Проверка подписи" -icon info -message "Не выбран документ для проверки" 
         return
       }
       if {$p7(messageDigestTek) != ""} {
         if {$p7(messageDigestTek) != $p7(messageDigest)} {
-          tk_messageBox -title "Проверка подписи" -icon info -message "Файл с подписью поврежден" -detail "или неподдерживаемая подпись\n$p7(digestalgo)" -parent .
+          tk_messageBox -title "Проверка подписи" -icon info -message "Файл с подписью поврежден" -detail "или неподдерживаемая подпись\n$p7(digestalgo)" 
           return
         }
       }
       set file $src_fn
       if {![file exists $file]} {
-        tk_messageBox -title "Проверка подписи" -icon info -message "Файла с документом не существует" -parent .
+        tk_messageBox -title "Проверка подписи" -icon info -message "Файла с документом не существует" 
         return
       }
       #puts "Loading content file: $file"
@@ -7136,7 +7109,7 @@ proc ::workOp {w} {
 	  set digest_len 64
         }
         default {
-          tk_messageBox -title "Проверка подписи" -icon info -message "Невозможно проверить контент" -detail "Не известный алгоритм:\n\t$oidhash" -parent .
+          tk_messageBox -title "Проверка подписи" -icon info -message "Невозможно проверить контент" -detail "Не известный алгоритм:\n\t$oidhash"
           return
         }
       }
@@ -7146,11 +7119,11 @@ proc ::workOp {w} {
       binary scan $digest_mes_bin H* digest_mes_hex
 
       if {$digest_mes_hex != $p7(messageDigest) } {
-        tk_messageBox -title "Проверка подписи" -icon info -message "Подпись не от указанного документа" -parent .
+        tk_messageBox -title "Проверка подписи" -icon info -message "Подпись не от указанного документа" 
         return
       }
       if {$p7(cert_hex) == ""} {
-        tk_messageBox -title "Проверка подписи" -icon info -message "Отсутствует сертификат подписанта" -parent .
+        tk_messageBox -title "Проверка подписи" -icon info -message "Отсутствует сертификат подписанта"
         return
       }
 
@@ -7180,20 +7153,20 @@ proc ::workOp {w} {
       set public_key_str [binary format H* $public_key_str]
       set verify [lcc_gost3410_2012_512_verify $group $public_key_str $signerinfo_bin $signature_str]
     } else {
-      tk_messageBox -title "Проверка подписи" -icon error -message "Неподдерживаемый тип ключа" -detail "$infopk(pubkey_algo)"  -parent .
+      tk_messageBox -title "Проверка подписи" -icon error -message "Неподдерживаемый тип ключа" -detail "$infopk(pubkey_algo)" 
       return
     }
 
 
       if {$verify != 1} {
-        tk_messageBox -title "Проверка подписи" -icon error -message "Подпись не прошла проверку"  -parent .
+        tk_messageBox -title "Проверка подписи" -icon error -message "Подпись не прошла проверку"  
       } else {
-        tk_messageBox -title "Проверка подписи" -icon info -message "Подпись документа верна" -detail "$::dateSign\n$::dateSignTST" -parent .
+        tk_messageBox -title "Проверка подписи" -icon info -message "Подпись документа верна" -detail "$::dateSign\n$::dateSignTST" 
       }
   }
     1 {
       if {$p7(attached) == 0} {
-        tk_messageBox -title "Извлечение подписанного документа" -icon info -message "Подпись отсоединенная. Документ отсутствует." -parent .
+        tk_messageBox -title "Извлечение подписанного документа" -icon info -message "Подпись отсоединенная. Документ отсутствует." 
         return
       }
       set cont [binary  format H* $p7(context_hex)]
@@ -7204,7 +7177,7 @@ proc ::workOp {w} {
       #puts "typesave=$typesave"
       set ::dercert [binary  format H* $p7(cert_hex)]
       if {$::dercert == ""} {
-        tk_messageBox -title "Извлечение сертификата подписанта" -icon info -message "Сертификат подписанта отсутствует" -parent .
+        tk_messageBox -title "Извлечение сертификата подписанта" -icon info -message "Сертификат подписанта отсутствует" 
         return
       }
       saveCert $typesave $::dercert
@@ -7218,17 +7191,17 @@ proc ::workOp {w} {
       set  ::tekTSP $::tekTSPadd
 
       if {$src_fn == "" } {
-        #		tk_messageBox -title [mc "Verify signature"] -icon info -message [mc "Signed detached. Not content"] -parent .
-        tk_messageBox -title "Добавить подпись" -icon info -message "Не выбран документ для проверки" -parent .
+        #		tk_messageBox -title [mc "Verify signature"] -icon info -message [mc "Signed detached. Not content"] 
+        tk_messageBox -title "Добавить подпись" -icon info -message "Не выбран документ для проверки" 
         return
       }
       if {$::p7s_hex == "" } {
-        tk_messageBox -title "Добавить подпись" -icon info -message "Не выбран файл с электронной подписью" -parent .
+        tk_messageBox -title "Добавить подпись" -icon info -message "Не выбран файл с электронной подписью" 
         return
       }
       set file $src_fn
       if {![file exists $file]} {
-        tk_messageBox -title "Добавить подпись" -icon info -message "Файл с документом не существует" -parent .
+        tk_messageBox -title "Добавить подпись" -icon info -message "Файл с документом не существует" 
         return
       }
       #puts "sifn_file=$nickCert"
@@ -7258,7 +7231,7 @@ all_enable $w.fratext
       set pass ""
                         	
       if { [pki::pkcs11::login $::handle $::slotid_tek $password] == 0 } {
-        tk_messageBox -title "Добавить подпись" -message "Документ подписать не удалось" -detail "Неверный PIN-код" -icon error  -parent .
+        tk_messageBox -title "Добавить подпись" -message "Документ подписать не удалось" -detail "Неверный PIN-код" -icon error 
         return
       }
       set password ""
@@ -7272,7 +7245,7 @@ all_enable $w.fratext
         }
       }
       if {$i == 0 } {
-        tk_messageBox -title "Добавить подпись" -message "Документ подписать не удалось" -detail "У сертификата \n$nickCert\n нет закрытого ключа" -icon error  -parent .
+        tk_messageBox -title "Добавить подпись" -message "Документ подписать не удалось" -detail "У сертификата \n$nickCert\n нет закрытого ключа" -icon error 
         catch {::pki::pkcs11::logout $::handle $::slotid_tek}
         return
       }
@@ -7287,7 +7260,7 @@ all_enable $w.fratext
         }
       }
       if {$cert_derhex == ""} {
-        tk_messageBox -title "Добавить подпись" -message "На токене отсутствует сертификат подписанта:" -detail "\t$nickCert" -icon error  -parent .
+        tk_messageBox -title "Добавить подпись" -message "На токене отсутствует сертификат подписанта:" -detail "\t$nickCert" -icon error
         catch {::pki::pkcs11::logout $::handle $::slotid_tek}
         return
       }
@@ -7296,7 +7269,7 @@ all_enable $w.fratext
       foreach p7t $::lp7 {
         array set p7 $p7t
         if {$infopk(issuer) == $p7(issuer) && $infopk(serial_number) == $p7(serial_number)} {
-          tk_messageBox -title "Добавить подпись" -icon error -message "Уже имеется подпись для выбранного сертификата:" -detail $nickCert  -parent .
+          tk_messageBox -title "Добавить подпись" -icon error -message "Уже имеется подпись для выбранного сертификата:" -detail $nickCert 
           catch {::pki::pkcs11::logout $::handle $::slotid_tek}
           return
         }
@@ -7318,7 +7291,7 @@ all_enable $w.fratext
       set pkcs7_new [::pki::pkcs7_add_signeddata $content $cert_derhex "pkcs11"  $::p7s_hex]
       catch {::pki::pkcs11::logout $::handle $::slotid_tek}
       if {$pkcs7_new == 0 } {
-        tk_messageBox -title "Добавить подпись" -icon error -message "Не удалось добавить подпись"  -parent .
+        tk_messageBox -title "Добавить подпись" -icon error -message "Не удалось добавить подпись" 
 	place forget .topclock
         return
       }
@@ -7338,7 +7311,7 @@ all_enable $w.fratext
       variable ::lcerts
       variable typesave
       if {[llength $::lcerts] == 0 } {
-        tk_messageBox -title "Сохранить сертификаты" -icon info -message "Нет сертификатов" -detail "File=$p7s_fn" -parent .
+        tk_messageBox -title "Сохранить сертификаты" -icon info -message "Нет сертификатов" -detail "File=$p7s_fn"
         return
       }
       set dir [tk_chooseDirectory -initialdir $myHOME -title "Выберите папку для сертификатов"]
@@ -7374,12 +7347,12 @@ all_enable $w.fratext
         close $fd
         incr i
       }
-      tk_messageBox -title "Сохранить сертификаты" -icon info -message "Сертификаты сохранены в папке:\n\t$dir" -detail "$lfile" -parent .
+      tk_messageBox -title "Сохранить сертификаты" -icon info -message "Сертификаты сохранены в папке:\n\t$dir" -detail "$lfile" 
     }
     5 {
       #Извлечь p7 со штампом времени
       if {$p7(timeStamp) != 1} {
-        tk_messageBox -title "Сохранить метку времени" -icon info -message "Метка времени отсутствует" -parent .
+        tk_messageBox -title "Сохранить метку времени" -icon info -message "Метка времени отсутствует" 
         return
       }
       set p7tst [binary format H* $p7(p7timestamp_hex)]
@@ -7550,7 +7523,7 @@ proc ::verifysign {cert type} {
 	    set digest_len 64
 	}
         default {
-	    tk_messageBox -title "Проверка подписи" -icon info -message "Невозможно проверить подпись" -detail "Неизвестный алгоритм подписи:\n\t$signature_algo_number" -parent .
+	    tk_messageBox -title "Проверка подписи" -icon info -message "Невозможно проверить подпись" -detail "Неизвестный алгоритм подписи:\n\t$signature_algo_number"
 	    return
 	}
     }
@@ -7580,7 +7553,7 @@ proc ::verifysign {cert type} {
       set public_key_str [binary format H* $public_key_str]
       set verify [lcc_gost3410_2012_512_verify $group $public_key_str $digest_bin $signature_str]
     } else {
-      tk_messageBox -title "Проверка подписи" -icon error -message "Неподдерживаемый тип ключа" -detail "$infopk(pubkey_algo)"  -parent .
+      tk_messageBox -title "Проверка подписи" -icon error -message "Неподдерживаемый тип ключа" -detail "$infopk(pubkey_algo)" 
       return
     }
 
@@ -7625,7 +7598,7 @@ proc trace_signedcert {name index op } {
 
       if {$p7(attached) == 0} {
 	$c.lfr0.chb0 configure -text "Отсоединенная"
-        tk_messageBox -title "Работа с PKCS7" -icon info -message "Подпись отсоединенная." -detail "Укажите путь с подписанному документу\nvarescTS=$varescTS" -parent .
+        tk_messageBox -title "Работа с PKCS7" -icon info -message "Подпись отсоединенная." -detail "Укажите путь с подписанному документу\nvarescTS=$varescTS" 
       } else {
 	$c.lfr0.chb0 configure -text "Присоединенная"
       }
@@ -7699,7 +7672,7 @@ proc trace_signedcert {name index op } {
 
         binary scan $digsign H* digsign_hex
         if {$digsign_hex != $digesttsp_hex} {
-          tk_messageBox -title "Работа с PKCS7" -icon error -message "Проверка штампа времени" -detail "Штамп времени не от этой подписи" -parent .
+          tk_messageBox -title "Работа с PKCS7" -icon error -message "Проверка штампа времени" -detail "Штамп времени не от этой подписи"
           set ::dateSignTST "Метка времени: Метка чужая"
         }
 
@@ -7779,7 +7752,7 @@ proc trace_signedcert {name index op } {
 
         binary scan $digsign H* digsign_hex
         if {$digsign_hex != $digesttsp_hex} {
-          tk_messageBox -title "Работа с PKCS7" -icon error -message "Проверка штампа времени" -detail "Штамп escTS не от этой подписи" -parent .
+          tk_messageBox -title "Работа с PKCS7" -icon error -message "Проверка штампа времени" -detail "Штамп escTS не от этой подписи" 
         }
       }
                         	
@@ -7812,12 +7785,12 @@ proc trace_p7s {name index op} {
   set lp7s [::parse_pkcs7 "file" $p7s ""]
   #puts "LP7S=$lp7s"
   if {$lp7s == -1} {
-    tk_messageBox -title "Работа с PKCS7" -icon info -message "Подпись с неподдерживаемым хэшем" -parent .
+    tk_messageBox -title "Работа с PKCS7" -icon info -message "Подпись с неподдерживаемым хэшем" 
     return
   }
   foreach {::lcerts lcrls ::lp7} $lp7s {}
   if {![info exists ::lp7]} {
-    tk_messageBox -title "Работа с PKCS7" -icon info -message "Файл не содержит подписи" -parent .
+    tk_messageBox -title "Работа с PKCS7" -icon info -message "Файл не содержит подписи" 
     set p7s_fn ""
     return
   }
@@ -7929,7 +7902,7 @@ all_enable .fn7.fratext
   #    set p12er [catch {array set dCertKey [::GostPfx::pfxGetSingleKeyPair $indata $password 1]}]
   #    array set dCertKey [::GostPfx::pfxGetSingleCertKey $indata $password]
   if {$p12er} {
-    tk_messageBox -title "Работа с PKCS12" -icon error -message "Это не PKCS12 (или старый PKCS12) или плохой пароль" -detail "Если вы уверены в пароле, то попробуйе отключить проверку mac (кнопка nomac)"  -parent .
+    tk_messageBox -title "Работа с PKCS12" -icon error -message "Это не PKCS12 (или старый PKCS12) или плохой пароль" -detail "Если вы уверены в пароле, то попробуйе отключить проверку mac (кнопка nomac)" 
     set pfx_fn ""
     set friendly ""
     set ::certfrompfx ""
@@ -7950,7 +7923,7 @@ all_enable .fn7.fratext
       binary scan $keyValueRev H* keyValueRev_hex
       binary scan $dCertKey(keyValue) H* keyValue_hex
       set ::private_key_str $dCertKey(keyValue)
-      #tk_messageBox -title "Работа с PKCS12" -icon info -message "Длина закрытого ключа" -detail "[string length $::private_key_str]"  -parent .
+      #tk_messageBox -title "Работа с PKCS12" -icon info -message "Длина закрытого ключа" -detail "[string length $::private_key_str]" 
     }
     #	parray param3410
     set parid $param3410($dCertKey(gost3410Paramset))
@@ -7964,7 +7937,7 @@ all_enable .fn7.fratext
       set y_str [string range $public_key_str 32 63]
       binary scan $x_str H* x_str_hex
       binary scan $y_str H* y_str_hex
-      #tk_messageBox -title "Работа с PKCS12" -icon info -message "Publickey 256=$public_key_str_hex" -detail "x_str=$x_str_hex\ny_str=$y_str_hex"  -parent .
+      #tk_messageBox -title "Работа с PKCS12" -icon info -message "Publickey 256=$public_key_str_hex" -detail "x_str=$x_str_hex\ny_str=$y_str_hex"  
 
     } elseif {$dCertKey(keyAlg) == "1 2 643 7 1 1 1 2"} {
       set ::group [lcc_gost3410_2012_512_getGroupById "$parid"]
@@ -7976,7 +7949,7 @@ all_enable .fn7.fratext
       binary scan $y_str H* y_str_hex
       #tk_messageBox -title "Работа с PKCS12" -icon info -message "Publickey 512=$public_key_str_hex" -detail "x_str=$x_str_hex\ny_str=$y_str_hex"  -parent .
     } else {
-      tk_messageBox -title "Работа с PKCS12" -icon error -message "Неподдерживаемый тип ключа" -detail "$dCertKey(keyAlg)"  -parent .
+      tk_messageBox -title "Работа с PKCS12" -icon error -message "Неподдерживаемый тип ключа" -detail "$dCertKey(keyAlg)"  
       return
     }
     set ::public_key_str $public_key_str
@@ -7985,7 +7958,7 @@ all_enable .fn7.fratext
     #	set privkey "keyAlg: $dCertKey(keyAlg)\ngost3410Paramset: $dCertKey(gost3410Paramset)\ngost3410Paramset: $parid\ngost3411Paramset: $dCertKey(gost3411Paramset)\nkeyValue: $keyValue_hex\nkeyValueRev: $keyValueRev_hex"
     #	tk_messageBox -title "Работа с PKCS12" -icon info -message "$friendly" -detail "$privkey"  -parent .
   } else {
-    tk_messageBox -title "Работа с PKCS12" -icon error -message "Файл $pfx \nне содержит контейнер PKCS12" -parent .
+    tk_messageBox -title "Работа с PKCS12" -icon error -message "Файл $pfx \nне содержит контейнер PKCS12" 
   }
   return
 }
@@ -8016,11 +7989,11 @@ proc addsignature {w} {
 В противном случае нажмите\
 кнопку \"Нет\""
     if {$p7s_fn == ""} {
-	tk_messageBox -title "Добавить подпись" -icon error -message [mc "Не выбран файл с электронной подписью"] -parent .
+	tk_messageBox -title "Добавить подпись" -icon error -message "Не выбран файл с электронной подписью"
 	return
     }
     if {$src_fn == "" } {
-        tk_messageBox -title "Добавить подпись" -icon info -message "Не выбран документ для подписи" -parent .
+        tk_messageBox -title "Добавить подпись" -icon info -message "Не выбран документ для подписи"
         return
     }
 
@@ -8029,7 +8002,7 @@ proc addsignature {w} {
     } else {
 	set mes $mesp12
     }
-    set answer [tk_messageBox -title "Добавить подпись" -icon question -message "Добавление новой подписи" -detail $mes -type yesno -parent .]
+    set answer [tk_messageBox -title "Добавить подпись" -icon question -message "Добавление новой подписи" -detail $mes -type yesno ]
 #wm state . normal
     if {$answer != "yes"} {
       puts "Передумали"
@@ -8039,12 +8012,6 @@ proc addsignature {w} {
     set typekey ""
 puts "Добавляем подпись"
     if {$storage == 0} {
-#Все как для PKCS12 c учетом выборки сертификата с токена - см. строку 5136 третий пункт
-#    	    infotoken
-#    	    return
-      ##################
-      #Ввод PIN-кода
-#      wm title .topPinPw "Токен: $::slotid_teklab"
       #Ввод PIN-кода
 all_disable $w.fratext
 #      pack forget $w.fratext
@@ -8070,7 +8037,7 @@ all_enable $w.fratext
       set pass ""
                         	
       if { [pki::pkcs11::login $::handle $::slotid_tek $password] == 0 } {
-        tk_messageBox -title "Добавить подпись" -message "Документ подписать не удалось" -detail "Неверный PIN-код" -icon error  -parent .
+        tk_messageBox -title "Добавить подпись" -message "Документ подписать не удалось" -detail "Неверный PIN-код" -icon error 
         return
       }
       set password ""
@@ -8084,7 +8051,7 @@ all_enable $w.fratext
         }
       }
       if {$i == 0 } {
-        tk_messageBox -title "Добавить подпись" -message "Документ подписать не удалось" -detail "У сертификата \n$nickCert\n нет закрытого ключа" -icon error  -parent .
+        tk_messageBox -title "Добавить подпись" -message "Документ подписать не удалось" -detail "У сертификата \n$nickCert\n нет закрытого ключа" -icon error 
         catch {::pki::pkcs11::logout $::handle $::slotid_tek}
         return
       }
@@ -8099,7 +8066,7 @@ all_enable $w.fratext
         }
       }
       if {$cert_derhex == ""} {
-        tk_messageBox -title "Добавить подпись" -message "На токене отсутствует сертификат подписанта:" -detail "\t$nickCert" -icon error  -parent .
+        tk_messageBox -title "Добавить подпись" -message "На токене отсутствует сертификат подписанта:" -detail "\t$nickCert" -icon error  
         catch {::pki::pkcs11::logout $::handle $::slotid_tek}
         return
       }
@@ -8108,7 +8075,7 @@ all_enable $w.fratext
       foreach p7t $::lp7 {
         array set p7 $p7t
         if {$infopk(issuer) == $p7(issuer) && $infopk(serial_number) == $p7(serial_number)} {
-          tk_messageBox -title [mc "Add signature"] -icon error -message [mc "Уже имеется подпись для выбранного сертификата:"] -detail $nickCert  -parent .
+          tk_messageBox -title [mc "Add signature"] -icon error -message [mc "Уже имеется подпись для выбранного сертификата:"] -detail $nickCert 
           catch {::pki::pkcs11::logout $::handle $::slotid_tek}
           return
         }
@@ -8122,7 +8089,7 @@ all_enable $w.fratext
 #Добавка подписи на базе PKCS#12
 	if {$::certfrompfx == "" } {
           tk_messageBox -title "Добавить подпись" -icon error -message "Не выбран контейнер PKCS12." \
-             -detail "Зайдите на вкладку\n\"Работаем с PKCS12/PFX\"\n и выберите контейнер" -parent .
+             -detail "Зайдите на вкладку\n\"Работаем с PKCS12/PFX\"\n и выберите контейнер" 
 	    return
 	}
 	set certbin [binary format H* $::certfrompfx]
@@ -8130,7 +8097,7 @@ all_enable $w.fratext
 	foreach p7t $::lp7 {
 	    array set p7 $p7t
     	    if {$infopk(issuer_hex) == $p7(issuer) && $infopk(serial_number_hex) == $p7(serial_number)} {
-        	tk_messageBox -title "Добавить подпись" -icon info -message "Уже имеется подпись для\nвыбранного сертификата."  -parent .
+        	tk_messageBox -title "Добавить подпись" -icon info -message "Уже имеется подпись для\nвыбранного сертификата."  
         	return
     	    }
 	}
@@ -8154,7 +8121,7 @@ all_enable $w.fratext
 #after 3000
 #set pkcs7_new 0
       if {$pkcs7_new == 0 } {
-        tk_messageBox -title "Добавление подписи" -icon error -message "Не удалось добавить подпись"  -parent .
+        tk_messageBox -title "Добавление подписи" -icon error -message "Не удалось добавить подпись" 
 	place forget .topclock
         return
       }
@@ -8164,7 +8131,7 @@ all_enable $w.fratext
       #puts -nonewline $fd $ret(contextforsign)
       close $fd
       set pathsign [string map {"/" "/\n"} $p7s_fn]
-    tk_messageBox -title "Добавить подпись" -icon info -message "Подпись добавлена" -detail "Файл с подписями:\n$pathsign" -parent .
+    tk_messageBox -title "Добавить подпись" -icon info -message "Подпись добавлена" -detail "Файл с подписями:\n$pathsign" 
     set p7s_fn $p7s_fn
     place forget .topclock
 
@@ -8285,7 +8252,7 @@ proc func_page1 {c} {
 
     set com "ttk::button  $c.b2 -command {::sign_file  $c \"pkcs11\"} -text \"Подписать документ\""
     eval [subst $com]
-    eval "pack $c.b2 -side top -anchor center -padx 5 -pady [expr $::intpx2mm * 5] "
+    eval "pack $c.b2 -side top -anchor center -padx $::intpx2mm -pady [expr $::intpx2mm * 5]  -anchor ne"
 
      clock:set myclock          ;# call once, keeps ticking ;-) RS
 }
@@ -8350,7 +8317,7 @@ proc func_page2 {c} {
     ttk::radiobutton $c.lfr0.chb1 -value 0 -variable createescTS1 -text "Тип подписи" -pad 0 
     grid $c.lfr0.chb0 -row 0 -column 0 -sticky swen -padx {14 0} -pady {0 12} -ipadx 5
     grid $c.lfr0.chb1 -row 0 -column 1 -sticky swen -padx {14 0} -pady {0 12} -ipadx 5
-    pack $c.lfr0 -fill both -side top -padx 10 -pady 8
+    eval "pack $c.lfr0 -fill both -side top -padx 10 -pady $::intpx2mm"
 
     labelframe $c.frc -text "Сертификаты подписантов"
     set ::nomacver 0
@@ -8358,8 +8325,8 @@ proc func_page2 {c} {
     pack $c.frc.listCert -side left  -padx 4 -pady 0 -expand 1 -fill x
     button  $c.frc.viewcert -command {if {[info exists ::signedCert]} {::viewCert "pkcs7" $::signedCert}} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -activebackground white -highlightthickness 0
     pack $c.frc.viewcert -side right -padx {0 5} -pady 0 -expand 0 -fill none
-    pack $c.frc -fill both -side top -padx 10 -pady 0
-    label $c.l3 -text "Документ подписан:" -textvariable ::dateSign -anchor w -bg white  -width 0 -height 0 -pady 0
+    eval "pack $c.frc -fill both -side top -padx 10 -pady $::intpx2mm"
+    label $c.l3 -text "Документ подписан:" -textvariable ::dateSign -anchor w -bg skyblue  -width 0 -height 0 -pady 0
     pack $c.l3 -fill both -side top -padx 10 -pady 0
     label $c.l4 -text "Метка времени получена:" -textvariable ::dateSignTST -anchor w -bg white  -width 0 -height 0 -pady 0
     pack $c.l4 -fill both -side top -padx 10 -pady 0 
@@ -8395,14 +8362,14 @@ proc func_page2 {c} {
     pack $c.tsp.listTSP -side left -fill x -expand 1
     pack $c.tsp -fill both -side top -padx 10
   labelframe $c.lfr1 -text "Дополнительные операции" -relief groove -bd 5 -bg wheat
-  ttk::radiobutton $c.lfr1.rb1 -value 0 -variable typeop -text "Проверить подпись"
-  ttk::radiobutton $c.lfr1.rb2 -value 1 -variable typeop -text "Извлечь документ"
+  ttk::radiobutton $c.lfr1.rb1 -value 0 -variable typeop -text "Проверить подпись"  -pad 0
+  ttk::radiobutton $c.lfr1.rb2 -value 1 -variable typeop -text "Извлечь документ" -pad 0
 #  ttk::radiobutton $c.lfr1.rb3 -value 3 -variable typeop -text "Добавить подпись"
-  ttk::radiobutton $c.lfr1.rb4 -value 2 -variable typeop -text "Сохранить сер-т подписанта"
+  ttk::radiobutton $c.lfr1.rb4 -value 2 -variable typeop -text "Сохранить сер-т подписанта" -pad 0
 #  ttk::radiobutton $c.lfr1.rb6 -value 5 -variable typeop -text "Извлечь метку времени"
-  ttk::checkbutton $c.lfr1.ch4 -variable typesave -text "PEM-формат"
-  ttk::radiobutton $c.lfr1.rb5 -value 4 -variable typeop -text "Сохранить все сертификаты"
-  ttk::checkbutton $c.lfr1.ch5 -variable typesave -text "PEM-формат"
+  ttk::checkbutton $c.lfr1.ch4 -variable typesave -text "PEM-формат" -pad 0
+  ttk::radiobutton $c.lfr1.rb5 -value 4 -variable typeop -text "Сохранить все сертификаты" -pad 0
+  ttk::checkbutton $c.lfr1.ch5 -variable typesave -text "PEM-формат" -pad 0
 
   grid $c.lfr1.rb1 -row 0 -column 0 -columnspan 2 -sticky w -padx {4 0} -pady {0 0}
   grid $c.lfr1.rb2 -row 0 -column 0 -columnspan 2 -sticky e -padx {4 0} -pady {0 0}
@@ -8415,7 +8382,7 @@ proc func_page2 {c} {
     eval "pack $c.lfr1 -fill both -side top -padx 10 -pady $::intpx2mm"
     
   eval "ttk::button  $c.b2 -command {::workOp $corig} -text {Выполнить операцию}"
-  eval "pack $c.b2 -side top  -pady $::intpx2mm"
+  eval "pack $c.b2 -side top  -pady $::intpx2mm -anchor ne"
     
   labelframe $c.lfr2 -text "Добавить подписанта" -relief groove -bd 5 -bg wheat
   variable storage
@@ -8427,7 +8394,7 @@ proc func_page2 {c} {
   eval $cmd
     pack $c.lfr2.st1 -side left -padx {0 0} 
     pack $c.lfr2.st2 -side left -padx {0 0} 
-  eval "pack $c.lfr2.b1 -side right -padx {0 $::intpx2mm} -pady $::intpx2mm"
+  eval "pack $c.lfr2.b1 -side right -padx {0 $::intpx2mm} -pady $::intpx2mm -anchor ne"
   eval "pack $c.lfr2 -fill both -side top -pady $::intpx2mm -padx 10"
 
     trace variable p7s_fn w trace_p7s
@@ -8743,7 +8710,7 @@ proc CreateRequestTCL {profilename attributes} {
   set token_slotid $::slotid_tek
   puts "token_slotid=$token_slotid"
   if { [pki::pkcs11::login $::handle $token_slotid $attr(keypassword)] == 0 } {
-    tk_messageBox -title "Запрос на сертификат" -message "Не смогли залогиниться на токене\nПроверьте PIN-код." -icon error  -parent .
+    tk_messageBox -title "Запрос на сертификат" -message "Не смогли залогиниться на токене\nПроверьте PIN-код." -icon error  
     return ""
   }
   set aa [list "pkcs11_handle" $::handle "pkcs11_slotid" $token_slotid]
@@ -8764,7 +8731,7 @@ proc CreateRequestTCL {profilename attributes} {
       set inn [string trimleft $attr(INN) "0"]
     }
     if {$lenkpp != 0 && $lenkpp != 9 } {
-      tk_messageBox -title "Запрос на сертификат" -message "Ошибка в поле КПП." -detail "Поле должно быть пустым или содеожать 9 цифр" -icon error  -parent .
+      tk_messageBox -title "Запрос на сертификат" -message "Ошибка в поле КПП." -detail "Поле должно быть пустым или содеожать 9 цифр" -icon error 
       return ""
     }
     if {$lenkpp == 9} {
@@ -8863,7 +8830,7 @@ proc ::finalizeCSR {tpage} {
     #set ::pw 01234567
     #set ::rpw 01234567
     if {$::rpw != $::pw || $::rpw == ""} {
-      tk_messageBox -title "Выпуск сертификата" -message "Ошибка в пароле для Вашего PKCS#12.\nВернитесь на шаг назад и задайте пароль" -detail "(Пароль не может быть пустым)" -icon error  -parent .
+      tk_messageBox -title "Выпуск сертификата" -message "Ошибка в пароле для Вашего PKCS#12.\nВернитесь на шаг назад и задайте пароль" -detail "(Пароль не может быть пустым)" -icon error 
       place forget .topclock
       return -code break
     }
@@ -8872,7 +8839,7 @@ proc ::finalizeCSR {tpage} {
   }
 
   if {$req == "" } {
-    tk_messageBox -title $tit -message $ercreate -icon error  -parent .
+    tk_messageBox -title $tit -message $ercreate -icon error  
     place forget .topclock
     return -code break
   }
@@ -8884,7 +8851,7 @@ proc ::finalizeCSR {tpage} {
   chan configure $fd -translation binary
   puts -nonewline $fd $req
   close $fd
-  tk_messageBox -title $tit -message $msgok -detail $detok -icon info  -parent .
+  tk_messageBox -title $tit -message $msgok -detail $detok -icon info 
   place forget .topclock
 
   #array set csr_parse [::pki::pkcs::parse_csr_gost $req]
@@ -8920,7 +8887,7 @@ proc nextStep {tpage numpage} {
   }
   if { $currentStep == 1 && $tpage == "cert" } {
     if {$certfor == 0 && $::ku5 == 0} {
-      tk_messageBox -title "Выпуск сертификата" -message "Вы хотите выпустить корневой сертификат, но в назначении ключа отсутствует возможность подписания сертификатов!" -icon error  -parent .
+      tk_messageBox -title "Выпуск сертификата" -message "Вы хотите выпустить корневой сертификат, но в назначении ключа отсутствует возможность подписания сертификатов!" -icon error 
       return 0;
     }
   }
@@ -8947,12 +8914,12 @@ proc nextStep {tpage numpage} {
       }
     }
     if {$err == -1} {
-      tk_messageBox -title "Запрос на сертификат" -message "Токен $wizData(token)\nне поддерживает ключи $wizData(typekey)" -icon error  -parent .
+      tk_messageBox -title "Запрос на сертификат" -message "Токен $wizData(token)\nне поддерживает ключи $wizData(typekey)" -icon error 
       return 0;
     }
   } elseif {$currentStep == 2} {
     if {$wizData(CN) == ""} {
-      tk_messageBox -title "Запрос на сертификат" -message "Пожалуйста, укажите владельца (CN) сертификата." -icon error  -parent .
+      tk_messageBox -title "Запрос на сертификат" -message "Пожалуйста, укажите владельца (CN) сертификата." -icon error 
       return 0;
     }
   } elseif {$currentStep == 3} {
@@ -8977,64 +8944,63 @@ proc nextStep {tpage numpage} {
     if {$wizData(E) != ""} {
       set mail [verifyemail $wizData(E)]
       if {$mail != "OK" } {
-        tk_messageBox -title "Запрос на сертификат" -message "Вы неверно указали адрес электронной почты." -icon error  -parent .
+        tk_messageBox -title "Запрос на сертификат" -message "Вы неверно указали адрес электронной почты." -icon error 
         return 0
       }
     } else {
-      tk_messageBox -title "Запрос на сертификат" -message "Вы не указали электронную почту"  -icon error  -parent .
+      tk_messageBox -title "Запрос на сертификат" -message "Вы не указали электронную почту"  -icon error 
       return 0
     }
     if {$wizData(INN) != ""} {
       set leninn [string length $wizData(INN)]
       if {$leninn != 12} {
         tk_messageBox -title "Запрос на сертификат" -message "Неправильная длина поля ИНН." \
-        -detail "Для юрлиц ИНН имеет 10 цифр, дополненные слева двумя нулями.\nДля физлиц и ИП это 12 цифр." \
-        -icon error  -parent .
+        -detail "Для юрлиц ИНН имеет 10 цифр, дополненные слева двумя нулями.\nДля физлиц и ИП это 12 цифр." -icon error 
         return 0
       }
       if { $wizData(type) == "Юридическое лицо" } {
         if {[string range $wizData(INN) 0 1] != "00" } {
           tk_messageBox -title "Запрос на сертификат" -message "Первые две цифры в ИНН для юрлица должны быть 00.\n(Это вынужденное дополнение)" \
           -detail "Для юрлиц ИНН имеет 10 цифр, дополненные слева двумя нулями.\nДля физлиц и ИП это 12 цифр." \
-          -icon error  -parent .
+          -icon error 
           return 0
         }
         if {[string range $wizData(INN) 2 2] == "0" } {
           tk_messageBox -title "Запрос на сертификат" -message "Первая цифра ИНН не может быть нулем." \
           -detail "Для юрлиц ИНН имеет 10 цифр, дополненные слева двумя нулями.\nДля физлиц и ИП это 12 цифр." \
-          -icon error  -parent .
+          -icon error 
           return 0
         }
       } else {
         if {[string range $wizData(INN) 0 0] == "0" } {
           tk_messageBox -title "Запрос на сертификат" -message "Первая цифра ИНН не может быть нулем." \
           -detail "Для юрлиц ИНН имеет 10 цифр, дополненные слева двумя нулями.\nДля физлиц и ИП это 12 цифр." \
-          -icon error  -parent .
+          -icon error 
           return 0
         }
       }
     }
     if {$missingvalue && $tpage == "csr"} {
-      tk_messageBox -title "Запрос на сертификат" -message "Вы не заполнили следующие обязательные поля:" -detail "[join $missinglist {, }]."  -icon error  -parent .
+      tk_messageBox -title "Запрос на сертификат" -message "Вы не заполнили следующие обязательные поля:" -detail "[join $missinglist {, }]."  -icon error  
       return 0
     }
   } elseif {$currentStep == 4} {
     if {$tpage == "csr"} {
       if {$wizData(csr_fn) == ""} {
-        tk_messageBox -title "Запрос на сертификат" -message "Не задан файл для сохранения запроса." -icon error  -parent .
+        tk_messageBox -title "Запрос на сертификат" -message "Не задан файл для сохранения запроса." -icon error 
         return 0
       }
       if {$wizData(keypassword) == ""} {
-        tk_messageBox -title "Запрос на сертификат" -message "Задайте PIN-код." -icon error  -parent .
+        tk_messageBox -title "Запрос на сертификат" -message "Задайте PIN-код." -icon error 
         return 0
       }
     } else {
       if {$wizData(csr_fn) == ""} {
-        tk_messageBox -title "Выпуск сертификата" -message "Не выбран каталог для хранения сертификатов и ключей." -icon error  -parent .
+        tk_messageBox -title "Выпуск сертификата" -message "Не выбран каталог для хранения сертификатов и ключей." -icon error 
         return 0
       }
       if {$::rpw != $::pw || $::rpw == ""} {
-        tk_messageBox -title "Выпуск сертификата" -message "Ошибка в пароле для Вашего PKCS#12." -detail "(Пароль не может быть пустым)" -icon error  -parent .
+        tk_messageBox -title "Выпуск сертификата" -message "Ошибка в пароле для Вашего PKCS#12." -detail "(Пароль не может быть пустым)" -icon error 
         return 0
       }
     }
@@ -9300,7 +9266,7 @@ proc create_csr_list1 {tpage c num} {
   set dflt [subst $$ckzi]
   labelframe $c.l5 -text "Наименование СКЗИ"
   ttk::entry $c.c5 -textvariable $ckzi -width 33
-  # -textvariable $ckzi -bg white -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
+#  entry $c.c5 -textvariable $ckzi -width 33 -bg white -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
   $c.c5 delete 0 end
   $c.c5 insert end $dflt
 
@@ -9346,21 +9312,8 @@ proc create_csr_list1 {tpage c num} {
   set k 0
   foreach v $::ku_options {
     #puts "KU=::ku$k"
-    ttk::checkbutton $c.c$i -text "$v" -variable ::ku$k 
-    #    	    -pady 0
-    pack $c.c$i -in  $c.l6 -side top -fill x
-if {0} {
-    grid $c.c$i -row $ir -column $j -columnspan 1 -sticky w -padx 8  -pady {0 0}
-    #    	    grid rowconfigure $c $i -weight 0
-    incr i
-    if {$j == 1} {
-      incr ir
-      set j 0
-    } else {
-      incr j
-    }
-    incr k
-}
+    ttk::checkbutton $c.c$i -text "$v" -variable ::ku$k -pad 0
+    pack $c.c$i -in  $c.l6 -side top -fill x -pady 0
     incr k
     incr i
   }
@@ -10071,7 +10024,7 @@ proc func_page4 {c} {
   pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
   set c "$c.fratext"
 
-    labelframe $c.tok -text "Сертификаты токена" -bd 0
+    labelframe $c.tok -text "Сертификаты токена"  -borderwidth 5 -bg wheat -relief groove
     ttk::combobox $c.tok.listCert -textvariable nickCert -state readonly -values $::listx509
     button $c.tok.viewcert -command {if {[info exists nickCert]} {::viewCert "pkcs11" $nickCert}} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0
     pack $c.tok.listCert -side left  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
@@ -10104,10 +10057,10 @@ proc func_page4 {c} {
   pack $c.fscr.e1 -side left -expand 1 -fill both
   button  $c.fscr.viewscr -command {variable csr_fn;::viewCSR  $csr_fn 1} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0
   pack $c.fscr.viewscr -side right -padx {4 0} -pady 0 -expand 0 -fill none
-    pack $c.fscr -fill both -side top -padx 10
+  eval "pack $c.fscr -fill both -side top -padx $::intpx2mm"
 ################################
   label $c.lsep -text "Работа с сертификатами из файлов" -font TkDefaultFontBold -bg #eff0f1 -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
-  eval "pack $c.lsep -fill both -side top -padx 10 -pady $::intpx2mm"
+  eval "pack $c.lsep -fill both -side top -padx 10 -pady {$::intpx2mm 0}"
 
   labelframe $c.fcrt -text "Файл с сертификатом" -relief flat -bd 0
   if {$macos} {
@@ -10124,44 +10077,48 @@ proc func_page4 {c} {
   -initialdir $::myHOME \
   -filetypes $ft
   pack $c.fcrt.e2 -side left -expand 1 -fill both
-  button  $c.fcrt.viewcrt -command {variable opcert; set z $opcert;set opcert 2;::workOpCert;set opcert $z} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0
+  button  $c.fcrt.viewcrt -command {variable opcert; set z $opcert;set opcert 2;::workOpCert ".fn4";set opcert $z} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0
   pack $c.fcrt.viewcrt -side right -padx {2 0} -pady 0 -expand 0 -fill none
   ########
 
-  labelframe $c.lfr1 -text "Выполняемая операция с сертификатом" -borderwidth 5 -bg wheat -relief groove
-  ttk::radiobutton $c.lfr1.rb1 -value 0 -variable opcert -text "Цепочка/Проверка подписи"
-  ttk::radiobutton $c.lfr1.rb2 -value 1 -variable opcert -text "Проверка валидности"
+  labelframe $c.lfr1 -text "Операции с сертификатом в файла" -borderwidth 5 -bg wheat -relief groove
+  ttk::radiobutton $c.lfr1.rb1 -value 0 -variable opcert -text "Цепочка/Проверка подписи" -pad 0
+  ttk::radiobutton $c.lfr1.rb2 -value 1 -variable opcert -text "Проверка валидности" -pad 0
   #    radiobutton $c.lfr1.rb3 -value 2 -variable opcert -text "Просмотр сертификата" -highlightthickness 0
-  ttk::radiobutton $c.lfr1.rb4 -value 3 -variable opcert -text "Импорт сертификата на токен"
-  ttk::checkbutton $c.lfr1.chb4 -variable ::certegais -text "Сертификат для ЕГАИС"
+  ttk::radiobutton $c.lfr1.rb4 -value 3 -variable opcert -text "Импорт сертификата на токен" -pad 0
+  ttk::checkbutton $c.lfr1.chb4 -variable ::certegais -text "Сертификат для ЕГАИС" -pad 0
 
-  grid $c.lfr1.rb1 -row 0 -column 0 -sticky w -padx {4 0} -pady {0 3}
-  grid $c.lfr1.rb2 -row 1 -column 0 -sticky w -padx {4 0} -pady {0 3}
-  grid $c.lfr1.rb4 -row 2 -column 0 -sticky w -padx {4 0} -pady {0 4}
-  grid $c.lfr1.chb4 -row 3 -column 0 -sticky w -padx {4 0} -pady {0 4}
-  eval "pack $c.fcrt -fill both -side top -padx 10  -pady $::intpx2mm"
-  ttk::button  $c.b2 -command {::workOpCert ".fn4"} -text "Выполнить операцию" -style My.TButton
-    pack $c.lfr1 -fill both -side top -padx 10
-  eval "pack $c.b2  -side top -pady $::intpx2mm"
-  label $c.lsep1 -text "Работа с сертификатами на токене" -font TkDefaultFontBold -bg #eff0f1 -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
-  eval "pack $c.lsep1 -fill both -side top -padx 10 -pady {0 $::intpx2mm}"
-  labelframe $c.lfr2 -text "Операция с сертификатом на токене" -borderwidth 5 -bg wheat -relief groove
-  ttk::radiobutton $c.lfr2.rb0 -value 4 -variable opcertp11 -text "Удалить сертификат с токена"
-  ttk::radiobutton $c.lfr2.rb1 -value 0 -variable opcertp11 -text "Цепочка/Проверка подписи"
-  ttk::radiobutton $c.lfr2.rb2 -value 1 -variable opcertp11 -text "Проверка валидности"
-  ttk::radiobutton $c.lfr2.rb4 -value 2 -variable opcertp11 -text "Экспорт сертификата в PEM"
-  ttk::radiobutton $c.lfr2.rb5 -value 3 -variable opcertp11 -text "Экспорт сертификата в DER"
-  ttk::radiobutton $c.lfr2.rb6 -value 5 -variable opcertp11 -text "Сменить nickname"
+  grid $c.lfr1.rb1 -row 0 -column 0 -sticky w -padx {4 0} 
+  grid $c.lfr1.rb2 -row 1 -column 0 -sticky w -padx {4 0} 
+  grid $c.lfr1.rb4 -row 2 -column 0 -sticky w -padx {4 0} 
+  grid $c.lfr1.chb4 -row 3 -column 0 -sticky w -padx {4 0}
+  eval "pack $c.fcrt -fill both -side top -padx {0 $::intpx2mm} -pady {$::intpx2mm 0}"
+  ttk::button  $c.b2 -command {::workOpCert ".fn4"} -text "Выполнить операцию"
+  pack $c.lfr1 -fill both -side top -padx 10
+  eval "pack $c.b2  -side top -pady {$::intpx2mm 0} -padx {0 $::intpx2mm} -anchor e"
+#  label $c.lsep1 -text "Работа с сертификатами на токене" -font TkDefaultFontBold -bg #eff0f1 -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
+#  eval "pack $c.lsep1 -fill both -side top -padx 10 -pady {0 $::intpx2mm}"
+#  labelframe $c.lfr2 -text "Операция с сертификатом на токене" -borderwidth 5 -bg wheat -relief groove
+  labelframe $c.lfr2 -text "Операция с сертификатом на токене"  -font TkDefaultFontBold
+  ttk::radiobutton $c.lfr2.rb0 -value 4 -variable opcertp11 -text "Удалить сертификат с токена" -pad 0
+  ttk::radiobutton $c.lfr2.rb1 -value 0 -variable opcertp11 -text "Цепочка/Проверка подписи" -pad 0
+  ttk::radiobutton $c.lfr2.rb2 -value 1 -variable opcertp11 -text "Проверка валидности" -pad 0
+  ttk::radiobutton $c.lfr2.rb4 -value 2 -variable opcertp11 -text "Экспорт сертификата в PEM" -pad 0
+  ttk::radiobutton $c.lfr2.rb5 -value 3 -variable opcertp11 -text "Экспорт сертификата в DER" -pad 0
+  ttk::radiobutton $c.lfr2.rb6 -value 5 -variable opcertp11 -text "Сменить nickname" -pad 0
 
-  grid $c.lfr2.rb0 -row 0 -column 0 -sticky w -padx {4 0} -pady {0 3}
-  grid $c.lfr2.rb1 -row 1 -column 0 -sticky w -padx {4 0} -pady {0 3}
-  grid $c.lfr2.rb2 -row 2 -column 0 -sticky w -padx {4 0} -pady {0 3}
-  grid $c.lfr2.rb4 -row 3 -column 0 -sticky w -padx {4 0} -pady {0 4}
-  grid $c.lfr2.rb5 -row 4 -column 0 -sticky w -padx {4 0} -pady {0 4}
-  grid $c.lfr2.rb6 -row 5 -column 0 -sticky w -padx {4 0} -pady {0 4}
+  grid $c.lfr2.rb0 -row 0 -column 0 -sticky nwse -padx {4 0}
+  grid $c.lfr2.rb1 -row 1 -column 0 -sticky nwse -padx {4 0}
+  grid $c.lfr2.rb2 -row 2 -column 0 -sticky nwse -padx {4 0}
+  grid $c.lfr2.rb4 -row 3 -column 0 -sticky nwse -padx {4 0}
+  grid $c.lfr2.rb5 -row 4 -column 0 -sticky nwse -padx {4 0}
+  grid $c.lfr2.rb6 -row 5 -column 0 -sticky nwse -padx {4 0}
+#  grid columnconfigure $c.lfr2 "0 1 2 3 4 5" -uniform group1 -weight 1
+  grid columnconfigure $c.lfr2 0  -weight 1
   ttk::button  $c.b3 -command {::workOpCertP11 ".fn4" $opcertp11} -text {Выполнить операцию}
   pack $c.lfr2 -fill both -side top -padx 10
-  eval "pack $c.b3 -side top -pady {$::intpx2mm 0}"
+#В правом углу anchor e
+  eval "pack $c.b3 -side top -pady {$::intpx2mm 0} -padx {0 $::intpx2mm} -anchor e"
 }
 
 #Страница работы с PKCS#12
@@ -10212,7 +10169,7 @@ proc func_page7 {c} {
 #    button $c.tok.viewtok -command {if {[info exists nickCert]} {::viewCert "pkcs11" $nickCert}} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0
     pack $c.tok.listTok -side top  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
 #    pack $c.tok.viewtok -side right -padx {0 5} -pady 0 -expand 0 -fill none
-    pack $c.tok -fill both -side top -padx 10 -pady {4 10}
+    eval "pack $c.tok -fill both -side top -padx 10 -pady $::intpx2mm"
 
     labelframe $c.cert -text "Сертификаты токена" -bd 0
     ttk::combobox $c.cert.listCert -textvariable nickCert -values $::listx509
@@ -10220,8 +10177,8 @@ proc func_page7 {c} {
     button $c.cert.viewcert -command {if {[info exists nickCert]} {::viewCert "pkcs11" $nickCert}} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0
     pack $c.cert.listCert -side left  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
     pack $c.cert.viewcert -side right -padx {0 5} -pady 0 -expand 0 -fill none
-#    pack $c.cert -fill both -side top -padx 10 -pady 4
-    pack $c.cert -in $c.tok -fill both -side top -padx {2 1} -pady 4
+#    eval "pack $c.cert -in $c.tok -fill both -side top -padx {2 1} -pady {0 $::intpx2mm}"
+    pack $c.cert -in $c.tok -fill both -side top -padx {2 1} -pady 0
 
 #    ttk::labelframe $c.fr0 -text "Файл с PKCS12" 
     labelframe $c.fr0 -text "Файл с PKCS12" -bd 0
@@ -10232,7 +10189,7 @@ proc func_page7 {c} {
 	-variable pfx_fn \
 	-initialdir $::myHOME \
 	-filetypes $filetypep12
-    pack $c.fr0.e1 -side right  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
+    pack $c.fr0.e1 -side right  -padx {2 1}  -ipady 1  -expand 1 -fill x
 #    ttk::labelframe $c.frc -text "Просмотр сертификата из контейнера"
     labelframe $c.frc -text "Просмотр сертификата из контейнера" -bd 0
     pack $c.fr0 -fill both -side top -padx 10
@@ -10246,7 +10203,8 @@ proc func_page7 {c} {
     pack $c.frc.mac  -padx 0 -pady 0 -side left  -expand 0 -fill none
     button  $c.frc.viewcert -command {::viewCert "pkcs12" $::certfrompfx} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -activebackground white -highlightthickness 0
     pack $c.frc.viewcert -side right -padx {0 5} -pady 0 -expand 0 -fill none
-    pack $c.frc -fill both -side top -padx 10 -pady 8
+#    eval "pack $c.frc -fill both -side top -padx 10 -pady {0 $::intpx2mm}"
+    pack $c.frc -fill both -side top -padx 10 -pady 0
 
 #    ttk::labelframe $c.frdoc -text "Документ для подписи:"
     labelframe $c.frdoc -text "Документ для подписи:"
@@ -10263,8 +10221,8 @@ proc func_page7 {c} {
 	-variable  doc_for_sign \
 	-initialdir $::myHOME \
 	-filetypes $ft
-    pack $c.frdoc.e1 -side right  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
-    pack $c.frdoc -fill both -side top -padx 10
+    pack $c.frdoc.e1 -side right  -padx {2 1}  -ipady 1  -expand 1 -fill x
+    pack $c.frdoc -fill both -side top -padx 10 -pady 0
 
 #    ttk::labelframe $c.frdir -text "Папка для подписи:"
     labelframe $c.frdir -text "Папка для подписи и/или сертификата:"
@@ -10273,20 +10231,21 @@ proc func_page7 {c} {
 	-width $wd \
 	-variable  file_for_sign \
 	-initialdir $::myHOME
-    pack $c.frdir.e2 -side right  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
-    pack $c.frdir -fill both -side top -padx 10  -pady 8
-#    ttk::labelframe $c.lfr0 -text "Тип и формат электронной подписи"  -labelanchor n
+    pack $c.frdir.e2 -side right  -padx {2 1}  -ipady 1  -expand 1 -fill x
+#    eval "pack $c.frdir -fill both -side top -padx 10  -pady $::intpx2mm"
+    pack $c.frdir -fill both -side top -padx 10  -pady 0
     labelframe $c.lfrat -text "Тип электронной подписи"  -labelanchor n -bg wheat -relief groove -bd 5
-    ttk::radiobutton $c.lfrat.rb1 -value 1 -variable typesig -image signattach
+    ttk::radiobutton $c.lfrat.rb1 -value 1 -variable typesig -image signattach -pad 0
 #   -text "Присоединенная"
-    ttk::radiobutton $c.lfrat.rb2 -value 0 -variable typesig -image signdetach
+    ttk::radiobutton $c.lfrat.rb2 -value 0 -variable typesig -image signdetach -pad 0
   # -text "Отсоединенная"
 #    eval "grid $c.lfrat.rb1 -row 0 -column 0 -sticky wsen -padx {8 0} -pady $::intpx2mm"
     grid $c.lfrat.rb1 -row 0 -column 0 -sticky wsen -padx {8 0}
     grid $c.lfrat.rb2 -row 0 -column 1 -sticky ns -padx {0 0}
     grid columnconfigure $c.lfrat 1 -weight 1
     grid columnconfigure $c.lfrat 0 -weight 1
-    eval "pack $c.lfrat -fill both -side top -padx 10 -pady {0 $::intpx2mm}"
+#    eval "pack $c.lfrat -fill both -side top -padx 10 -pady {0 $::intpx2mm}"
+    pack $c.lfrat -fill both -side top -padx 10 -pady 0
 
     labelframe $c.lfr0 -text "Формат электронной подписи"  -labelanchor n -borderwidth 5 -bg wheat -relief groove
 #    ttk::checkbutton $c.lfr0.chb0 -variable typesig -text "Присоединенная подпись" -pad 0
@@ -10296,8 +10255,8 @@ proc func_page7 {c} {
 #    grid $c.lfr0.chb0 -row 0 -column 0 -columnspan 3 -sticky w -padx {14 0} -pady {0 12}
     grid $c.lfr0.chb1 -row 1 -column 0 -sticky w -padx {4 0}
     grid $c.lfr0.chb2 -row 1 -column 1 -sticky w -padx {4 0}
-    eval "grid $c.lfr0.chb3 -row 1 -column 2 -sticky w -padx {4 0} -pady $::intpx2mm"
-    pack $c.lfr0 -fill both -side top -padx 10
+    eval "grid $c.lfr0.chb3 -row 1 -column 2 -sticky w -padx {4 0} -pady {$::intpx2mm}"
+    pack $c.lfr0 -fill both -side top -padx 10 -pady 0
     ttk::frame $c.tsp
     label $c.tsp.tsp -text "Сервер TSP:" -anchor w -bg white  -width 0 -height 0
     if {$macos} {
@@ -10308,30 +10267,27 @@ proc func_page7 {c} {
     set ::tekTSP [lindex $::listtsp 0]
     pack $c.tsp.tsp -side left
     pack $c.tsp.listTSP -side left -fill x -expand 1
-    pack $c.tsp -fill both -side top -padx 10
-    set com "ttk::button  $c.b2 -command {::sign_file  $c \"pkcs12\"} -text \"Подписать документ\""
+    pack $c.tsp -fill both -side top -padx 10 -pady 0
+    set com "ttk::button  $c.b2 -command {::sign_file  $c \"pkcs12\"} -text \"Подписать документ\" -pad 0"
     eval [subst $com]
-#    pack $c.b2 -side top -anchor nw -padx 5 -pady 4
-    pack $c.b2 -side top -anchor center -padx 5 -pady 4
+    eval "pack $c.b2 -side top -anchor center -padx $::intpx2mm  -pady $::intpx2mm -anchor ne "
 
     labelframe $c.lfr1 -text "Дополнительные операции" -bd 5 -bg wheat -relief groove
     #-bg skyblue
-    ttk::radiobutton $c.lfr1.rb1 -value 0 -variable top12 -text "Сертификат на токен"
-    ttk::radiobutton $c.lfr1.rb2 -value 1 -variable top12 -text "Ключ на токен"
-    ttk::checkbutton $c.lfr1.ch0 -variable exp12 -text "Неэкспортируемый"
-    ttk::radiobutton $c.lfr1.rb3 -value 2 -variable top12 -text "Сертификат в файл"
-    ttk::checkbutton $c.lfr1.ch1 -variable ts12 -text "PEM-формат"
-    grid $c.lfr1.rb1 -row 1 -column 0 -sticky news -padx {4 0} -pady {0 2}
-    grid $c.lfr1.rb2 -row 2 -column 0 -sticky news -padx {4 0} -pady {0 0} -ipadx 0
-#  grid $c.lfr1.ch0 -row 2 -column 1 -sticky w -padx {4 0} -pady {0 2}
+    ttk::radiobutton $c.lfr1.rb1 -value 0 -variable top12 -text "Сертификат на токен" -pad 0
+    ttk::radiobutton $c.lfr1.rb2 -value 1 -variable top12 -text "Ключ на токен" -pad 0
+    ttk::checkbutton $c.lfr1.ch0 -variable exp12 -text "Неэкспортируемый" -pad 0
+    ttk::radiobutton $c.lfr1.rb3 -value 2 -variable top12 -text "Сертификат в файл" -pad 0
+    ttk::checkbutton $c.lfr1.ch1 -variable ts12 -text "PEM-формат" -pad 0
+    grid $c.lfr1.rb1 -row 1 -column 0 -sticky news -padx {4 0} -pady 0
+    grid $c.lfr1.rb2 -row 2 -column 0 -sticky news -padx {4 0} -pady 0 -ipadx 0
 
-
-    grid $c.lfr1.rb3 -row 0 -column 0 -columnspan 1 -sticky wens -padx {4 0} -pady {0 2}
-    grid $c.lfr1.ch1 -row 0 -column 1 -columnspan 1 -sticky wnse -padx {4 0} -pady {0 2}
+    grid $c.lfr1.rb3 -row 0 -column 0 -columnspan 1 -sticky wens -padx {4 0} -pady 0
+    grid $c.lfr1.ch1 -row 0 -column 1 -columnspan 1 -sticky wnse -padx {4 0} -pady 0
     pack $c.lfr1 -fill both -side top -padx 10
     
-    eval "ttk::button  $c.b3 -command {::workOpP12 $c} -text {Выполнить операцию}"
-    eval "pack $c.b3 -side top  -pady $::intpx2mm"
+    eval "ttk::button  $c.b3 -command {::workOpP12 $c} -text {Выполнить операцию} -pad 0"
+    eval "pack $c.b3 -side top -padx $::intpx2mm -pady $::intpx2mm -anchor ne"
 
     if {$c == ".fn7.fratext"} {
 	trace variable pfx_fn w trace_pfx
@@ -10363,7 +10319,7 @@ proc ::deleteallobj {} {
   set pass ""
         	
   if { [pki::pkcs11::login $::handle $::slotid_tek $password] == 0 } {
-    tk_messageBox -title "Очистить токен" -message "Доступ к токену не получен" -detail "Проверьте PIN-код" -icon error  -parent .
+    tk_messageBox -title "Очистить токен" -message "Доступ к токену не получен" -detail "Проверьте PIN-код" -icon error  
     return 0
   }
   set password ""
@@ -10385,15 +10341,15 @@ proc ::deleteallobj {} {
 
 proc p11status {} {
   if {$::pkcs11_status == 1 } {
-    tk_messageBox -title "Используемый токен"   -icon info -message "Нет подключенных токенов." -parent .
+    tk_messageBox -title "Используемый токен"   -icon info -message "Нет подключенных токенов." 
     return
   }
   if {$::pkcs11_status == 3 } {
-    tk_messageBox -title "Используемый токен"   -icon info -message "Токен не лицензирован." -detail "Обратитесь к вкладке \"Создать токены\"" -parent .
+    tk_messageBox -title "Используемый токен"   -icon info -message "Токен не лицензирован." -detail "Обратитесь к вкладке \"Создать токены\"" 
     return
   }
   if {$::pkcs11_status == 2 } {
-    tk_messageBox -title "Используемый токен"   -icon info -message "Токен еще не проинициализирован." -parent .
+    tk_messageBox -title "Используемый токен"   -icon info -message "Токен еще не проинициализирован." 
     return
   }
   return $::pkcs11_status
@@ -10513,7 +10469,7 @@ global ::slotid_tek
       set rupin [$c.lfr2.entRepUserPin get]
       if {$sopin == "" || $upin == "" || $rupin == "" || $upin != $rupin || $upin == "87654321"} {
         tk_messageBox -title "Смена SO-PIN-а" -icon info -message "Ошибка в заполнении полей. Будьте внимательны!" \
-        -detail "SO-PIN не может быть равен первоначальному значению" -parent .
+        -detail "SO-PIN не может быть равен первоначальному значению" 
         return
       }
       #      catch {::pki::pkcs11::logout $::handle $::slotid_tek}
@@ -10527,13 +10483,13 @@ global ::slotid_tek
       #      catch {::pki::pkcs11::logout $::handle $::slotid_tek}
       if {$ret} {
         tk_messageBox -title "Смена SO-PIN-кода" -icon info -message "Новый SO-PIN-код установлен" \
-        -detail "Храните надежно и токен и PIN-коды" -parent .
+        -detail "Храните надежно и токен и PIN-коды"
         $c.lfr2.entSoPin delete 0 end
         $c.lfr2.entUserPin delete 0 end
         $c.lfr2.entRepUserPin delete 0 end
       } else {
         tk_messageBox -title "Смена SO-PIN-кода" -icon error -message "Сменить SO-PIN-код не удалось" \
-        -detail "Проверьте текущий SO-PIN-код" -parent .
+        -detail "Проверьте текущий SO-PIN-код" 
       }
       ::updatetok
     }
@@ -10543,19 +10499,19 @@ global ::slotid_tek
       set rupin [$c.lfr2.entRepUserPin get]
       if {$sopin == "" || $upin == "" || $rupin == "" || $upin != $rupin} {
         tk_messageBox -title "Деблокировать USER-PIN" -icon info -message "Ошибка в заполнении полей. Будьте внимательны!" \
-        -detail "upin=$upin\nrupin=$rupin\nsopin=$sopin" -parent .
+        -detail "upin=$upin\nrupin=$rupin\nsopin=$sopin" 
         return
       }
       set ret [::pki::pkcs11::inituserpin $::handle $::slotid_tek $sopin $upin]
       if {$ret} {
         tk_messageBox -title "Деблокировать USER-PIN" -icon info -message "Ваш PIN-код разблокирован" \
-        -detail "Храните надежно и токен и PIN-коды" -parent .
+        -detail "Храните надежно и токен и PIN-коды" 
         $c.lfr2.entSoPin delete 0 end
         $c.lfr2.entUserPin delete 0 end
         $c.lfr2.entRepUserPin delete 0 end
       } else {
         tk_messageBox -title "Деблокировать USER-PIN" -icon error -message "Разблокировать PIN-код не удалось" \
-        -detail "Проверьте PIN-коды" -parent .
+        -detail "Проверьте PIN-коды" 
       }
     }
     4 {
@@ -10563,7 +10519,7 @@ wm state . withdraw
       set ret [::deleteallobj]
 wm state . normal
       if {$ret} {
-        tk_messageBox -title "Очистить токен" -icon info -message "Токен \"$::slotid_teklab\" очищен"  -parent .
+        tk_messageBox -title "Очистить токен" -icon info -message "Токен \"$::slotid_teklab\" очищен" 
       }
     }
   }
@@ -10634,7 +10590,33 @@ proc setoptok {c} {
 }
 
 proc licload {} {
+	set ret [::updatetok]
+	switch -- $::pkcs11_status {
+	    -1	{
+		tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует библиотека"
+	    }
+	    0 {
+set tinfo "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab"
+		tk_messageBox -title "Используемый токен"   -icon info -message "$tinfo"
+		return
+	    }
+	    1	{
+		tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует подключенный токен"
+		return
+	    }
+	    2  {
+#puts "::pkcs11_status=$::pkcs11_status \nret=$ret"
+#		tk_messageBox -title "Используемый токен"   -icon info -message "Требуется инициализация токена.\nДля инициализации токена перейдите\nна страницу\n\"Конфигурирование токена\""
+set tinfo "Требуется инициализация токена.\nДля инициализации токена \nперейдите на страницу\n\"Конфигурирование токена\""
+		tk_messageBox -title "Используемый токен"   -icon info -message "$tinfo"
+		return
+	    }
+	    3  {
+#set tinfo "Нет лицензии на токен.\nЗапрос на лицензию LIC.REQ \nхранится в папке:\n$::myHOME\nДля получения и установки лицензии\n перейдите на вкладку \n\"Конфигурирование токенов\""
     borg activity android.intent.action.VIEW http://soft.lissi.ru/ls_product/skzi/LS11SW2016/ text/html
+		return
+	    }
+	}
 }
 
 proc licinstall {} {
@@ -10643,6 +10625,33 @@ proc licinstall {} {
     {"Файл с лицензией" ".DAT"}
     {"Любой файл" *}
   }
+	set ret [::updatetok]
+	switch -- $::pkcs11_status {
+	    -1	{
+		tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует библиотека"
+	    }
+	    0 {
+set tinfo "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab"
+		tk_messageBox -title "Используемый токен"   -icon info -message "$tinfo"
+		return
+	    }
+	    1	{
+		tk_messageBox -title "Используемый токен"   -icon info -message "Отсутствует подключенный токен"
+		return
+	    }
+	    2  {
+#puts "::pkcs11_status=$::pkcs11_status \nret=$ret"
+#		tk_messageBox -title "Используемый токен"   -icon info -message "Требуется инициализация токена.\nДля инициализации токена перейдите\nна страницу\n\"Конфигурирование токена\""
+set tinfo "Требуется инициализация токена.\nДля инициализации токена \nперейдите на страницу\n\"Конфигурирование токена\""
+		tk_messageBox -title "Используемый токен"   -icon info -message "$tinfo"
+		return
+	    }
+	    3  {
+#set tinfo "Нет лицензии на токен.\nЗапрос на лицензию LIC.REQ \nхранится в папке:\n$::myHOME\nДля получения и установки лицензии\n перейдите на вкладку \n\"Конфигурирование токенов\""
+		break
+	    }
+	}
+
   set newlic [tk_getOpenFile  -title "Выберите файл с лицензией токена" -initialdir $::myHOME -filetypes $filetype]
   if {$newlic == ""} {
     return
@@ -10692,64 +10701,64 @@ proc func_page11 {c} {
 #    button $c.tok.viewcert -command {if {[info exists nickCert]} {::viewCert "pkcs11" $nickCert}} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0
     pack $c.tok.listTok -side left  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
 #    pack $c.tok.viewcert -side right -padx {0 5} -pady 0 -expand 0 -fill none
-    pack $c.tok -fill both -side top -padx 10 -pady {4 0}
+  pack $c.tok -fill both -side top 
 #  grid $c.tok -row 0 -column 0 -sticky wsen -padx 10 -pady 10
-  set laboptok "Для инициализации токена заполните следующие поля:"
-  labelframe $c.lfr1 -text "Выберите операцию с токеном:" -background white
-  set cmd "ttk::radiobutton $c.lfr1.rb1 -value 0 -variable optok -text {Инициализация токена} -width 30 -command {setoptok $c}"
+  set laboptok "Для инициализации токена \nзаполните следующие поля:"
+  labelframe $c.lfr1 -text "Выберите операцию с токеном:" -borderwidth 5 -bg wheat -relief groove
+  set cmd "ttk::radiobutton $c.lfr1.rb1 -value 0 -variable optok -text {Инициализация токена} -width 30 -command {setoptok $c} -pad 0"
   eval [subst $cmd]
-  set cmd "ttk::radiobutton $c.lfr1.rb2 -value 1 -variable optok -text {Сменить USER-PIN} -command {setoptok $c}"
+  set cmd "ttk::radiobutton $c.lfr1.rb2 -value 1 -variable optok -text {Сменить USER-PIN} -command {setoptok $c} -pad 0"
   eval [subst $cmd]
-  set cmd "ttk::radiobutton $c.lfr1.rb3 -value 2 -variable optok -text {Сменить SO-PIN} -width 30 -command {setoptok $c}"
+  set cmd "ttk::radiobutton $c.lfr1.rb3 -value 2 -variable optok -text {Сменить SO-PIN} -width 30 -command {setoptok $c} -pad 0"
   eval [subst $cmd]
-  set cmd "ttk::radiobutton $c.lfr1.rb4 -value 3 -variable optok -text {Разблокировать USER-PIN} -command {setoptok $c}"
+  set cmd "ttk::radiobutton $c.lfr1.rb4 -value 3 -variable optok -text {Разблокировать USER-PIN} -command {setoptok $c} -pad 0"
   eval [subst $cmd]
-  set cmd "ttk::radiobutton $c.lfr1.rb5 -value 4 -variable optok -text {Очистить токен} -command {setoptok $c}"
+  set cmd "ttk::radiobutton $c.lfr1.rb5 -value 4 -variable optok -text {Очистить токен} -command {setoptok $c} -pad 0"
   eval [subst $cmd]
 
-  grid $c.lfr1.rb1 -row 0 -column 0 -sticky news -padx {4 0} -pady 8
-  grid $c.lfr1.rb2 -row 1 -column 0 -sticky news -padx {4 0} -pady 0
-  grid $c.lfr1.rb3 -row 2 -column 0 -sticky news -padx {4 0} -pady 8
-  grid $c.lfr1.rb4 -row 3 -column 0 -sticky news -padx {4 0} -pady 0
-  grid $c.lfr1.rb5 -row 4 -column 0 -sticky news -padx {4 0} -pady 8
-    pack $c.lfr1 -fill both -side top -padx 10 -pady 10
+  grid $c.lfr1.rb1 -row 0 -column 0 -sticky news -padx {4 0}  -pady 0
+  eval "grid $c.lfr1.rb2 -row 1 -column 0 -sticky news -padx {4 0} -pady $::intpx2mm"
+  grid $c.lfr1.rb3 -row 2 -column 0 -sticky news -padx {4 0}  -pady 0
+  eval "grid $c.lfr1.rb4 -row 3 -column 0 -sticky news -padx {4 0} -pady $::intpx2mm"
+  grid $c.lfr1.rb5 -row 4 -column 0 -sticky news -padx {4 0}  -pady 0
+  eval "pack $c.lfr1 -fill both -side top -padx 10 -pady $::intpx2mm"
 #  grid $c.lfr1 -row 1 -column 0 -sticky wsen -padx {40 0} -pady 10
 
   ttk::label .lfortok -textvariable laboptok -background wheat
-  labelframe $c.lfr2 -labelwidget .lfortok -bg wheat 
+  labelframe $c.lfr2 -labelwidget .lfortok  -borderwidth 5 -bg wheat -relief groove
 #  ttk::label .lfortok -textvariable laboptok -background #bee9fd
 #  labelframe $c.lfr2 -labelwidget .lfortok -bg #bee9fd
   label $c.lfr2.labTok -background skyblue -justify left -text "Введите метку токена"  -anchor w -width 30
   grid $c.lfr2.labTok -column 0 -padx 5 -pady 2 -row 0 -sticky we
-  entry $c.lfr2.entTok -background snow -width 40
-  grid $c.lfr2.entTok -column 0 -padx 2 -pady 2 -row 1 -sticky we -padx {0 5}
+  entry $c.lfr2.entTok -background snow -width 35
+  grid $c.lfr2.entTok -column 0 -padx 2 -pady 2 -row 1 -sticky nwse -padx {0 5}
   label $c.lfr2.labSoPin -background skyblue -text "Введите SO PIN" -anchor w -width 30
   grid $c.lfr2.labSoPin -column 0 -padx 5 -pady 2 -row 2 -sticky we
-  entry $c.lfr2.entSoPin -background snow -show * -width 40
-  grid $c.lfr2.entSoPin -column 0 -pady 2 -row 3 -padx {0 5}
+  entry $c.lfr2.entSoPin -background snow -show * 
+  grid $c.lfr2.entSoPin -column 0 -sticky nwse -pady 2 -row 3 -padx {0 5}
   label $c.lfr2.labUserPin -background skyblue -text "Новый PIN-пользователя" -anchor w
   grid $c.lfr2.labUserPin -column 0 -row 4 -sticky we -padx 5
-  entry $c.lfr2.entUserPin -background snow -show * -width 40
-  grid $c.lfr2.entUserPin -column 0 -pady 2 -row 5 -padx {0 5}
+  entry $c.lfr2.entUserPin -background snow -show *  
+  grid $c.lfr2.entUserPin -column 0 -pady 2 -row 5 -sticky nwse -padx {0 5}
   label $c.lfr2.labRepUserPin -background skyblue -text "Повторите PIN-пользователя" -anchor w
   grid $c.lfr2.labRepUserPin -column 0 -pady 2 -row 6 -sticky we -padx 5
-  entry $c.lfr2.entRepUserPin -background snow -show * -width 40
-  grid $c.lfr2.entRepUserPin -column 0 -pady {2 10} -row 7 -padx {0 5}
+  entry $c.lfr2.entRepUserPin -background snow -show * 
+  grid $c.lfr2.entRepUserPin -column 0 -pady {2 10} -sticky nwse -row 7 -padx {0 5}
 
 #  grid $c.lfr2 -row 2 -column 0 -sticky se -padx {40 0}
-    pack $c.lfr2 -fill both -side top -padx 10 -pady 10
+  eval "pack $c.lfr2 -fill both -side top -padx 10  -pady {0 $::intpx2mm}"
   set cmd "ttk::button  $c.butop -command {p11conf  $c} -text {Выполнить операцию} -style TButton"
   eval [subst $cmd]
 #  grid $c.butop -row 3 -column 0  -sticky se -padx 0 -pady {10 0}
-    pack $c.butop -fill none -side top -padx 10 -pady {10 }
+  eval "pack $c.butop -fill none -side top -padx 10  -pady 0"
   labelframe $c.licfr -text "Лицензирование токена:" -background wheat
   label  $c.licfr.llic -text {Лицензию:} -bg skyblue
-  ttk::button  $c.licfr.bread -command {licload } -text {Получить} -style TButton
-  ttk::button  $c.licfr.bust -command {licinstall } -text {Установить} -style TButton
-    pack $c.licfr.llic -fill none -side left -padx 10 -pady {10 }
-    pack $c.licfr.bread -fill none -side left -padx 10 -pady {10 }
-    pack $c.licfr.bust -fill none -side left -padx 10 -pady {10 }
-    pack $c.licfr -fill both -side top -padx 10 -pady 10
+  ttk::button  $c.licfr.bread -command {licload } -text {Получить} -style TButton -pad 0
+  ttk::button  $c.licfr.bust -command {licinstall } -text {Установить} -style TButton -pad 0
+    pack $c.licfr.llic -fill none -side left -padx 10
+    pack $c.licfr.bread -fill none -side left -padx 10
+    pack $c.licfr.bust -fill none -side left -padx 10 -pady {5}
+  eval "pack $c.licfr -fill both -side top -padx 10 -pady $::intpx2mm"
 }
 
 
@@ -11145,7 +11154,7 @@ proc func_page5 {w} {
   set cmd "ttk::button  $w.butop -command {mechlist  $w} -text {Механизмы} -style TButton"
   eval [subst $cmd]
 #  grid $c.butop -row 3 -column 0  -sticky se -padx 0 -pady {10 0}
-    pack $w.butop -fill none -side top -padx 10 -pady {20 }
+  eval "pack $w.butop -fill none -side top -padx 10 -pady [expr $::intpx2mm * 2]"
 
 # mechlist $w
 #  set ::entryd ""
@@ -11214,7 +11223,7 @@ proc ::updateobj {w} {
   set pass ""
         	
   if { [pki::pkcs11::login $::handle $::slotid_tek $password] == 0 } {
-    tk_messageBox -title "Объекты токена" -message "Доступ к токену не получен" -detail "Проверьте PIN-код" -icon error  -parent .
+    tk_messageBox -title "Объекты токена" -message "Доступ к токену не получен" -detail "Проверьте PIN-код" -icon error 
     return
   }
   set password ""
@@ -11271,7 +11280,7 @@ wm state . normal
   set pass ""
         	
   if { [pki::pkcs11::login $::handle $::slotid_tek $password] == 0 } {
-    tk_messageBox -title "Очистить токен" -message "Доступ к токену не получен" -detail "Проверьте PIN-код" -icon error  -parent .
+    tk_messageBox -title "Очистить токен" -message "Доступ к токену не получен" -detail "Проверьте PIN-код" -icon error 
     return 0
   }
   set password ""
@@ -11505,7 +11514,7 @@ if {$drawerCNT == 12} {
 		$fr.can bind textlineTag($drawerCNT)  <ButtonRelease-1>   {butReturn}
 	    }
 	} else {
-	    frame .fn$drawerCNT -background white -relief flat -pady 0 -padx 0
+	    frame .fn$drawerCNT -background white -relief flat -pady $::intpx2mm -padx $::intpx2mm -bg #bee9fd
 #	    set titul ""
 	    set titul $but($drawerCNT)
 	    if {$drawerCNT != 1 && $drawerCNT != 2 && $drawerCNT != 3 && $drawerCNT != 4 && $drawerCNT != 5 && $drawerCNT != 6 && $drawerCNT != 7 && $drawerCNT != 9 && $drawerCNT != 10 && $drawerCNT != 11} {
