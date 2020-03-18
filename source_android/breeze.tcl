@@ -698,17 +698,7 @@ EQr8aXIqSfhTgRUE9cOdDgOQ2KJ55ptwU9GZb0JjqQlAGAAmYXTqhTLsRXZtSS+y
 lhkABDGlAOlD0Ejnxm/+OyPLvDvv79k4rgCrh+03NU/rBj9b11QAAAAASUVORK5C
 YII=
 }]
-#For Android
-set iw 0
-if {$::typetlf} {
-    set iw [expr [image width $I(radio-checked-active)] * 2]
-    foreach index [array names I] {
-	scaleImage $I($index) 3
-    }
-}
-
-
-
+#Загрузка из png
 if {0} {
     proc LoadImages {imgdir} {
         variable I
@@ -720,6 +710,42 @@ if {0} {
 
     LoadImages [file join [file dirname [info script]] Breeze]
 }
+
+
+#For Android
+set iw 0
+set existtlf [info exists ::typetlf]
+if {$existtlf && $::typetlf} {
+#Для Android
+    set iw [expr [image width $I(radio-checked-active)] * 2]
+    foreach index [array names I] {
+	scaleImage $I($index) 3
+    }
+        ttk::style element create CheckbuttonMY.indicator image [list $I(checkbox-unchecked) \
+                disabled            $I(checkbox-unchecked-insensitive) \
+                {pressed selected}  $I(checkbox-checked-pressed) \
+                {active selected}   $I(checkbox-checked-active) \
+                {pressed !selected} $I(checkbox-unchecked-pressed) \
+                active              $I(checkbox-unchecked-active) \
+                selected            $I(checkbox-checked) \
+                {disabled selected} $I(checkbox-checked-insensitive) \
+            ] -width 22 -sticky w -padding $iw
+        ttk::style element create RadiobuttonMY.indicator image [list $I(radio-unchecked) \
+                disabled            $I(radio-unchecked-insensitive) \
+                {pressed selected}  $I(radio-checked-pressed) \
+                {active selected}   $I(radio-checked-active) \
+                {pressed !selected} $I(radio-unchecked-pressed) \
+                active              $I(radio-unchecked-active) \
+                selected            $I(radio-checked) \
+                {disabled selected} $I(radio-checked-insensitive) \
+            ] -width 22 -sticky w -padding $iw
+    ttk::style layout TRadiobutton {
+	Radiobutton.padding -sticky nswe -children {RadiobuttonMY.indicator -side left -sticky {} Radiobutton.focus -side left -sticky {} -children {Radiobutton.label -sticky nswe}}
+    }
+    ttk::style layout TCheckbutton {
+	Checkbutton.padding -sticky nswe -children {CheckbuttonMY.indicator -side left -sticky {} Checkbutton.focus -side left -sticky w -children {Checkbutton.label -sticky nswe}} 
+    }
+} else {
 
     ttk::style theme create Breeze -parent default -settings {
         ttk::style configure . \
@@ -754,7 +780,6 @@ if {0} {
             }
         }
 
-if {!$::typetlf} {
         ttk::style layout Toolbutton {
             Toolbutton.button -children {
                     Toolbutton.padding -children {
@@ -793,7 +818,6 @@ if {!$::typetlf} {
                     }
                 }
         }
-}   
         #
         # Elements:
         #
@@ -817,14 +841,12 @@ if {0} {
                 disabled    $I(button-hover) \
             ] -border 3 -sticky ewns
 
-if {!$::typetlf} {
         ttk::style element create Toolbutton.button image [list $I(button-empty) \
                 {active selected !disabled}  $I(button-active) \
                 selected            $I(button-toggled) \
                 pressed             $I(button-active) \
                 {active !disabled}  $I(button-hover) \
             ] -border 3 -sticky news
-}
 
         ttk::style element create Checkbutton.indicator image [list $I(checkbox-unchecked) \
                 disabled            $I(checkbox-unchecked-insensitive) \
@@ -845,7 +867,6 @@ if {!$::typetlf} {
                 {disabled selected} $I(radio-checked-insensitive) \
             ] -width 22 -sticky w -padding $iw
 
-if {!$::typetlf } {            
         ttk::style element create Horizontal.Scrollbar.trough image $I(scrollbar-trough-horiz-active) \
         -border {6 0 6 0} -sticky ew
         ttk::style element create Horizontal.Scrollbar.thumb \
@@ -1031,7 +1052,7 @@ if {!$::typetlf } {
         	activeBackground [ttk::style lookup . -selectbackground] \
         	activeForeground [ttk::style lookup . -selectforeground]
         option add *font [ttk::style lookup . -font]
-}
         ttk::style configure TButton -padding {8 4 8 4} -width -10 -anchor center
     }
+  }
 }

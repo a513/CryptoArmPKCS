@@ -1733,6 +1733,7 @@ image create photo logobic -file [file join $mydir "imageme" "logo-bic_token_96x
 set ::padls 20
 set ::padlx 15
 set ::padly 15
+source [file join $mydir breeze.tcl]
 if {[tk windowingsystem] == "win32"}  {
     wm state . zoomed  ;# This command for Windows only
 } elseif {$::typetlf} {
@@ -1767,17 +1768,10 @@ if {[tk windowingsystem] == "win32"}  {
 	set ::padlx 75
 	set ::padly 50
 } else {
-#	wm minsize . 370 700
+    package provide ttk::theme::Breeze 0.6
+    ttk::style theme use Breeze
 	scaleImage logo_awish -2
-#	scaleImage logo_orel -2
-#	set ::scrwidth 370
-#	set ::scrheight 670
-
 }
-
-package provide ttk::theme::Breeze 0.6
-source [file join $mydir breeze.tcl]
-ttk::style theme use Breeze
 
 source [file join $mydir "GostPfx.tcl"]
 source [file join $mydir "alloids.tcl"]
