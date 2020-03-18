@@ -857,7 +857,6 @@ proc ::updatetok {} {
     set ::pkcs11_status -1
     return  -1
   }
-#create_template_sw_token
   if {[catch {set ::handle [pki::pkcs11::loadmodule "$::pkcs11_module"]} result]} {
 	set cm [string first "TOKEN_NOT_RECOGNIZED" $result]
 	if { $cm != -1} {
@@ -981,104 +980,6 @@ if {0} {
   .fn11.tok.listTok configure -values $::listtok
 }
   return 1	
-}
-
-proc create_template_sw_token {} {
-global mydir
-global env
-#Ввести параметр для пересоздания и уничтожения
-    set userpath $env(EXTERNAL_STORAGE)
-
-    set tokpath [file join $userpath ".LS11SW2016"]
-tk_messageBox -title "Проверка токена" -icon info -message "Токена существует????"
-
-    if {![file exists $tokpath]} {
-        tk_messageBox -title "Проверка токена" -icon info -message "Токена не существует:\n$tokpath"
-        file mkdir $tokpath
-	if {![file exists $tokpath]} {
-    	    tk_messageBox -title "Проверка токена" -icon info -message "Не удалось создать папку:\n$tokpath"
-    	    return
-	} 
-    	tk_messageBox -title "Проверка токена" -icon info -message "Папка для токена создана:\n$tokpath"	
-    	# generate random bytes for signature
-	set rnd_ctx [lrnd_random_ctx_create ""]
-	set rnd_bytes [lrnd_random_ctx_get_bytes $rnd_ctx 40]
-	set frnd [file join $tokpath "prng_start.bin"]
-	if {![file exists $frnd]} {
-    	    set fd [open $frnd w]
-    	    chan configure $fd -translation binary
-    	    puts -nonewline $fd $rnd_bytes
-    	    close $fd
-    	}
-    } else {
-
-	set frnd [file join $tokpath "prng_start.bin"]
-tk_messageBox -title "Проверка токена" -icon info -message "Токена существует=$tokpath\n$frnd"
-    	# generate random bytes for signature
-	set rnd_ctx [lrnd_random_ctx_create ""]
-	set rnd_bytes [lrnd_random_ctx_get_bytes $rnd_ctx 40]
-	if {![file exists $frnd]} {
-    	    set fd [open $frnd w]
-    	    chan configure $fd -translation binary
-    	    puts -nonewline $fd $rnd_bytes
-    	    close $fd
-    	    tk_messageBox -title "Проверка токена" -icon info -message "Датчик нет, создаем:\n$frnd"
-	} else {
-        tk_messageBox -title "Проверка токена" -icon info -message "Датчик:\n$frnd"
-	}
-    }
-#Инициализация программного токена
-    set handle [pki::pkcs11::loadmodule $::pkcs11_module]
-    set sopin "87654321"
-    set labtok "testtoken"
-    set token_slotid 0
-#===========
-  set slots [pki::pkcs11::listslots $handle]
-  #    puts "Slots: $slots"
-  set listtok {}
-  foreach slotinfo $slots {
-    set slotid [lindex $slotinfo 0]
-    set slotlabel [lindex $slotinfo 1]
-    set slotflags [lindex $slotinfo 2]
-    set tokeninfo [lindex $slotinfo 3]
-tk_messageBox -title "FLAGS" -icon info -message "FLAGS $slotlabel:\n $slotflags"
-  }
-    set mkuser [file join $tokpath "MK_USER"]
-    if {[file exists $mkuser]} {
-tk_messageBox -title "FLAGS" -icon info -message "MK_USER присутствует "
-	catch {::pki::pkcs11::logout $handle 0}
-	catch {set handle [pki::pkcs11::unloadmodule $handle]}
-	return
-    }
-if {0} {
-#    set ind [string first "TOKEN_INITIALIZED" $slotflags]
-    set ind [string first "USER_PIN_INITIALIZED" $slotflags]
-    if {$ind != -1 } {
-tk_messageBox -title "FLAGS" -icon info -message "Токен присутствует "
-	catch {::pki::pkcs11::logout $handle 0}
-	catch {set handle [pki::pkcs11::unloadmodule $handle]}
-	return
-    }
-}
-#========
-tk_messageBox -title "FLAGS" -icon info -message "Токен не создавался "
-if {0} {
-    set ret [pki::pkcs11::inittoken $handle 0 $sopin $labtok]
-    catch {::pki::pkcs11::logout $handle 0}
-    set userpin "11111111"
-    set newpin "01234567"
-    if {[catch {set ret [pki::pkcs11::inituserpin $handle 0 $sopin $userpin]} result]} {
-	tk_messageBox -title "inituserpin" -icon error -message "BAD inituserpin:$result"
-    } else {
-	if {[catch {set ret [pki::pkcs11::setpin $handle $token_slotid "user" $userpin $newpin ]} result]} {
-	    tk_messageBox -title "setpin" -icon error -message "BAD setpin:$result"
-	} else {
-	    tk_messageBox -title "Test token" -icon info -message "User PIN: $newpin\nРекомендуем сменить"
-	}
-    }
-}
-    catch {::pki::pkcs11::logout $handle 0}
-    catch {set handle [pki::pkcs11::unloadmodule $handle]}
 }
 
 set ::pki::oids(2.5.4.42)  "givenName"
@@ -1260,9 +1161,6 @@ load "Lcc.so" Lcc
 load "Lrnd.so" Lrnd
 #load [file join $mydir "Lrnd.so"] Lrnd
 load "tclpkcs11.so" Tclpkcs11
-
-#create_template_sw_token
-#tk_messageBox -title "TclPKCS11" -icon info -message "Грузим LS11SW2016"  
 
 } else {
 wm overrideredirect . no      ;# moves window decorations
@@ -10698,7 +10596,7 @@ proc func_page11 {c} {
   pack $c.tok -fill both -side top 
 #  grid $c.tok -row 0 -column 0 -sticky wsen -padx 10 -pady 10
   set laboptok "Для инициализации токена \nзаполните следующие поля:"
-  labelframe $c.lfr1 -text "Выберите операцию с токеном:" -borderwidth 5 -bg wheat -relief groove
+  labelframe $c.lfr1 -text "Выберите операцию с токеном:" -borderwidth 5 -bg wheat -relief groove -padx $::intpx2mm
   set cmd "ttk::radiobutton $c.lfr1.rb1 -value 0 -variable optok -text {Инициализация токена} -width 30 -command {setoptok $c} -pad 0"
   eval [subst $cmd]
   set cmd "ttk::radiobutton $c.lfr1.rb2 -value 1 -variable optok -text {Сменить USER-PIN} -command {setoptok $c} -pad 0"
@@ -10710,34 +10608,36 @@ proc func_page11 {c} {
   set cmd "ttk::radiobutton $c.lfr1.rb5 -value 4 -variable optok -text {Очистить токен} -command {setoptok $c} -pad 0"
   eval [subst $cmd]
 
-  grid $c.lfr1.rb1 -row 0 -column 0 -sticky news -padx {4 0}  -pady 0
-  eval "grid $c.lfr1.rb2 -row 1 -column 0 -sticky news -padx {4 0} -pady $::intpx2mm"
-  grid $c.lfr1.rb3 -row 2 -column 0 -sticky news -padx {4 0}  -pady 0
-  eval "grid $c.lfr1.rb4 -row 3 -column 0 -sticky news -padx {4 0} -pady $::intpx2mm"
-  grid $c.lfr1.rb5 -row 4 -column 0 -sticky news -padx {4 0}  -pady 0
+  grid $c.lfr1.rb1 -row 0 -column 0 -sticky news   -pady 0
+  eval "grid $c.lfr1.rb2 -row 1 -column 0 -sticky news  -pady $::intpx2mm"
+  grid $c.lfr1.rb3 -row 2 -column 0 -sticky news  -pady 0
+  eval "grid $c.lfr1.rb4 -row 3 -column 0 -sticky news  -pady $::intpx2mm"
+  eval "grid $c.lfr1.rb5 -row 4 -column 0 -sticky news   -pady {0 $::intpx2mm}"
   eval "pack $c.lfr1 -fill both -side top -padx 10 -pady $::intpx2mm"
 #  grid $c.lfr1 -row 1 -column 0 -sticky wsen -padx {40 0} -pady 10
+  grid columnconfigure $c.lfr1 0  -weight 1
 
   ttk::label .lfortok -textvariable laboptok -background wheat
-  labelframe $c.lfr2 -labelwidget .lfortok  -borderwidth 5 -bg wheat -relief groove
+  labelframe $c.lfr2 -labelwidget .lfortok  -borderwidth 5 -bg wheat -relief groove -padx $::intpx2mm
 #  ttk::label .lfortok -textvariable laboptok -background #bee9fd
 #  labelframe $c.lfr2 -labelwidget .lfortok -bg #bee9fd
-  label $c.lfr2.labTok -background skyblue -justify left -text "Введите метку токена"  -anchor w -width 30
-  grid $c.lfr2.labTok -column 0 -padx 5 -pady 2 -row 0 -sticky we
-  entry $c.lfr2.entTok -background snow -width 35
-  grid $c.lfr2.entTok -column 0 -padx 2 -pady 2 -row 1 -sticky nwse -padx {0 5}
-  label $c.lfr2.labSoPin -background skyblue -text "Введите SO PIN" -anchor w -width 30
-  grid $c.lfr2.labSoPin -column 0 -padx 5 -pady 2 -row 2 -sticky we
+  label $c.lfr2.labTok -background skyblue -justify left -text "Введите метку токена"  -anchor nw
+  grid $c.lfr2.labTok -column 0 -padx 0 -row 0 -sticky we -pady 0
+  entry $c.lfr2.entTok -background snow
+  grid $c.lfr2.entTok -column 0   -row 1 -sticky nwse 
+  label $c.lfr2.labSoPin -background skyblue -text "Введите SO PIN" -anchor nw
+  grid $c.lfr2.labSoPin -column 0  -row 2 -sticky we
   entry $c.lfr2.entSoPin -background snow -show * 
-  grid $c.lfr2.entSoPin -column 0 -sticky nwse -pady 2 -row 3 -padx {0 5}
+  grid $c.lfr2.entSoPin -column 0 -sticky nwse -row 3 
   label $c.lfr2.labUserPin -background skyblue -text "Новый PIN-пользователя" -anchor w
-  grid $c.lfr2.labUserPin -column 0 -row 4 -sticky we -padx 5
+  grid $c.lfr2.labUserPin -column 0 -row 4 -sticky we 
   entry $c.lfr2.entUserPin -background snow -show *  
-  grid $c.lfr2.entUserPin -column 0 -pady 2 -row 5 -sticky nwse -padx {0 5}
-  label $c.lfr2.labRepUserPin -background skyblue -text "Повторите PIN-пользователя" -anchor w
-  grid $c.lfr2.labRepUserPin -column 0 -pady 2 -row 6 -sticky we -padx 5
+  grid $c.lfr2.entUserPin -column 0 -row 5 -sticky nwse 
+  label $c.lfr2.labRepUserPin -background skyblue -text "Повторите PIN-пользователя" -anchor nw
+  grid $c.lfr2.labRepUserPin -column 0  -row 6 -sticky we 
   entry $c.lfr2.entRepUserPin -background snow -show * 
-  grid $c.lfr2.entRepUserPin -column 0 -pady {2 10} -sticky nwse -row 7 -padx {0 5}
+  eval "grid $c.lfr2.entRepUserPin -column 0  -sticky nwse -row 7  -pady {0 $::intpx2mm}"
+  grid columnconfigure $c.lfr2 0  -weight 1
 
 #  grid $c.lfr2 -row 2 -column 0 -sticky se -padx {40 0}
   eval "pack $c.lfr2 -fill both -side top -padx 10  -pady {0 $::intpx2mm}"
