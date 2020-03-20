@@ -256,7 +256,7 @@ array set wizDatacsr {
   typekey "gost2012_256"
   parkey "1.2.643.2.2.35.3"
   dn ""
-  ckzi "Наименование СКЗИ пользователя"
+  ckzi ""
   expkey 0
   selfca 0
   selfssl 1
@@ -268,6 +268,7 @@ array set wizDatacsr {
   keypassword ""
   keytok 1
 }
+#  ckzi "Наименование СКЗИ пользователя"
 set g_iso3166_codes {
   Австралия AU Австрия AT Азербайджан AZ {Аландские о-ва} AX Албания AL Алжир DZ {Американское Самоа} AS
   Ангилья AI Ангола AO Андорра AD Антарктида AQ {Антигуа и Барбуда} AG Аргентина AR Армения AM Аруба AW
@@ -658,6 +659,7 @@ set ::px2mm [winfo fpixels . 1m]
 #Запоминаем сколько целых пикселей в 1 мм
 set aa [expr $::px2mm + 0.5]
 set ::intpx2mm [expr {int($aa)}]
+set ::bdlf [expr $::intpx2mm / 2]
 
 puts "$::scrwidth  $::scrwidthmm $::px2mm"
 set ::typetlf 0
@@ -3654,7 +3656,7 @@ proc page_password {}  {
   ttk::label .lforpas -text "PIN-код для токена"  -textvariable ::labpas 
 
 #Widget for enter PIN or Password
-    frame .topPinPw -relief flat -bd 5 -bg chocolate
+    frame .topPinPw -relief flat -bd $::bdlf -bg chocolate
     labelframe .topPinPw.labFrPw -borderwidth 4 -labelanchor nw -relief groove -labelwidget .lforpas -foreground black -bg #eff0f1 -height 120 -width 200
     if {$::typetlf} {
 	pack .topPinPw.labFrPw -in .topPinPw  -anchor nw -padx 25 -pady 25 -fill both -expand 0
@@ -8070,8 +8072,7 @@ proc func_page1 {c} {
   frame $c.fratext -borderwidth 0 -relief flat -bg #bee9fd
   pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
   set c "$c.fratext"
-
-    labelframe $c.tok -text "Выберите токен и сертификат" -borderwidth 5 -bg wheat -relief groove -padx $::intpx2mm
+    labelframe $c.tok -text "Выберите токен и сертификат" -bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm
     ttk::combobox $c.tok.listTok -textvariable ::nickTok -values $::listtok
     set ::nickTok [lindex $::listtok 0]
     pack $c.tok.listTok -side top  -padx 0 -pady {1 0} -ipady 1  -expand 1 -fill x
@@ -8109,7 +8110,7 @@ proc func_page1 {c} {
 	-initialdir $::myHOME
     eval "pack $c.frdir.e2 -side right  -padx 0 -pady {0 $::intpx2mm} -ipady 1  -expand 1 -fill x"
     eval "pack $c.frdir -fill both -side top -padx $::intpx2mm  -pady [expr $::intpx2mm * 2]"
-    labelframe $c.lfr0 -text "Тип электронной подписи"  -labelanchor n -bg wheat -relief groove -bd 5 -padx $::intpx2mm
+    labelframe $c.lfr0 -text "Тип электронной подписи"  -labelanchor n -bg wheat -relief groove -bd $::bdlf -padx $::intpx2mm
     ttk::radiobutton $c.lfr0.rb1 -value 1 -variable typesig -image signattach
 #   -text "Присоединенная"
     ttk::radiobutton $c.lfr0.rb2 -value 0 -variable typesig -image signdetach
@@ -8119,7 +8120,7 @@ proc func_page1 {c} {
     grid columnconfigure $c.lfr0 1 -weight 1
     grid columnconfigure $c.lfr0 0 -weight 1
     eval "pack $c.lfr0 -fill both -side top -padx $::intpx2mm -pady {0 $::intpx2mm}"
-    labelframe $c.lfr1 -text "Формат ЭП CAdes" -labelanchor n -bg wheat -relief groove -bd 5 -padx $::intpx2mm
+    labelframe $c.lfr1 -text "Формат ЭП CAdes" -labelanchor n -bg wheat -relief groove -bd $::bdlf -padx $::intpx2mm
     ttk::radiobutton $c.lfr1.chb1 -value 0 -variable createescTS -text "- BES"
     ttk::radiobutton $c.lfr1.chb2 -value 1 -variable createescTS -text "- T"
     ttk::radiobutton $c.lfr1.chb3 -value 2 -variable createescTS -text "- XLT1   "
@@ -8197,7 +8198,7 @@ proc func_page2 {c} {
 	-filetypes $filetypep7s
     pack $c.fr0.e1 -side right  -padx 0 -pady {1 0} -ipady 1  -expand 1 -fill x
     pack $c.fr0 -fill both -side top  -padx $::intpx2mm
-    labelframe $c.lfr0 -text "Тип и формат электронной подписи" -labelanchor n -bg wheat -relief groove -bd 5  -padx $::intpx2mm -pady $::intpx2mm
+    labelframe $c.lfr0 -text "Тип и формат электронной подписи" -labelanchor n -bg wheat -relief groove -bd $::bdlf  -padx $::intpx2mm -pady $::intpx2mm
 
     variable typesig1
     variable createescTS1
@@ -8252,7 +8253,7 @@ proc func_page2 {c} {
     pack $c.tsp.tsp -side left
     pack $c.tsp.listTSP -side left -fill x -expand 1
     pack $c.tsp -fill both -side top -padx $::intpx2mm
-  labelframe $c.lfr1 -text "Дополнительные операции" -relief groove -bd 5 -bg wheat -padx $::intpx2mm
+  labelframe $c.lfr1 -text "Дополнительные операции" -relief groove -bd $::bdlf -bg wheat -padx $::intpx2mm
   ttk::radiobutton $c.lfr1.rb1 -value 0 -variable typeop -text "Проверить подпись"  -pad 0
   ttk::radiobutton $c.lfr1.rb2 -value 1 -variable typeop -text "Извлечь док-т" -pad 0
   ttk::radiobutton $c.lfr1.rb4 -value 2 -variable typeop -text "Экспорт сер-та подп-та" -pad 0
@@ -8271,7 +8272,7 @@ proc func_page2 {c} {
   eval "ttk::button  $c.b2 -command {::workOp $corig} -text {Выполнить операцию}"
   eval "pack $c.b2 -side top  -pady $::intpx2mm -anchor ne"
     
-  labelframe $c.lfr2 -text "Добавить подписанта" -relief groove -bd 5 -bg wheat
+  labelframe $c.lfr2 -text "Добавить подписанта" -relief groove -bd $::bdlf -bg wheat
   variable storage
   set storage 1
   ttk::radiobutton $c.lfr2.st1 -value 0 -variable storage -text "PKCS11" -command {}
@@ -8291,11 +8292,12 @@ proc func_page2 {c} {
 proc wizard {tpage toplevel pages func} {
   puts "WIZARD=$toplevel"
   set j 0
+
   for {set i 1} {$i <= $pages} {incr i} {
     set finish {}
     set page $toplevel.p$i
-    frame $page -bg #f5f5f5 -relief flat -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue -padx 2 -pady 2
-    frame $page.page -bg #f5f5f5 -relief flat -highlightthickness 2 -highlightbackground skyblue -highlightcolor skyblue -padx 2 -pady 2
+    frame $page -relief flat -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue -padx 2 -pady 2 
+    frame $page.page -relief flat -highlightthickness 2 -highlightbackground skyblue -highlightcolor skyblue -padx 2 -pady 2
     lappend page_list $page.page
     lappend page_list [lindex $func $j]
     incr j
@@ -9044,22 +9046,22 @@ proc create_csr_list1 {tpage c num} {
   global wizDatacert
   variable certfor
   global macos
-  #puts "LIST1=$c"
-  puts "create_csr_list1 tpage=$tpage"
+  puts "LIST1=$c"
+  puts "WIDTH= [winfo width .]"
+#  puts "create_csr_list1 tpage=$tpage"
 
-#  $c configure -bg white
   $c configure -background #bee9fd
-    labelframe $c.tok -text "Выберите токен PKCS11"  -borderwidth 5
+    labelframe $c.tok -text "Выберите токен PKCS11"  -bd $::bdlf -font TkDefaultFontBold 
     ttk::combobox $c.tok.listTok -textvariable ::nickTok -values $::listtok
     set ::nickTok [lindex $::listtok 0]
     $c.tok.listTok configure -state normal
     $c.tok.listTok configure -values $::listtok
     $c.tok.listTok configure -state readonly
-    pack $c.tok.listTok -fill both -side top -padx 4 -pady {2 4}
-  grid $c.tok -row 0 -column 0 -sticky wsen -padx {4 4} -pady 2
+    pack $c.tok.listTok -fill both -side top -padx 4 -pady {2 4} -expand 1
+  grid $c.tok -row 0 -column 0 -sticky nwse -padx {4 4} -pady 2
 
   set typeCert  {"Физическое лицо" reqFL "Индивидуальный предприниматель" reqIP "Юридическое лицо" reqUL}
-  labelframe $c.l1 -text "Владелец сертификата" 
+  labelframe $c.l1 -text "Кто владелец сертификата:" -font TkDefaultFontBold
 
   set listCert {}
   # insert existing profiles
@@ -9078,9 +9080,9 @@ proc create_csr_list1 {tpage c num} {
 
 
   if {$macos} {
-    spinbox $c.c1 -width 33 -textvariable $type -values $listCert -state readonly
+    spinbox $c.c1 -textvariable $type -values $listCert -state readonly
   } else {
-    ttk::combobox $c.c1 -width 33 -textvariable $type -values $listCert -state readonly -style TCombobox
+    ttk::combobox $c.c1 -textvariable $type -values $listCert -state readonly -style TCombobox
   }
   if {$tpage == "csr"} {
     bind $c.c1 <<ComboboxSelected>> {egais_ul %W "csr" }
@@ -9090,23 +9092,16 @@ proc create_csr_list1 {tpage c num} {
     frame $c.fcrt -relief flat -bg white  -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue -padx 0
     label $c.lcrt -text "Выберите тип сертификата:" -bg white -anchor w
     ttk::radiobutton $c.fcrt.chb1 -value 1 -variable certfor -text "User" -pad 0
-    #	 -highlightthickness 0 -disabledforeground #000000
     ttk::radiobutton $c.fcrt.chb2 -value 0 -variable certfor -text "CA (Корневой)" -pad 0
-    #	-highlightthickness 0 -disabledforeground #000000
-    #	ttk::radiobutton $c.lcrt.chb2 -value 0 -variable certfor -text "CA (Корневой)"
     ttk::radiobutton $c.fcrt.chb3 -value 2 -variable certfor -text "SSL" -pad 0
-    #	 -highlightthickness 0
     pack $c.fcrt.chb1 -side left -padx {8 8} -pady {0 0} -fill y -expand 1 -pady 1
     pack $c.fcrt.chb2 -side left -padx {38 8} -pady {0 0} -fill y -expand 1 -pady 1
     pack $c.fcrt.chb3 -side right -padx {8 8} -pady {0 0} -fill y -expand 1 -pady 1
-    #	grid $c.lcrt.chb1 -row 0 -column 0 -sticky wnse -padx {8 8} -pady {0 2}
-    #	grid $c.lcrt.chb2 -row 0 -column 1 -sticky wnse -padx {8 8} -pady {0 2}
-    #	grid $c.lcrt.chb3 -row 0 -column 2 -sticky wnse -padx {8 8} -pady {0 2}
   }
 
   #Type Key
   # combo box
-  labelframe $c.l3 -text "Тип и параметры ключа" -font TkDefaultFontBold
+  labelframe $c.l3 -text "Тип и параметры ключа" -font TkDefaultFontBold -labelanchor n
   set listKey {gost2012_256 gost2012_512}
   if {$tpage == "csr"} {
     set dflt $wizDatacsr(typekey)
@@ -9117,12 +9112,9 @@ proc create_csr_list1 {tpage c num} {
   if {$macos} {
     spinbox $c.c3 -width 13  -textvariable $typekey -values $listKey -state readonly
   } else {
-    ttk::combobox $c.c3 -width 13  -textvariable $typekey -values $listKey -state readonly  -style TCombobox
+    ttk::combobox $c.c3  -textvariable $typekey -values $listKey -state readonly  -style TCombobox -width 13
   }
   set $typekey $dflt
-  #    $c.c3 delete 0 end
-  #    set tekC [lsearch $listKey $dflt]
-  #    $c.c3 insert end [lindex $listKey $tekC]
 
   #puts "C=$c"
   if {$tpage == "csr"} {
@@ -9142,39 +9134,32 @@ proc create_csr_list1 {tpage c num} {
   if {$macos} {
     spinbox $c.c4 -width 18  -textvariable $parkey -values $listBits  -state readonly
   } else {
-    ttk::combobox $c.c4 -width 18  -textvariable $parkey -values $listBits -style TCombobox -state readonly
+    ttk::combobox $c.c4  -textvariable $parkey -values $listBits -style TCombobox -state readonly -width 17
   }
   $c.c3 delete 0 end
   set tekC [lsearch $listKey $dflt]
   $c.c3 insert end [lindex $listKey $tekC]
-
   set dflt [subst $$ckzi]
-  labelframe $c.l5 -text "Наименование СКЗИ"
-  ttk::entry $c.c5 -textvariable $ckzi -width 33
-#  entry $c.c5 -textvariable $ckzi -width 33 -bg white -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
+
+  labelframe $c.l5 -text "Введите наименование СКЗИ"  -font TkDefaultFontBold
+  entry $c.c5 -textvariable $ckzi -bg white -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
   $c.c5 delete 0 end
   $c.c5 insert end $dflt
 
-  grid $c.l1 -row 1 -column 0 -sticky wsen -padx {4 4} -pady 2
-#  grid $c.c1 -in $c.l1 -row 0 -column 1 -sticky wsen -padx {12 4} -pady 2p
-  pack $c.c1 -in $c.l1  -padx 4 -pady 2p
+  grid $c.l1 -row 1 -column 0 -sticky nwse -padx {4 4} -pady 2
+  grid columnconfigure $c.l1 0 -weight 1
+  pack $c.c1 -in $c.l1  -padx 4 -fill x -pady 2p 
 
   if {$tpage == "cert"} {
     grid $c.lcrt -row 1 -column 0 -columnspan 1 -sticky wsen -padx {4 4} -pady {0 0}
     grid $c.fcrt -row 1 -column 1 -columnspan 2 -sticky wsen -padx {12 4} -pady {0 0}
   }
-  #    grid $c.l3 -row 2 -column 0 -sticky w -padx 4 -pady 4
-  #    grid $c.c3 -row 2 -column 1 -sticky w -padx 4 -pady 4
-  grid $c.l3 -row 2 -column 0 -sticky wsen -padx {4 4} -pady 4
-  grid $c.c3 -in $c.l3  -row 2 -column 0 -sticky e -padx {0 4} -pady 4
-  #    grid $c.l4 -row 3 -column 0 -sticky w -padx 4 -pady 4
-  #    grid $c.c4 -row 3 -column 1 -sticky w -padx 4 -pady 4
-  grid $c.c4 -in $c.l3 -row 2 -column 1 -sticky e -padx {2 4} -pady 4
+  grid $c.l3 -row 2 -column 0 -sticky wsen -padx {4 4} -pady 1mm
+  grid $c.c3 -in $c.l3  -row 2 -column 0 -sticky e -padx {1mm 2mm} -pady {4 2mm}
+  grid $c.c4 -in $c.l3 -row 2 -column 1 -sticky nwse -padx {2mm 0} -pady {4 2mm}
 
-
-  grid $c.l5 -row 40 -column 0 -sticky wsen -padx 4 -pady 4
-#  grid $c.c5 -row 4 -column 1 -sticky w -padx {12 4} -pady 4
-  pack $c.c5 -in $c.l5  -padx {4 4} -pady 4 
+  grid $c.l5 -row 40 -column 0 -sticky nwse -padx {4 4} -pady $::intpx2mm
+  pack $c.c5 -in $c.l5 -fill x -padx 0 -pady 1mm
 
   #    if {$tpage == "csr"} {
   #	checkbutton $c.c6 -text "Ключ неэкспортируемый"  -variable $expkey  -bg white -highlightthickness 0
@@ -9187,9 +9172,9 @@ proc create_csr_list1 {tpage c num} {
   #	grid $c.c7 -row 6 -column 0 -columnspan 2 -sticky w -padx 4 -pady 4
 
   #	label $c.l6 -text "Key Usage:" -font TkDefaultFontBold  -bg skyblue
-  labelframe $c.l6 -text "Использование ключа" 
+  labelframe $c.l6 -text "Использование ключа" -padx $::intpx2mm -font TkDefaultFontBold
   # -bg skyblue
-  grid $c.l6 -row 7 -column 0 -columnspan 1 -sticky wsen -padx 4 ;#-pady 4
+  grid $c.l6 -row 7 -column 0 -columnspan 1 -sticky wsen -padx 1mm -pady {2mm 2mm} ;#-pady 4
 
   set i 8
   set j 0
@@ -9204,15 +9189,11 @@ proc create_csr_list1 {tpage c num} {
   }
   if {$tpage == "csr"} {
     incr ir
-#    checkbutton $c.egais -image egais_83x36 -text "Запрос на сертификат для ЕГАИС" -variable ::egais  -compound left  -bd 0 -bg skyblue
     checkbutton $c.egais -text "Запрос на сертификат для ЕГАИС" -variable ::egais  -compound left  -bd 0 -bg skyblue
-    #	 -background white -activebackground white -highlightthickness 0
     grid $c.egais -row $ir -column 0 -columnspan 3 -sticky w -padx 0 -pady 0
     grid remove $c.egais
     egais_ul $c.c1 "csr"
   }
-
-  return
 }
 
 set typeCert  {"Физическое лицо" reqFL "Индивидуальный предприниматель" reqIP "Юридическое лицо" reqUL}
@@ -9629,7 +9610,7 @@ proc create_csr_list5 {tpage c num} {
     -initialdir $::myHOME
   }
 
-  labelframe $c.ftype -text "Формат файла с запросом:" -bd 5 -relief groove -bg wheat -labelanchor n -padx $::intpx2mm
+  labelframe $c.ftype -text "Формат файла с запросом:" -bd $::bdlf -relief groove -bg wheat -labelanchor n -padx $::intpx2mm
   ttk::radiobutton $c.ftype.typeDer -text "DER-формат" -value 0 -variable ::formatCSR -pad 0
   pack $c.ftype.typeDer -expand 1 -fill x  -side left -padx 0 -pady 1
   ttk::radiobutton $c.ftype.typePem -text "PEM-формат" -value 1 -variable ::formatCSR -pad 0
@@ -9911,7 +9892,7 @@ proc func_page4 {c} {
   pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
   set c "$c.fratext"
 
-    labelframe $c.tok -text "Сертификаты токена"  -borderwidth 5 -bg wheat -relief groove
+    labelframe $c.tok -text "Сертификаты токена"  -bd $::bdlf -bg wheat -relief groove
     ttk::combobox $c.tok.listCert -textvariable nickCert -state readonly -values $::listx509
     button $c.tok.viewcert -command {if {[info exists nickCert]} {::viewCert "pkcs11" $nickCert}} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0
     pack $c.tok.listCert -side left  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
@@ -9968,7 +9949,7 @@ proc func_page4 {c} {
   pack $c.fcrt.viewcrt -side right -padx {2 0} -pady 0 -expand 0 -fill none
   pack $c.fcrt -fill both -side top -padx $::intpx2mm -pady 0
 
-  labelframe $c.lfr1 -text "Операции с сертификатом из файла" -borderwidth 5 -bg wheat -relief groove -padx $::intpx2mm
+  labelframe $c.lfr1 -text "Операции с сертификатом из файла" -bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm
   ttk::radiobutton $c.lfr1.rb1 -value 0 -variable opcert -text "Цепочка/Проверка подписи" -pad 0
   ttk::radiobutton $c.lfr1.rb2 -value 1 -variable opcert -text "Проверка валидности" -pad 0
   #    radiobutton $c.lfr1.rb3 -value 2 -variable opcert -text "Просмотр сертификата" -highlightthickness 0
@@ -9984,7 +9965,7 @@ proc func_page4 {c} {
   eval "pack $c.b2  -side top -pady {$::intpx2mm 0} -padx {0 $::intpx2mm} -anchor e"
   label $c.lsep1 -text "Работа с сертификатом на токене" -font TkDefaultFontBold -bg #eff0f1 -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
   eval "pack $c.lsep1 -fill both -side top -padx 0 -pady {0 $::intpx2mm}"
-  labelframe $c.lfr2 -text "Операция с сертификатом на токене" -borderwidth 5 -bg wheat -relief groove -padx $::intpx2mm
+  labelframe $c.lfr2 -text "Операция с сертификатом на токене" -bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm
 #  labelframe $c.lfr2 -text "Операция с сертификатом на токене"  -font TkDefaultFontBold
   ttk::radiobutton $c.lfr2.rb0 -value 4 -variable opcertp11 -text "Удалить сертификат с токена" -pad 0
   ttk::radiobutton $c.lfr2.rb1 -value 0 -variable opcertp11 -text "Цепочка/Проверка подписи" -pad 0
@@ -10111,7 +10092,7 @@ proc func_page7 {c} {
 	-initialdir $::myHOME
     pack $c.frdir.e2 -side right  -padx {2 1}  -ipady 1  -expand 1 -fill x
     pack $c.frdir -fill both -side top -padx $::intpx2mm  -pady 0
-    labelframe $c.lfrat -text "Тип электронной подписи"  -labelanchor n -bg wheat -relief groove -bd 5
+    labelframe $c.lfrat -text "Тип электронной подписи"  -labelanchor n -bg wheat -relief groove -bd $::bdlf
     ttk::radiobutton $c.lfrat.rb1 -value 1 -variable typesig -image signattach -pad 0
 #   -text "Присоединенная"
     ttk::radiobutton $c.lfrat.rb2 -value 0 -variable typesig -image signdetach -pad 0
@@ -10122,7 +10103,7 @@ proc func_page7 {c} {
     grid columnconfigure $c.lfrat 0 -weight 1
     pack $c.lfrat -fill both -side top -padx $::intpx2mm -pady 0
 
-    labelframe $c.lfr0 -text "Формат электронной подписи"  -labelanchor n -borderwidth 5 -bg wheat -relief groove
+    labelframe $c.lfr0 -text "Формат электронной подписи"  -labelanchor n -bd $::bdlf -bg wheat -relief groove
     ttk::radiobutton $c.lfr0.chb1 -value 0 -variable createescTS -text "CAdes-BES" -pad 0
     ttk::radiobutton $c.lfr0.chb2 -value 1 -variable createescTS -text "CAdes-T" -pad 0
     ttk::radiobutton $c.lfr0.chb3 -value 2 -variable createescTS -text "CAdes-XLT1" -pad 0
@@ -10145,7 +10126,7 @@ proc func_page7 {c} {
     eval [subst $com]
     eval "pack $c.b2 -side top -anchor center -padx $::intpx2mm  -pady $::intpx2mm -anchor ne "
 
-    labelframe $c.lfr1 -text "Дополнительные операции" -bd 5 -bg wheat -relief groove -padx $::intpx2mm
+    labelframe $c.lfr1 -text "Дополнительные операции" -bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm
     ttk::radiobutton $c.lfr1.rb1 -value 0 -variable top12 -text "Сертификат на токен" -pad 0
     ttk::radiobutton $c.lfr1.rb2 -value 1 -variable top12 -text "Ключ на токен" -pad 0
     ttk::checkbutton $c.lfr1.ch0 -variable exp12 -text "Неэкспортируемый" -pad 0
@@ -10566,7 +10547,7 @@ proc func_page11 {c} {
   set optok 0
   variable laboptok
 
-    labelframe $c.tok -text "Выберите токен PKCS11"  -borderwidth 5
+    labelframe $c.tok -text "Выберите токен PKCS11"  -bd $::bdlf
     ttk::combobox $c.tok.listTok -textvariable ::nickTok -values $::listtok
     set ::nickTok [lindex $::listtok 0]
     $c.tok.listTok configure -state readonly
@@ -10576,7 +10557,7 @@ proc func_page11 {c} {
   pack $c.tok -fill both -side top 
 #  grid $c.tok -row 0 -column 0 -sticky wsen -padx 10 -pady 10
   set laboptok "Для инициализации токена \nзаполните следующие поля:"
-  labelframe $c.lfr1 -text "Выберите операцию с токеном:" -borderwidth 5 -bg wheat -relief groove -padx $::intpx2mm
+  labelframe $c.lfr1 -text "Выберите операцию с токеном:" -bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm
   set cmd "ttk::radiobutton $c.lfr1.rb1 -value 0 -variable optok -text {Инициализация токена} -width 30 -command {setoptok $c} -pad 0"
   eval [subst $cmd]
   set cmd "ttk::radiobutton $c.lfr1.rb2 -value 1 -variable optok -text {Сменить USER-PIN} -command {setoptok $c} -pad 0"
@@ -10598,7 +10579,7 @@ proc func_page11 {c} {
   grid columnconfigure $c.lfr1 0  -weight 1
 
   ttk::label .lfortok -textvariable laboptok -background wheat
-  labelframe $c.lfr2 -labelwidget .lfortok  -borderwidth 5 -bg wheat -relief groove -padx $::intpx2mm
+  labelframe $c.lfr2 -labelwidget .lfortok  -bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm
 #  ttk::label .lfortok -textvariable laboptok -background #bee9fd
 #  labelframe $c.lfr2 -labelwidget .lfortok -bg #bee9fd
   label $c.lfr2.labTok -background skyblue -justify left -text "Введите метку токена"  -anchor nw
@@ -11002,7 +10983,7 @@ set ::slotid_tek 0
 
 #Информация о токене
 proc func_page5 {w} {
-    labelframe $w.tok -text "Выберите токен PKCS11"  -borderwidth 5
+    labelframe $w.tok -text "Выберите токен PKCS11"  -bd $::bdlf
     ttk::combobox $w.tok.listTok -textvariable ::nickTok -values $::listtok
     set ::nickTok [lindex $::listtok 0]
 #    button $w.tok.updateTok -command {updatetok} -image ::img::update_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0
@@ -11176,7 +11157,7 @@ wm state . normal
 #Информация об объектах токене
 proc func_page6 {w} {
     set ::listObjs [list ]
-    labelframe $w.tok -text "Выберите токен PKCS11" -borderwidth 5
+    labelframe $w.tok -text "Выберите токен PKCS11" -bd $::bdlf
     ttk::combobox $w.tok.listTok -textvariable ::nickTok -values $::listtok
     set ::nickTok [lindex $::listtok 0]
     set cmd "button $w.tok.updateTok -command {::updateobj $w} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0"
@@ -11202,7 +11183,7 @@ proc func_page6 {w} {
     $w.fratext.text configure -background white
   pack $w.fratext -in $w -anchor center -expand 1 -fill both -side top
 
-  labelframe $w.frhd -text "Handle объекта" -borderwidth 5
+  labelframe $w.frhd -text "Handle объекта" -bd $::bdlf
   ttk::combobox $w.frhd.lobj -textvariable ::handleObj -values $::listObjs -takefocus {}   -style TCombobox
   #    -state readonly
 
