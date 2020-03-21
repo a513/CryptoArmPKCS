@@ -1054,48 +1054,12 @@ array set param3410 {
 #set mydir [file dirname [info script]]
 update
 wm title . "Full-screen with NO decorations"
-wm overrideredirect . yes      ;# removes window decorations
 
 set ::certfrompfx ""
-################
-if {0} {
-pack [text .t -wrap none] -fill both -expand 1
-set count 0
-set tabwidth 0
-
-font delete TkDefaultFont
-font create TkDeafaultFont -family {Arial} -size 10
-option add *font TkDefaultFont
-
-.t insert end "This is a simple sampler Функционал\n"
-
-foreach family [lsort -dictionary [font families]] {
-    .t tag configure f[incr count] -font [list $family 10]
-    .t insert end ${family}:\t {} \
-            "This is a simple sampler Функционал\n" f$count
-    set w [font measure [.t cget -font] ${family}:]
-    if {$w+5 > $tabwidth} {
-        set tabwidth [expr {$w+5}]
-        .t configure -tabs $tabwidth
-    }
-}
-set i 0
-set fam ""
-foreach family [lsort -dictionary [font families]] {
-    append fam "$family\n"
-    incr i
-    if {$i > 10 } {
-	set i 0
-tk_messageBox -title "FONTS" -icon info -message "$fam"
-set fam ""
-
-    }
-}
-}
-
-###############
 set ::sntlf "Неизвестно"
+
 if {$::scrwidth < $::scrheight} {
+   wm overrideredirect . yes      ;# removes window decorations
     global env
 #    option add *Dialog.msg.width 70
     option add *Dialog.msg.wrapLength 750
@@ -1192,7 +1156,7 @@ load $ltclpkcs11 Tclpkcs11
     set ::scrheight [expr int(160 * $px2mm)]
 #    set ::scrheight 670
 #    set ::scrheight 600
-    wm minsize . $::scrwidth $::scrheight
+    wm minsize . [expr $::scrwidth * 2] $::scrheight
     set geometr $::scrwidth
     append geometr "x"
     append geometr $::scrheight
@@ -1229,11 +1193,15 @@ proc dateLIC {} {
 
 proc butImg {img} {
     if {$img == "but2"} {
-	pack forget  .fr0
-	pack .fr1 -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
+	if {$::typetlf} {
+	    pack forget  .fr0
+	    pack .fr1 -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
+	} 
     } elseif {$img == "but1"} {
-	pack forget  .fr1
-	pack .fr0 -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
+	if {$::typetlf} {    
+	    pack forget  .fr1
+	    pack .fr0 -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
+	}
     } elseif {$img == "but3"} {
 	exitPKCS
     } elseif {$img == "img1"} {
@@ -1987,7 +1955,7 @@ puts "butCliked=$num, fr=$fr"
     #puts "MOVE wizpage=$::wizpagecsr"
 	move "csr" [lindex $::pagescsr 0]
 #	pack $fr 
-	pack $fr -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
+	pack $fr -side top -anchor center -expand 1 -fill both  -padx 0 -pady 0 
 #pack forget $fr.can
 #pack $fr.can  -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0
     } elseif {$num == 6} {
@@ -1997,9 +1965,13 @@ puts "butCliked=$num, fr=$fr"
 	$fr.fratext.frhd.lobj delete 0 end
 	$fr.fratext.frhd.lobj configure -values $::listObjs
 	$fr.fratext.frhd.lobj configure -state readonly
-	pack $fr -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
+	pack $fr -side top -anchor center -expand 1 -fill both  -padx 0 -pady 0 
     } else {
-	pack $fr -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
+	if {$::typetlf} {
+	    pack $fr -side top -anchor ne -expand 1 -fill both   -padx 0 -pady 0 
+	} else {
+	    pack $fr -side right -anchor ne -expand 1 -fill both   -padx 0 -pady 0 
+	}
     }
 #    tk_dialog .dialog1 "Dear user:" "Button $num was clicked\nFr=$fr" info 0 OK 
 }
@@ -3657,21 +3629,17 @@ proc page_password {}  {
 
 #Widget for enter PIN or Password
     frame .topPinPw -relief flat -bd $::bdlf -bg chocolate
-    labelframe .topPinPw.labFrPw -borderwidth 4 -labelanchor nw -relief groove -labelwidget .lforpas -foreground black -bg #eff0f1 -height 120 -width 200
-    if {$::typetlf} {
-	pack .topPinPw.labFrPw -in .topPinPw  -anchor nw -padx 25 -pady 25 -fill both -expand 0
-    } else {
-	pack .topPinPw.labFrPw -in .topPinPw  -anchor nw -padx 10 -pady 10 -fill both -expand 0
-    }
+    labelframe .topPinPw.labFrPw -borderwidth 4 -labelanchor nw -relief groove -labelwidget .lforpas -foreground black -height 120 -width 200  -bg #eff0f1
+    pack .topPinPw.labFrPw -in .topPinPw  -anchor nw -padx 1mm -pady $::bdlf -fill both -expand 0
     entry .topPinPw.labFrPw.entryPw -background snow -show * -highlightbackground gray85 -highlightcolor skyblue -justify left -relief sunken 
     entry .topPinPw.labFrPw.entryLb -background snow -highlightbackground gray85 -highlightcolor skyblue -justify left -relief sunken
-    pack .topPinPw.labFrPw.entryPw -fill x -expand 1 -padx 5 -pady 5  -ipady 2 -pady 20
+    pack .topPinPw.labFrPw.entryPw -fill x -expand 1 -padx 1mm -ipady 2 -pady 2mm
     bind .topPinPw.labFrPw.entryPw <Key-Return> {readPw .topPinPw.labFrPw.entryPw}
     bind .topPinPw.labFrPw.entryLb <Key-Return> {readPw .topPinPw.labFrPw.entryLb}
     ttk::button .topPinPw.labFrPw.butPw  -command {global yespas;set yespas "no"; } -text "Отмена"
     ttk::button .topPinPw.labFrPw.butOk  -command {readPw .topPinPw.labFrPw.entryPw} -text "Готово"
     ttk::button .topPinPw.labFrPw.butLbOk  -command {readPw .topPinPw.labFrPw.entryLb} -text "Готово"
-    pack .topPinPw.labFrPw.butPw .topPinPw.labFrPw.butOk -pady {0 5} -sid right -padx 5 -pady {0 20}
+    pack .topPinPw.labFrPw.butPw .topPinPw.labFrPw.butOk -pady {0 5} -sid right -padx 5 -pady {0 2mm}
 }
 
 proc ::sign_file {w typekey} {
@@ -8072,21 +8040,19 @@ proc func_page1 {c} {
   frame $c.fratext -borderwidth 0 -relief flat -bg #bee9fd
   pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
   set c "$c.fratext"
-    labelframe $c.tok -text "Выберите токен и сертификат" -bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm
+    labelframe $c.tok -text "Выберите токен и сертификат" -bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm -width 400 
     ttk::combobox $c.tok.listTok -textvariable ::nickTok -values $::listtok
     set ::nickTok [lindex $::listtok 0]
     pack $c.tok.listTok -side top  -padx 0 -pady {1 0} -ipady 1  -expand 1 -fill x
-    eval "pack $c.tok -fill both -side top -padx $::intpx2mm -pady $::intpx2mm"
-
+    pack $c.tok -fill both -side top -padx $::intpx2mm -pady $::intpx2mm -anchor nw
     labelframe $c.cert -text "Сертификаты токена"  -borderwidth 0 -relief flat
     ttk::combobox $c.cert.listCert -textvariable nickCert -values $::listx509
     button $c.cert.viewcert -command {if {[info exists nickCert]} {::viewCert "pkcs11" $nickCert}} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0
     pack $c.cert.listCert -side left  -padx {0 1} -pady {1 0} -ipady 1  -expand 1 -fill x
     pack $c.cert.viewcert -side right -padx {0 5} -pady 0 -expand 0 -fill none
-    eval "pack $c.cert -in $c.tok -fill both -side top -padx {2 1} -pady $::intpx2mm"
-
+    eval "pack $c.cert -in $c.tok -fill both -side top -padx {2 1} -pady $::intpx2mm -expand 1"
     labelframe $c.frdoc -text "Документ для подписи:" -relief flat -bd 0 -padx 0 -pady 0
-    set wd 30
+    set wd 0
     if {$macos} {
 	set ft ""
     } else {
@@ -8117,8 +8083,8 @@ proc func_page1 {c} {
   # -text "Отсоединенная"
     eval "grid $c.lfr0.rb1 -row 0 -column 0 -sticky wsen -padx {8 0} -pady $::intpx2mm"
     grid $c.lfr0.rb2 -row 0 -column 1 -sticky ns -padx {0 0} -pady {0 4}
-    grid columnconfigure $c.lfr0 1 -weight 1
     grid columnconfigure $c.lfr0 0 -weight 1
+    grid columnconfigure $c.lfr0.rb1 0 -weight 1
     eval "pack $c.lfr0 -fill both -side top -padx $::intpx2mm -pady {0 $::intpx2mm}"
     labelframe $c.lfr1 -text "Формат ЭП CAdes" -labelanchor n -bg wheat -relief groove -bd $::bdlf -padx $::intpx2mm
     ttk::radiobutton $c.lfr1.chb1 -value 0 -variable createescTS -text "- BES"
@@ -8130,7 +8096,7 @@ proc func_page1 {c} {
     grid columnconfigure $c.lfr1 1 -weight 1
     pack $c.lfr1 -fill both -side top -padx $::intpx2mm
 #########################
-    labelframe $c.tsp -text "Сервер TSP:" -bd 0 -padx 0 -pady 0
+    labelframe $c.tsp -text "Сервер TSP:____________________________________" -bd 0 -padx 0 -pady 0
     # -bg #bee9fd
     if {$macos} {
 	spinbox $c.tsp.listTSP  -textvariable ::tekTSP -values $::listtsp -width $wd -background white
@@ -8226,7 +8192,6 @@ proc func_page2 {c} {
     pack $c.l5 -fill both -side top -padx $::intpx2mm -pady 0
 
     labelframe $c.frdoc -text "Подписанный документ:" -bd 0
-    set wd 30
     if {$macos} {
 	set ft ""
     } else {
@@ -8234,7 +8199,6 @@ proc func_page2 {c} {
     }
     cagui::FileEntry $c.frdoc.e1 -dialogtype open \
 	-title "Выберите полписанный документ" \
-	-width $wd \
 	-defaultextension .txt \
 	-variable  src_fn \
 	-initialdir $::myHOME \
@@ -8245,9 +8209,9 @@ proc func_page2 {c} {
     ttk::frame $c.tsp
     label $c.tsp.tsp -text "Сервер TSP:" -anchor w -bg white  -width 0 -height 0
     if {$macos} {
-	spinbox $c.tsp.listTSP  -textvariable ::tekTSP -values $::listtsp -width $wd -background white
+	spinbox $c.tsp.listTSP  -textvariable ::tekTSP -values $::listtsp -width 0 -background white
     } else {
-	ttk::combobox $c.tsp.listTSP  -textvariable ::tekTSP -values $::listtsp -width $wd -background white -style TCombobox
+	ttk::combobox $c.tsp.listTSP  -textvariable ::tekTSP -values $::listtsp -width 0 -background white -style TCombobox
     }
     set ::tekTSP [lindex $::listtsp 0]
     pack $c.tsp.tsp -side left
@@ -9141,7 +9105,7 @@ proc create_csr_list1 {tpage c num} {
   $c.c3 insert end [lindex $listKey $tekC]
   set dflt [subst $$ckzi]
 
-  labelframe $c.l5 -text "Введите наименование СКЗИ"  -font TkDefaultFontBold
+  labelframe $c.l5 -text "Введите наименование СКЗИ__________"  -font TkDefaultFontBold
   entry $c.c5 -textvariable $ckzi -bg white -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
   $c.c5 delete 0 end
   $c.c5 insert end $dflt
@@ -10971,28 +10935,24 @@ set ::slotid_tek 0
     $w.fratext.text insert end "Криптографические механизмы токена $::slotid_teklab\n" tagAbout
     #puts "HANDLE:ID:LAB=$::handle : $::slotid_tek : $::slotid_teklab"
     set llmech [pki::pkcs11::listmechs $::handle 0]
-#    set llmech [pki::pkcs11::listmechs $::handle $::slotid_tek]
     foreach mech $llmech {
       $w.fratext.text insert end $mech
       $w.fratext.text insert end "\n"
     }
-#  $w.fratext.text configure -state disabled
-#tk_messageBox -title "Список мех" -icon info -message "END\nHAndle=$::handle" 
 }
-
 
 #Информация о токене
 proc func_page5 {w} {
-    labelframe $w.tok -text "Выберите токен PKCS11"  -bd $::bdlf
+    labelframe $w.tok -text "Выберите токен PKCS11"  -bd 0 -padx 0 -labelanchor nw
     ttk::combobox $w.tok.listTok -textvariable ::nickTok -values $::listtok
     set ::nickTok [lindex $::listtok 0]
 #    button $w.tok.updateTok -command {updatetok} -image ::img::update_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0
     set cmd "button $w.tok.updateTok -command {mechlist $w} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0"
     set cmd [subst $cmd]
     eval $cmd 
-    pack $w.tok.listTok -side left  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
+    pack $w.tok.listTok -side left  -padx {0 1mm} -pady {1 0} -ipady 1  -expand 1 -fill x
     pack $w.tok.updateTok -side right -padx {0 5} -pady 0 -expand 0 -fill none
-    pack $w.tok -fill x -side top -padx 10 -pady 4
+    pack $w.tok -fill x -side top -padx 0 -pady 4
 
   frame $w.fratext -borderwidth 0 -relief flat  -bg #bee9fd
   text $w.fratext.text -yscrollcommand [list $w.fratext.scr set]  \
@@ -11009,10 +10969,7 @@ proc func_page5 {w} {
   set cmd "ttk::button  $w.butop -command {mechlist  $w} -text {Механизмы} -style TButton"
   eval [subst $cmd]
 #  grid $c.butop -row 3 -column 0  -sticky se -padx 0 -pady {10 0}
-  eval "pack $w.butop -fill none -side top -padx 10 -pady [expr $::intpx2mm * 2]"
-
-# mechlist $w
-#  set ::entryd ""
+  eval "pack $w.butop -fill none -side top -padx 1mm -pady [expr $::intpx2mm * 2]"
 }
 
 proc ::deleteObject {w } {
@@ -11026,13 +10983,16 @@ proc ::deleteObject {w } {
 	tk_messageBox -title "Удалить объект" -icon info -message "Список объектов пуст" 
         return
     }
-    
-
-  puts "HANDLE=$::handleObj"
+#  puts "HANDLE=$::handleObj"
 
   set aa [dict create pkcs11_handle $::handle pkcs11_slotid $::slotid_tek]
   lappend aa "hobj"
   lappend aa $::handleObj
+    set answer [tk_messageBox -title "Удаление объекта" -icon question -message "Удалить объект?" -type yesno ]
+    if {$answer != "yes"} {
+#      puts "Передумали"
+      return
+    }
 
   set err [::pki::pkcs11::delete obj $aa]
   #    catch {::pki::pkcs11::logout $::handle $::slotid_tek}
@@ -11058,16 +11018,13 @@ proc ::updateobj {w} {
 #  wm title .topPinPw "Токен: $::slotid_teklab"
     #Ввод PIN-кода
     pack forget $w.
-#    place .topPinPw -in .fn6 -relx 0.0 -rely 0.27 -relwidth 1.0
     place .topPinPw -in .fn6 -relx 0.01 -rely 0.27 -relwidth 0.98
-#    pack .topPinPw -in .fn1 -side top
     after 100
     update
     focus .topPinPw.labFrPw.entryPw
     set yespass ""
     vwait yespas
     place forget .topPinPw
-#    pack forget .topPinPw
     pack $w -side bottom
     #Ввод пароля
   if { $yespas == "no" } {
@@ -11157,15 +11114,15 @@ wm state . normal
 #Информация об объектах токене
 proc func_page6 {w} {
     set ::listObjs [list ]
-    labelframe $w.tok -text "Выберите токен PKCS11" -bd $::bdlf
+    labelframe $w.tok -text "Выберите токен и его объекты" -bd 0
     ttk::combobox $w.tok.listTok -textvariable ::nickTok -values $::listtok
     set ::nickTok [lindex $::listtok 0]
     set cmd "button $w.tok.updateTok -command {::updateobj $w} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0"
     set cmd [subst $cmd]
     eval $cmd 
-    pack $w.tok.listTok -side left  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
+    pack $w.tok.listTok -side left  -padx {0 1mm} -pady {1 0} -ipady 1  -expand 1 -fill x
     pack $w.tok.updateTok -side right -padx {0 5} -pady 0 -expand 0 -fill none
-    pack $w.tok -fill x -side top -padx 10 -pady 4
+    pack $w.tok -fill x -side top -padx 0 -pady 4
 #Общий фрейм для place
   frame $w.fratext -borderwidth 0 -relief flat -bg #bee9fd
   pack $w.fratext  -anchor center -expand 1 -fill both -side top
@@ -11192,8 +11149,8 @@ proc func_page6 {w} {
   eval $cmd 
 
   pack $w.frhd.lobj -anchor center -expand 1 -fill x -side left -ipadx 3 -ipady 2 -padx 5
-  pack $w.frhd.butdel -anchor center -expand 0 -fill none -side left -ipady 0 -pady 0 -padx {0 10}
-  pack $w.frhd -fill x -side top -padx 10 -pady 4
+  pack $w.frhd.butdel -anchor center -expand 0 -fill none -side left -ipady 0 -pady 0 -padx 1mm
+  pack $w.frhd -fill x -side top -padx 0 -pady 4
 }
 
 #proc page_about  {w} 
@@ -11354,7 +11311,6 @@ if {$drawerCNT == 12} {
 	-anchor w \
         -font fontTEMP_drawer \
         -text "$but($drawerCNT)" 
-#        -tag textlineTag($drawerCNT)
 #Прозрачный прямоугольник между двумя линиями - это и есть кнопка
       $fr.can create rect $xLocTextPx [expr $yLineLocPx + $widl]  [expr $drawerWidthPx + $xLocTextPx] [expr $yLineLocPx + $boxbut - $widl] \
 	-width 0 \
@@ -11369,12 +11325,11 @@ if {$drawerCNT == 12} {
 		$fr.can bind textlineTag($drawerCNT)  <ButtonRelease-1>   {butReturn}
 	    }
 	} else {
-	    frame .fn$drawerCNT -background white -relief flat -pady $::intpx2mm -padx $::intpx2mm -bg #bee9fd
-#	    set titul ""
+	    frame .fn$drawerCNT -background white -relief flat -pady $::intpx2mm -padx $::intpx2mm -bg #bee9fd -width $::scrwidth
 	    set titul $but($drawerCNT)
 	    if {$drawerCNT != 1 && $drawerCNT != 2 && $drawerCNT != 3 && $drawerCNT != 4 && $drawerCNT != 5 && $drawerCNT != 6 && $drawerCNT != 7 && $drawerCNT != 9 && $drawerCNT != 10 && $drawerCNT != 11} {
-#		label .fn$drawerCNT.lab -text $but($drawerCNT) 
-#		pack .fn$drawerCNT.lab -side top 
+		label .fn$drawerCNT.lab -text "$but($drawerCNT) 0123456789"
+		pack .fn$drawerCNT.lab -side top  -fill x 
 	    } else {
 		func_page$drawerCNT .fn$drawerCNT
 	    }
@@ -11384,10 +11339,10 @@ if {$drawerCNT == 12} {
 	    set but1(0) "Возврат в основное меню"
 	    frame .fn$drawerCNT.can
 	    set frret .fn$drawerCNT.can
-	    eval "frame $frret.sep -bg #a0a0a0 -height $::intpx2mm -relief groove -bd $::intpx2mm"
+	    eval "frame $frret.sep -bg #a0a0a0 -width $::scrwidth -height $::intpx2mm -relief groove -bd $::intpx2mm"
 	    eval "label $frret.seplab -text {$titul}  -bg skyblue -font {-family {$::ftxt} -size 12}"
 	    eval "button $frret.sepbut -text {Возврат в основное меню} -bg skyblue -command {butReturn}"
-	    pack $frret.sepbut -side bottom  -expand 1
+	    pack $frret.sepbut -side bottom  
 	    pack $frret.seplab -side bottom -fill x -expand 1
 	    pack $frret.sep -side bottom  -fill x
 	    pack $frret -side bottom -fill both -expand 1
@@ -11456,7 +11411,11 @@ ttk::frame .fr$i -pad 0 -padding 0
 #frame .fr$i -padx 0 -relief flat -bd 0
 page_titul ".fr$i"  "logo_ls"
 #page_titul ".fr$i"  "logo_orel"
-pack .fr$i -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
+if {$::typetlf} {
+    pack .fr$i -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0 
+} else {
+    pack .fr$i -side top -anchor center -expand 1 -fill both -side left  -padx 0 -pady 0 
+}
 update
 #Создаем страницы с функционалом
 incr i
@@ -11478,6 +11437,9 @@ ttk::frame .fr$i -pad 0 -padding 0
 #parray but
 
 page_func ".fr$i" newtile "Функционал" "but"
+if {!$::typetlf} {
+    pack .fr$i -side right -anchor ne -fill both -expand 1
+}
 #Create Widget for enter PIN or Password
 page_password
 #ЧАСЫ СТАРТ
