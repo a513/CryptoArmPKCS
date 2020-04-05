@@ -159,6 +159,16 @@ GNUwqoGeGgAWkgtw6lHz0gAAAABJRU5ErkJggg==
 }]
 
 set I(scrollbar-trough-vert-active) [image create photo  -data {
+iVBORw0KGgoAAAANSUhEUgAAABQAAAA4CAYAAAD959hAAAABhWlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AYht/+SEWqDnYQcYhSnSyIijhqFYpQIdQKrTqYXPoHTRqS
+FBdHwbXg4M9i1cHFWVcHV0EQ/AFxcnRSdJESv0sKLWK847iH97735e47wF8vM9UMjgOqZhmpRFzIZFeF0CuCNHswhGGJmfqcKCbhOb7u4eP7XYxnedf9ObqVnMkAn0A8
+y3TDIt4gnt60dM77xBFWlBTic+Ixgy5I/Mh12eU3zgWH/TwzYqRT88QRYqHQxnIbs6KhEk8RRxVVo3x/xmWF8xZntVxlzXvyF4Zz2soy12kNIoFFLEGEABlVlFCGhRjt
+GikmUnQe9/APOH6RXDK5SmDkWEAFKiTHD/4Hv3tr5icn3KRwHOh4se2PESC0CzRqtv19bNuNEyDwDFxpLX+lDsx8kl5radEjoHcbuLhuafIecLkD9D/pkiE5UoCWP58H
+3s/om7JA3y3Qteb2rXmO0wcgTb1K3gAHh8BogbLXPd7d2d63f2ua/fsBSEZylgWSZiIAAAAGYktHRAD/AP8A/6C9p5MAAAAJcEhZcwAALiMAAC4jAXilP3YAAAAHdElN
+RQfkBAQOKRhmV+gUAAAAGXRFWHRDb21tZW50AENyZWF0ZWQgd2l0aCBHSU1QV4EOFwAAAE5JREFUWMPtzLEJACAQBEHfhswEe7BcexDMrEhTwVc+EEz2woUbcZeFmLLW
+e6vl9PHu8QABAQEBAQEBAQEBAQEBAQE/gDJszQiK7GetrZtQ9wh0fGlLIQAAAABJRU5ErkJggg==
+}]
+
+set I(scrollbar-trough-vert-active_ORIG) [image create photo  -data {
 iVBORw0KGgoAAAANSUhEUgAAABQAAAA4CAYAAAD959hAAAAABmJLR0QA/wD/AP+g
 vaeTAAAAsUlEQVRYhe3XoQ7CMBQF0NuNUgzZFPwACswcFrsvnsXiZkDxA6BYMJSy
 DoNYUtYtDYbsPnn77kntA0Y3om9hlecqud6XAFAt5pdzUehgMMt2aTPVWwDyExnx
@@ -715,11 +725,23 @@ if {0} {
 #For Android
 set iw 0
 set existtlf [info exists ::typetlf]
+#Запоминаем сколько пикселей в 1 мм
+set ::px2mm [winfo fpixels . 1m]
+
 if {$existtlf && $::typetlf} {
 #Для Android
     set iw [expr [image width $I(radio-checked-active)] * 2]
+    set upz 1
+    if { $::px2mm > 15} {
+	set upz 4
+    } elseif { $::px2mm > 10} {
+	set upz 3
+    } elseif { $::px2mm > 5} {
+	set upz 2
+    }
+
     foreach index [array names I] {
-	scaleImage $I($index) 3
+	scaleImage $I($index) $upz
     }
         ttk::style element create CheckbuttonMY.indicator image [list $I(checkbox-unchecked) \
                 disabled            $I(checkbox-unchecked-insensitive) \
@@ -745,6 +767,34 @@ if {$existtlf && $::typetlf} {
     ttk::style layout TCheckbutton {
 	Checkbutton.padding -sticky nswe -children {CheckbuttonMY.indicator -side left -sticky {} Checkbutton.focus -side left -sticky w -children {Checkbutton.label -sticky nswe}} 
     }
+
+        ttk::style element create HorizontalMY.Scrollbar.trough image $I(scrollbar-trough-horiz-active) \
+        -border {6 0 6 0} -sticky ew
+        ttk::style element create HorizontalMY.Scrollbar.thumb \
+             image [list $I(scrollbar-slider-horiz) \
+                        {active !disabled}  $I(scrollbar-slider-horiz-active) \
+                        disabled            $I(scrollbar-slider-insens) \
+            ] -border {6 0 6 0} -sticky ew
+
+        ttk::style element create VerticalMY.Scrollbar.trough image $I(scrollbar-trough-vert-active) \
+            -border {0 6 0 6} -sticky ns
+        ttk::style element create VerticalMY.Scrollbar.thumb \
+            image [list $I(scrollbar-slider-vert) \
+                        {active !disabled}  $I(scrollbar-slider-vert-active) \
+                        disabled            $I(scrollbar-slider-insens) \
+            ] -border {0 6 0 6} -sticky ns
+
+        ttk::style layout Vertical.TScrollbar {
+            VerticalMY.Scrollbar.trough -sticky ns -children {
+                VerticalMY.Scrollbar.thumb -expand true
+            }
+        }
+
+        ttk::style layout Horizontal.TScrollbar {
+            HorizontalMY.Scrollbar.trough -sticky ew -children {
+                HorizontalMY.Scrollbar.thumb -expand true
+            }
+        }
 } else {
 
     ttk::style theme create Breeze -parent default -settings {
@@ -811,6 +861,8 @@ if {$existtlf && $::typetlf} {
             }
         }
         
+#MY for Treeview
+if {0} {
         ttk::style layout Item {
             Treeitem.padding -sticky nswe -children {
                 Treeitem.indicator -side left -sticky {} Treeitem.image -side left -sticky {} -children {
@@ -818,6 +870,7 @@ if {$existtlf && $::typetlf} {
                     }
                 }
         }
+}
         #
         # Elements:
         #
@@ -988,14 +1041,13 @@ if {0} {
             image $I(scrollbar-trough-vert-active) -border {0 6 0 6} -sticky ns
         ttk::style element create Vertical.Progressbar.pbar \
             image $I(scrollbar-slider-vert) -border {0 6 0 6} -sticky ns
-
         # TODO: Ab hier noch teilweise Arc style
         ttk::style element create Treeview.field \
             image $I(treeview) -border 1
         ttk::style element create Treeheading.cell \
             image [list $I(notebook-client) \
                 active $I(treeheading-prelight)] \
-            -border 1 -padding 4 -sticky ewns
+            -border 1 -padding 0 -sticky ewns
         
         # TODO: arrow-* ist at the moment a little bit too big 
         # the small version is too small :-)
@@ -1006,8 +1058,7 @@ if {0} {
                 user2 $I(empty) \
                 user1 $I(arrow-down) \
                 ] \
-            -width 15 -sticky w
-            
+            -width 0 -sticky w
         # I don't know why Only with this I get a thin enough sash
         ttk::style element create vsash image $I(transparent) -sticky e -padding 1 -width 1
 	    ttk::style element create hsash image $I(transparent) -sticky n -padding 1 -width 1
@@ -1039,7 +1090,7 @@ if {0} {
             ]
         
         # Treeview
-        ttk::style configure Treeview -background white
+        ttk::style configure Treeview -background white 
         ttk::style configure Treeview.Item -padding {2 0 0 0}
         
         # Some defaults for non ttk-widgets so that they fit
@@ -1053,6 +1104,8 @@ if {0} {
         	activeForeground [ttk::style lookup . -selectforeground]
         option add *font [ttk::style lookup . -font]
         ttk::style configure TButton -padding {8 4 8 4} -width -10 -anchor center
+
+
     }
   }
 }
