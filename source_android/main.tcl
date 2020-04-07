@@ -5337,11 +5337,11 @@ proc saveCert { typesave cont} {
   set tsav "."
   if { $typesave == 1 } {
     set typeCert [subst $typeCertPem]
-    set typeTitle "Экспорт сертификата в PEM формате"
+    set typeTitle "Экспорт сертификата в\nPEM формате"
     set msk "$typeCertPem1"
   } elseif { $typesave == 0 } {
     set typeCert [subst $typeCertDer]
-    set typeTitle "Экспорт сертификата в DER формате"
+    set typeTitle "Экспорт сертификата в\nDER формате"
     set msk "$typeCertDer1"
   } elseif { $typesave == 2 }  {
     set typeCert [subst $typeFileAll]
@@ -7902,17 +7902,17 @@ proc feselect {tdialog c typew titul tekdir var msk } {
   set fm "$c.sfile"
   $fm.titul.lab configure -text $titul
 
-  puts "vrr=$vrr"
+#  puts "vrr=$vrr"
   if {$typew == "frame"} {
     pack $c.sfile -fill both -expand 1
   }
-  puts "wait ::otv"
+#  puts "wait ::otv"
   vwait $vrr
 
   ###################
   pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
-  puts "var=$var"
-  puts "subst=[subst $$vrr]"
+#  puts "var=$var"
+#  puts "subst=[subst $$vrr]"
   set $var [subst $$vrr]
   return [subst $$vrr]
 }

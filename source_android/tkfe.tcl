@@ -3,6 +3,7 @@
 # GUI File explorer (FE) for ttk package
 #
 #  Copyright (c) 2020 Vladimir Orlov
+# email: vorlov@lissi.ru
 
 package require Tk 8.5.0
 package require msgcat
@@ -267,7 +268,9 @@ namespace eval FE {
     if {$answer != "yes"} {
       return
     }
-    file delete -force $file
+#    file delete -force "$file"
+    file delete -force [lindex $file 0]
+
     $w.seldir.entdir configure -state normal
     $w.seldir.entdir delete 0 end
     $w.seldir.entdir configure -state readonly
@@ -369,7 +372,7 @@ namespace eval FE {
 
     # Now reshuffle the rows into the sorted order
 
-    foreach info [lsort -dictionary -index 0 $dir $data1] {
+    foreach info [lsort -dictionary -index 0 "$dir" "$data1"] {
       $tree move [lindex $info 1] {} [incr r]
     }
 
@@ -394,7 +397,7 @@ namespace eval FE {
 
   proc initfe {typew w initdir typefb otv msk} {
     #Для Win32
-    if {1} {
+    if {0} {
       #Целесообразно делать в программе пользователя
       if {[tk windowingsystem] == "win32"} {
         set initdir [encoding convertfrom cp1251 $initdir ]
@@ -413,11 +416,42 @@ namespace eval FE {
         wm title $w [mc "Выберите файл"]
         wm iconphoto $w iconfile
       }
+      set tw $::scrwidth
+      set th [expr $::scrheight - 100]
       wm minsize $w $::scrwidth  [expr $::scrheight - 100]
-      set geometr $::scrwidth
+      set geometr $tw
       append geometr "x"
-      append geometr [expr $::scrheight - 100]
-      append geometr "+0+0"
+      append geometr $th
+  #Считываем размеры экрана в пикселях
+      set rw [winfo screenwidth .]
+      set rh [winfo screenheight .]
+      if { $rw <= $rh } {
+         append geometr "+0+0"
+      } else {
+#Координаты главного окна
+	set rgeom [wm geometry .]
+	set rgf [string first "x" $rgeom]
+	set rw [string range $rgeom 0 $rgf-1]
+	set rg [string first "+" $rgeom]
+	set xx [string range $rgeom $rgf+1 $rg-1]
+	set rg1 [string range $rgeom $rg+1 end]
+	if {$rw <= $tw} {
+#Окно fe уже главного окна
+    	    append geometr $rg1
+        } else {
+	    set off [expr ($rw - $tw) / 2]
+	    set rg2 [string first "+" $rg1]
+	    incr rg
+	    incr rg2 -1
+	    set offw [string range $rg1 0 $rg2]
+	    set offw1 [expr $offw + $off]
+	    incr rg2 2
+	    set offw2 [string range $rg1 $rg2  end]
+	    set offw2 [expr $offw2 + ($xx - $th)/2]
+    	    append geometr "+$offw1+$offw2"
+
+        }
+      }
       wm geometry $w $geometr
       #Убрать обрамление
       #	wm overrideredirect $w 1
@@ -548,22 +582,24 @@ namespace eval FE {
   proc selectobj {w typefb click otv} {
     if {$click == 3} {
       set w1 [string range $w 0 end-5]
-      set tekdir [$w1.tekdir.entdir get]
+      set tekdir "[$w1.tekdir.entdir get]"
       if {$typefb != "dir"} {
         set mask [$w1.filter.entdir get]
       } else {
         set mask "*"
       }
-      foreach dir [lsort -dictionary $tekdir] {
-        populateTree $typefb $mask $w [$w insert {} end -text $dir \
-        -values [list $dir directory]]
-      }
+#      foreach dir [lsort -dictionary "$tekdir"] {}
+      set dir "$tekdir"
+        populateTree $typefb $mask $w [$w insert {} end -text "$dir" \
+        -values [list "$dir" directory]]
+#      {}
     }
     set num [$w selection]
     set titem [$w item $num -value]
+#puts "titem=$titem"
     if {$click == 2 && [lindex $titem 1] == "directory"} {
       #Выбираем имя главного фрейма/окна
-      set tekdir [lindex $titem 0]
+      set tekdir "[lindex $titem 0]"
       set w1 [string range $w 0 end-5]
 
       $w1.tekdir.entdir configure -state normal
@@ -575,22 +611,25 @@ namespace eval FE {
       } else {
         set mask "*"
       }
-      foreach dir [lsort -dictionary $tekdir] {
-        populateTree $typefb $mask $w [$w insert {} end -text $dir \
-        -values [list $dir directory]]
-      }
+#puts "tekdir=$tekdir"
+#      foreach dir [lsort -dictionary "$tekdir"] {}
+      set dir "$tekdir"
+#puts "selectobj dir=$dir"
+        populateTree $typefb $mask $w [$w insert {} end -text "$dir" \
+        -values [list "$dir" directory]]
+#      {}
     } elseif {$click == 2 && [lindex $titem 1] == "file"} {
       set fm [string range $w 0 end-5]
-      set tekdir [lindex $titem 0]
+      set tekdir "[lindex $titem 0]"
     } elseif {$click == 3 } {
       set tekdir ""
     } else {
-      set tekdir [lindex $titem 0]
+      set tekdir "[lindex $titem 0]"
     }
     set w1 [string range $w 0 end-5]
     $w1.seldir.entdir configure -state normal
     $w1.seldir.entdir delete 0 end
-    $w1.seldir.entdir insert end [file tail $tekdir]
+    $w1.seldir.entdir insert end "[file tail $tekdir]"
     $w1.seldir.entdir configure -state readonly
 
     if {$click == 2 && [lindex $titem 1] == "file"} {
@@ -653,10 +692,11 @@ namespace eval FE {
     } else {
       set mask "*"
     }
-    foreach dir [lsort -dictionary $tekdir] {
-      populateTree $typefb $mask $tree [$tree insert {} end -text $dir \
-      -values [list $dir directory]]
-    }
+#    foreach dir [lsort -dictionary "$tekdir"] {}
+    set dir "$tekdir"
+      populateTree $typefb $mask $tree "[$tree insert {} end -text "$dir" \
+      -values [list "$dir" directory]]"
+#    {}
   }
 
   ## Code to populate a node of the tree
@@ -665,23 +705,23 @@ namespace eval FE {
     if {[$tree set $node type] ne "directory"} {
       return
     }
-    set path [$tree set $node fullpath]
+    set path "[$tree set $node fullpath]"
     #На первый уровень
     set node ""
     set fm [string range $tree 0 5]
     variable [namespace current]::hiddencb
     set directory_list ""
 
-    set rr [file readable $path]
+    set rr [file readable "$path"]
     if {$rr == 0} {
       tk_messageBox -title "Просмотр папки" -icon info -message "Каталог не доступен:\n$path"
       set ::tekPATH $path
       return
     }
 
-    set directory_list [lsort -dictionary [glob -nocomplain -types d -directory $path "*"]]
+    set directory_list [lsort -dictionary [glob -nocomplain -types d -directory "$path" "*"]]
     if {$FE::hiddencb} {
-      set directory_list1 [lsort -dictionary [glob -nocomplain -types d -directory $path ".*"]]
+      set directory_list1 [lsort -dictionary [glob -nocomplain -types d -directory "$path" ".*"]]
       set ptr [string first "/.. " $directory_list1]
       if {$ptr != -1} {
         append directory_list [string range $directory_list1 [expr $ptr + 3] end ]
@@ -696,19 +736,20 @@ namespace eval FE {
     -values [list $levelup $type]]
     $tree item $id -text ".."
     foreach f $directory_list {
-      set type [file type $f]
-      set rr [file readable $f]
+      set type [file type "$f"]
+      set rr [file readable "$f"]
       if {$rr == 0} {
-        set id [$tree insert $node end -image icondirdenied -text [file tail $f] \
-        -values [list $f "denied"]]
+        set id [$tree insert $node end -image icondirdenied -text {[file tail "$f"]} \
+        -values [list "$f" "denied"]]
       } else {
-        set id [$tree insert $node end -image icondir -text [file tail $f] \
-        -values [list $f $type]]
+        set id [$tree insert $node end -image icondir -text {[file tail "$f"]} \
+        -values [list "$f" $type]]
       }
-      $tree item $id -text [file tail $f]/
+      set ee [file tail $f]
+      $tree item $id -text "$ee"
     }
     if {$typefb != "dir"} {
-      set files_list [lsort -dictionary  [glob -nocomplain -types f -directory $path "$mask"] ]
+      set files_list [lsort -dictionary  [glob -nocomplain -types f -directory "$path" "$mask"] ]
       foreach f $files_list {
         set type [file type $f]
         if {$typefb == "fileopen"} {
@@ -841,8 +882,10 @@ namespace eval FE {
     }
     set yespas "no"
     set newdir $pass
-    set newd [file join $::tekPATH $newdir]
-    set oldn [file join $::tekPATH $oldname]
+    set newd [file join $::tekPATH "$newdir"]
+    set oldn [file join $::tekPATH "$oldname"]
+puts "\n$newdir\n$oldname\n$newd\n$oldn"
+
     if {[file exists $newd]} {
       if {$type == "file"} {
         set answer [tk_messageBox -title "Переименование файла" -icon question -message "Файл с таким именем есть:\n$oldname\nПродолжить операцию ?" -type yesno]
@@ -851,7 +894,8 @@ namespace eval FE {
         }
       }
     }
-    file rename -force $oldn $newd
+    file rename -force "[lindex $oldname 0]" "$newd"
+#    file rename -force "$oldn" "$newd"
     $fm.seldir.entdir configure -state normal
     $fm.seldir.entdir delete 0 end
     $fm.seldir.entdir configure -state readonly
