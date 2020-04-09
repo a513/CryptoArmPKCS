@@ -433,19 +433,6 @@ set ::pkcs11_status -1
 variable certfor
 set certfor 1
 
-proc all_disable {parent} {
-  set widgets [info commands $parent*]
-  foreach w $widgets {
-    catch {$w configure -state disabled}
-  }
-}
-proc all_enable {parent} {
-  set widgets [info commands $parent*]
-  foreach w $widgets {
-    catch {$w configure -state normal}
-  }
-}
-
 #set ::listx509 [list "Токен не подключен"]
 set ::listx509 [list ]
 package require pki
@@ -2282,7 +2269,18 @@ proc ::fileWithCert {w nick cert_hex typecert} {
       set sek 6
     }
     set pk [edithex [string range $ret(pubkey) $sek end]]
-    $w insert end "\t[mc "Public Key"]:\t$pk\n"  margins11
+    
+#С разбивкой по 16-ть hex
+    $w insert end "\t[mc "Public Key"]:\t[string range $pk 0 47]\n"  margins11
+    for {set i 48 } { $i < [string length $pk] } {incr i 48} {
+#      $w insert end "\t\t[lindex $pk $i]\n"  margins1
+      $w insert end "\t\t[string range $pk $i $i+47]\n"  margins11
+    }
+#Одной строкой
+#    $w insert end "\t[mc "Public Key"]:\t$pk\n"  margins11
+
+
+
     #Идентификатор ключа получателя
     set pk_bin [binary format H* $ret(pubkey)]
     set pkcs11id_bin [lcc_sha1 $pk_bin]
@@ -2293,7 +2291,13 @@ proc ::fileWithCert {w nick cert_hex typecert} {
       binary scan $pkcs11id_bin H* ::pkcs11id
       $w insert end "\t[mc "Key Algorithm"]:\tRSA\n"  margins1
       $w insert end "\t[mc "Key Size"]:\t$cert_parse(l)\n"  margins2
-      $w insert end "\t[mc "Public Key"]:\t[edithex $cert_parse(pubkey)]\n"  margins11
+#С разбивкой по 16-ть hex
+      set pk [edithex $cert_parse(pubkey)]
+      $w insert end "\t[mc "Public Key"]:\t[string range $pk 0 47]\n"  margins11
+      for {set i 48 } { $i < [string length $pk] } {incr i 48} {
+       $w insert end "\t\t[string range $pk $i $i+47]\n"  margins11
+      }
+#      $w insert end "\t[mc "Public Key"]:\t[edithex $cert_parse(pubkey)]\n"  margins11
     } else {
       $w insert end "\t[mc "Key Algorithm"]:\t$cert_parse(pubkey_algo)\n"  margins1
       $w insert end "\t[mc "Key Info"]:\t[edithex $cert_parse(pubkeyinfo)]\n" margins11
@@ -2526,7 +2530,14 @@ proc ::fileWithCert {w nick cert_hex typecert} {
   $w insert end [mc "Signature"] bold
   $w insert end "\n"
   $w insert end "\t[mc "Signature Algorithm"]\t[mc "$cert_parse(signature_algo)"]\n"  margins1
-  $w insert end "\t[mc "Signature"]:\t[edithex $cert_parse(signature)]\n"  margins11
+
+#С разбивкой по 16-ть hex
+  set sg [edithex $cert_parse(signature)]
+  $w insert end "\t[mc "Signature"]:\t[string range $sg 0 47]\n"  margins11
+    for {set i 48 } { $i < [string length $sg] } {incr i 48} {
+      $w insert end "\t\t[string range $sg $i $i+47]\n"  margins11
+    }
+#  $w insert end "\t[mc "Signature"]:\t[edithex $cert_parse(signature)]\n"  margins11
 
   $w insert end [mc "Certificate Fingerprints"] bold
   $w insert end "\n"
@@ -2537,9 +2548,15 @@ proc ::fileWithCert {w nick cert_hex typecert} {
   binary scan $fingerprint_sha1_bin H* fingerprint_sha1
 
   $w insert end "\t[mc "SHA1"]:\t[edithex $fingerprint_sha1]\n"  margins11
-  $w insert end "\t[mc "SHA256"]:\t[edithex $fingerprint_sha256]\n"  margins11
+  set sf [edithex $fingerprint_sha256]
+  $w insert end "\t[mc "SHA256"]:\t[string range $sf 0 47]\n"  margins11
+    for {set i 48 } { $i < [string length $sf] } {incr i 48} {
+      $w insert end "\t\t[string range $sg $i $i+47]\n"  margins11
+    }
+#  $w insert end "\t[mc "SHA1"]:\t[edithex $fingerprint_sha1]\n"  margins11
 
   set ::parsecerttxt [$w get 1.0 end]
+  $w configure -state disabled
 }
 
 proc savetext {w typetxt} {
@@ -2682,7 +2699,7 @@ proc aboutUtil {w type parse_csr} {
     }
     #	parray csr_parse
   } elseif {$type == 3 || $type == 4 || $type == 5} {
-    set title "Просмотр сертификата: \"$parse_csr\""
+    set title "Просмотр сертификата:\n\"$parse_csr\""
   } elseif {$type == 6 } {
     set title "Просмотр сертификата (PKCS12)"
   } elseif {$type == 8 || $type == 9} {
@@ -2692,29 +2709,15 @@ proc aboutUtil {w type parse_csr} {
     return
   }
   catch {destroy $w}
-  wm state . withdraw
-  toplevel $w -bg skyblue
-  switch $typesys {
-    win32        {
-      wm geometry $w +200+100
-      wm minsize $w 80 25
-    }
-    x11 {
-      #      wm geometry $w 80x25+200+100
-      #      wm geometry $w 80x25
-    }
-    classic - aqua {
-      wm geometry $w 80x25+200+100
-    }
-  }
+#puts "aboutUtils=$::tekFrfunc\n$w"
+  labelframe $w -text $title -bg white -relief groove -bd 3 -bg white -labelanchor n  -highlightbackground bisque -highlightcolor skyblue  -highlightthickness 5
 
-  wm title $w $title
-  wm iconphoto $w icon11_24x24
   frame $w.txt -bg skyblue
   pack $w.txt -side top -expand 1 -fill both
   frame $w.butt -bg #f5f5f5 -highlightthickness 2 -highlightbackground skyblue -highlightcolor skyblue
   pack $w.butt -expand 0 -fill x -side bottom
-  ttk::button $w.butt.ok -text "Ok" -command "destroy $w;global varview;set varview 1;wm state . normal"
+#  ttk::button $w.butt.ok -text "Ok" -command "destroy $w;global varview;set varview 1;wm state . normal"
+  ttk::button $w.butt.ok -text "Ok" -command "destroy $w;global varview;set varview 1;  pack $::tekFrfunc.fratext -in $::tekFrfunc -anchor center -expand 1 -fill both -side top"
   if {$type == 7} {
     ttk::button $w.butt.save -text "Выпуск сертификата" -command "buildCRT $w [list [array get csr_parse]]"
   } else {
@@ -2729,15 +2732,18 @@ proc aboutUtil {w type parse_csr} {
       pack $w.butt.lab -side top  -pady {0 0} -fill x -expand 1  -padx {0 5}
     }
   }
+  ttk::scrollbar $w.hsb -orient horizontal 
+  if {!$::typetlf} {
+    pack $w.hsb  -side bottom -fill x -padx {0 5mm} 
+  }
 
   pack $w.butt.ok -side left -padx {4 5} -pady 2
   pack $w.butt.save -side left  -pady 2
-
   set worig $w
   set w $w.txt
 
   if {$type == 1 || $type == 7 || $type == 3 || $type == 4 || $type == 5  || $type == 6 } {
-    text $w.text -setgrid true -autosep 1  -width 60 -height 20 -wrap word -bg snow -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
+    text $w.text -setgrid false -autosep 1  -width 60 -height 25 -wrap none -bg snow -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
 
     $w.text tag configure bold -font TkDefaultFontBold
     $w.text tag configure super -offset 4p -font TkDefaultFont
@@ -2754,21 +2760,31 @@ proc aboutUtil {w type parse_csr} {
   bind $w.text <ButtonPress-3> {showTextMenu %W %x %y %X %Y}
 
   ttk::scrollbar $w.vsb -orient vertical -command [list $w.text yview]
-  pack $w.vsb -side right -fill y  -in $w
+  if {!$::typetlf} {
+    pack $w.vsb -side right -fill y  -in $w  
+  }
   pack $w.text -padx {1 1} -pady {2 0} -side left -fill both -expand 1
   $w.text configure -yscrollcommand [list $w.vsb set]
+  $w.text configure -xscrollcommand [list $worig.hsb set]
+  $worig.hsb configure -command [list $w.text xview]
 
   $w.text tag configure tagAbout -foreground blue -font {Roboto 10 bold italic}
 
   if {$type == 3} {
+    pack forget $::tekFrfunc.fratext
+    pack $worig -in $::tekFrfunc -anchor center -expand 1 -fill both -side top
     ::fileWithCert $w.text $parse_csr "" $type
     return
   }
   if {$type == 4 || $type == 6} {
+    pack forget $::tekFrfunc.fratext
+    pack $worig -in $::tekFrfunc -anchor center -expand 1 -fill both -side top
     ::fileWithCert $w.text $parse_csr $parse_csr $type
     return
   }
   if {$type == 5} {
+    pack forget $::tekFrfunc.fratext
+    pack $worig -in $::tekFrfunc -anchor center -expand 1 -fill both -side top
     ::fileWithCert $w.text "" $parse_csr $type
     return
   }
@@ -2852,12 +2868,24 @@ proc aboutUtil {w type parse_csr} {
         set sek 6
       }
       set pk [edithex [string range $ret(pubkey) $sek end]]
-      $w.text insert end "\t[mc "Public Key"]:\t$pk\n"  margins11
+#С разбивкой по 16-ть hex
+      $w.text insert end "\t[mc "Public Key"]:\t[string range $pk 0 47]\n"  margins11
+      for {set i 48 } { $i < [string length $pk] } {incr i 48} {
+       $w.text insert end "\t\t[string range $pk $i $i+47]\n"  margins11
+      }
+#      $w.text insert end "\t[mc "Public Key"]:\t$pk\n"  margins11
+
     } else {
       if {[string range $csr_parse(pubkey_algo) 0 2] == "rsa" } {
         $w.text insert end "\t[mc "Key Algorithm"]:\tRSA\n"  margins1
         $w.text insert end "\t[mc "Key Size"]:\t$csr_parse(l)\n"  margins2
-        $w.text insert end "\t[mc "Public Key"]:\t[edithex $csr_parse(pubkey)]\n"  margins11
+        set pk [edithex [edithex $csr_parse(pubkey)]
+        $w.text insert end "\t[mc "Public Key"]:\t[string range $pk 0 47]\n"  margins11
+        for {set i 48 } { $i < [string length $pk] } {incr i 48} {
+    	    $w.text insert end "\t\t[string range $pk $i $i+47]\n"  margins11
+        }
+#        $w.text insert end "\t[mc "Public Key"]:\t[edithex $csr_parse(pubkey)]\n"  margins11
+
       } else {
         $w.text insert end "\t[mc "Key Algorithm"]:\t$csr_parse(pubkey_algo)\n"  margins1
         $w.text insert end "\t[mc "Key Info"]:\t[edithex $csr_parse(pubkeyinfo)]\n" margins11
@@ -2956,16 +2984,20 @@ proc aboutUtil {w type parse_csr} {
     $w.text insert end [mc "Signature"] bold
     $w.text insert end "\n"
     $w.text insert end "\t[mc "Signature Algorithm"]\t[mc "$sign_algo)"]\n"  margins1
-    $w.text insert end "\t[mc "Signature"]:\t[edithex $signat]\n"  margins11
+#С разбивкой по 16-ть hex
+    set sg [edithex $signat]
+  $w.text insert end "\t[mc "Signature"]:\t[string range $sg 0 47]\n"  margins11
+    for {set i 48 } { $i < [string length $sg] } {incr i 48} {
+      $w.text insert end "\t\t[string range $sg $i $i+47]\n"  margins11
+    }
+#    $w.text insert end "\t[mc "Signature"]:\t[edithex $signat]\n"  margins11
 
-
+    pack forget $::tekFrfunc.fratext
+    pack $worig -in $::tekFrfunc -anchor center -expand 1 -fill both -side top
+    $w.text configure -state disabled
+    return
   }
-
-  #    wm protocol $w WM_DELETE_WINDOW ";"
-
-  set w $worig
-  catch {grab set $w}
-  catch {tkwait window $w}
+puts "aboutUtil type=$type"
 }
 
 proc chainocsp {chain_hex} {
@@ -3395,7 +3427,6 @@ proc ::viewCert {type nick} {
       return
     }
     #    puts "arrayCer=$::arrayCer($nick)"
-
     aboutUtil .about 3 $nick
     return
   }
@@ -3591,7 +3622,7 @@ proc ::sign_file {w typekey} {
   if {$typekey == "pkcs11"} {
     #puts "f_sign=$f_sign"
     #Ввод PIN-кода
-    all_disable $w
+    FE::all_disable $w
     set ::labpas "PIN-код токена \"$::slotid_teklab\""
     place .topPinPw -in .fn1 -relx 0.01 -rely 0.27 -relwidth 0.98
     after 100
@@ -3600,7 +3631,7 @@ proc ::sign_file {w typekey} {
     set yespass ""
     vwait yespas
     place forget .topPinPw
-    all_enable $w
+    FE::all_enable $w
     if { $yespas == "no" } {
       set pass ""
       return 0
@@ -3649,7 +3680,7 @@ proc ::sign_file {w typekey} {
   #    wm state . withdraw
   .topclock configure -text "Подписание документа"
   .topclock.lclock configure -text "Начался процесс подписания\nдокумента из файла\n[file tail $doc_for_sign]\nПодождите некоторое время!"
-  all_disable $w
+  FE::all_disable $w
   place .topclock -in $w -relx 0.1 -rely 0.2
   after 100
   update
@@ -3668,14 +3699,14 @@ proc ::sign_file {w typekey} {
     -detail "Подпись сохранена в файле:\n$pathsign\nБудете проверить на Госуслугах?" \
     -type yesno]
     place forget .topclock
-    all_enable $w
+    FE::all_enable $w
     if {$answer == "yes"} {
       borg activity android.intent.action.VIEW https://www.gosuslugi.ru/pgu/eds/  text/html
     }
     set err 0
     return
   }
-  all_enable $w
+  FE::all_enable $w
   if {$err != 0} {
     tk_messageBox -title "Подписать документ" -message "Документ подписать не удалось" -detail "$err" -icon error
   }
@@ -4702,6 +4733,9 @@ proc ::parse_pkcs7 {type p7file sfile} {
   variable typesig
   if {$type == "file"} {
     #puts "parse_pkcs7=$p7file, sfile=$sfile"
+    if {$p7file == ""} {
+      return -3
+    }
     set fd [open $p7file]
     chan configure $fd -translation binary
     set p7 [read $fd]
@@ -5320,6 +5354,7 @@ proc saveCert { typesave cont} {
     {"PKCS#7 в DER-формате"    .p7s}
     {"Любой"    *}
   }
+  set typeP7S1 {*.p7s * }
   set typeFileTXT {
     {"Экспорт просматриваемого"   .txt}
     {"Любой"    *}
@@ -5352,12 +5387,12 @@ proc saveCert { typesave cont} {
     set mok "Контент сохранен в файле"
   } elseif { $typesave == 3 }  {
     set typeCert [subst $typeP7S]
-    set msk "$typeP7S"
+    set msk "$typeP7S1"
     set typeTitle "Экспорт TimeStampToken"
     set encodePem 0
   } elseif { $typesave == 4 }  {
     set typeCert [subst $typeFileTXT]
-    set msk "$typeFileTXT"
+    set msk "$typeFileTXT1"
     set typeTitle "Экспорт просматриваемого"
     set tit "Экспорт просматриваемого"
     set mbad "Экспорт просматриваемого не удался в файл"
@@ -6122,7 +6157,7 @@ proc ::renamecert {w pkcs11_id} {
   #Ввод МЕТКИ
   set yespas ""
   set pass ""
-  all_disable $w.fratext
+  FE::all_disable $w.fratext
   set ::labpas  "Введите метку для сертификата"
 
   pack forget .topPinPw.labFrPw.entryPw
@@ -6151,7 +6186,7 @@ proc ::renamecert {w pkcs11_id} {
   pack .topPinPw.labFrPw.entryPw -fill x -expand 1 -padx 5 -pady 5  -ipady 2 -sid top -pady 20
   pack .topPinPw.labFrPw.butPw .topPinPw.labFrPw.butOk -pady {0 5} -sid right -padx 5 -pady {0 20}
 
-  all_enable $w.fratext
+  FE::all_enable $w.fratext
   if { $yespas == "no" } {
     set pass ""
     set pass ""
@@ -6163,7 +6198,7 @@ proc ::renamecert {w pkcs11_id} {
   set yespas ""
   set pass ""
   #Ввод PIN-кода
-  all_disable $w.fratext
+  FE::all_disable $w.fratext
   place .topPinPw -in $w -relx 0.01 -rely 0.27 -relwidth 0.98
   after 100
   update
@@ -6171,7 +6206,7 @@ proc ::renamecert {w pkcs11_id} {
   set yespass ""
   vwait yespas
   place forget .topPinPw
-  all_enable $w.fratext
+  FE::all_enable $w.fratext
   if { $yespas == "no" } {
     set pass ""
     return
@@ -6278,7 +6313,7 @@ proc ::workOpCertP11 {w opnum} {
         return
       }
       #Ввод PIN-кода
-      all_disable $w
+      FE::all_disable $w
       set ::labpas "PIN-код токена \"$::slotid_teklab\""
       place .topPinPw -in $w.fratext -relx 0.01 -rely 0.27 -relwidth 0.98
       after 100
@@ -6287,7 +6322,7 @@ proc ::workOpCertP11 {w opnum} {
       set yespass ""
       vwait yespas
       place forget .topPinPw
-      all_enable $w
+      FE::all_enable $w
       if { $yespas == "no" } {
         set pass ""
         return
@@ -6414,7 +6449,7 @@ proc ::workOpCert {w} {
       set yespas ""
       set pass ""
       set titpin "[mc {Token}]: $::slotid_teklab"
-      all_disable $w.fratext
+      FE::all_disable $w.fratext
       place .topPinPw -in $w -relx 0.01 -rely 0.27 -relwidth 0.98
       after 100
       update
@@ -6422,7 +6457,7 @@ proc ::workOpCert {w} {
       set yespas ""
       vwait yespas
       place forget .topPinPw
-      all_enable $w.fratext
+      FE::all_enable $w.fratext
       if { $yespas == "no" } {
         return
       }
@@ -6623,7 +6658,7 @@ proc ::workOpP12 {w} {
       set pass ""
       set titpin "[mc {Token}]: $::slotid_teklab"
       #Ввод PIN-кода
-      all_disable $w
+      FE::all_disable $w
       place .topPinPw -in .fn7 -relx 0.01 -rely 0.27 -relwidth 0.98
 
       after 100
@@ -6631,7 +6666,7 @@ proc ::workOpP12 {w} {
       focus .topPinPw.labFrPw.entryPw
       set yespass ""
       vwait yespas
-      all_enable $w
+      FE::all_enable $w
       place forget .topPinPw
       #Ввод пароля
       if { $yespas == "no" } {
@@ -6679,7 +6714,7 @@ proc ::workOpP12 {w} {
       set pass ""
       set titpin "[mc {Token}]: $::slotid_teklab"
       #Ввод PIN-кода
-      all_disable $w
+      FE::all_disable $w
       place .topPinPw -in .fn7 -relx 0.01 -rely 0.27 -relwidth 0.98
       after 100
       update
@@ -6687,7 +6722,7 @@ proc ::workOpP12 {w} {
       set yespass ""
       vwait yespas
       place forget .topPinPw
-      all_enable $w
+      FE::all_enable $w
       #Ввод пароля
       if { $yespas == "no" } {
         return
@@ -6972,7 +7007,7 @@ proc ::workOp {w} {
       #puts "sifn_file=$nickCert"
       ##################
       #Ввод PIN-кода
-      all_disable $w.fratext
+      FE::all_disable $w.fratext
       place .topPinPw -in $w -relx 0.01 -rely 0.27 -relwidth 0.98
       after 100
       update
@@ -6980,7 +7015,7 @@ proc ::workOp {w} {
       set yespass ""
       vwait yespas
       place forget .topPinPw
-      all_enable $w.fratext
+      FE::all_enable $w.fratext
       if { $yespas == "no" } {
         return 0
       }
@@ -7627,7 +7662,7 @@ proc trace_pfx {name index op} {
   close $file
   set ::labpas "Введите пароль для \n\"[file tail $pfx]\""
   #Ввод PIN-кода
-  all_disable .fn7.fratext
+  FE::all_disable .fn7.fratext
   place .topPinPw -in .fn7.fratext.fr00.e1 -relx 0.0 -rely 1.0 -relwidth 0.98
   after 100
   update
@@ -7635,7 +7670,7 @@ proc trace_pfx {name index op} {
   set yespass ""
   vwait yespas
   place forget .topPinPw
-  all_enable .fn7.fratext
+  FE::all_enable .fn7.fratext
   #Ввод пароля
   set ::labpas "PIN-код токена \"$::slotid_teklab\""
   if { $yespas == "no" } {
@@ -7761,7 +7796,7 @@ proc addsignature {w} {
   puts "Добавляем подпись"
   if {$storage == 0} {
     #Ввод PIN-кода
-    all_disable $w.fratext
+    FE::all_disable $w.fratext
     place .topPinPw -in $w -relx 0.01 -rely 0.27 -relwidth 0.98
     after 100
     update
@@ -7769,7 +7804,7 @@ proc addsignature {w} {
     set yespass ""
     vwait yespas
     place forget .topPinPw
-    all_enable $w.fratext
+    FE::all_enable $w.fratext
 
     if { $yespas == "no" } {
       return 0
@@ -10859,7 +10894,9 @@ proc func_page5 {w} {
   -insertbackground black -bg #f5f5f5 -highlightcolor skyblue -wrap word  -height 27
   $w.fratext.text tag configure tagAbout -foreground blue -font {{Roboto Condensed Medium} 9}
   ttk::scrollbar $w.fratext.scr  -command [list $w.fratext.text yview]
-  pack $w.fratext.scr -anchor center -expand 0 -fill y -side right
+  if {!$::typetlf} {
+    pack $w.fratext.scr -anchor center -expand 0 -fill y -side right
+  }
   pack $w.fratext.text -anchor center -expand 1 -fill both -side top -padx 0 -pady {0 0}
   $w.fratext.text configure -background white
   pack $w.fratext -in $w -anchor center -expand 1 -fill both -side top
@@ -10968,7 +11005,7 @@ proc ::deleteallobj {w} {
   variable ::handleObj
   variable ::listObjs
   #Ввод пароля
-  all_disable $w
+  FE::all_disable $w
   set ::labpas "PIN-код токена \"$::slotid_teklab\""
   place .topPinPw -in $w -relx 0.01 -rely 0.27 -relwidth 0.98
   after 100
@@ -10977,7 +11014,7 @@ proc ::deleteallobj {w} {
   set yespass ""
   vwait yespas
   place forget .topPinPw
-  all_enable $w
+  FE::all_enable $w
   if { $yespas == "no" } {
     return 0
   }
@@ -11028,7 +11065,9 @@ proc func_page6 {w} {
   -insertbackground black -bg #f5f5f5 -highlightcolor skyblue -wrap word  -height 27
   $w.fratext.text tag configure tagAbout -foreground blue -font {{Roboto Condensed Medium} 9}
   ttk::scrollbar $w.fratext.scr  -command [list $w.fratext.text yview]
-  pack $w.fratext.scr -anchor center -expand 0 -fill y -side right
+  if {!$::typetlf} {
+    pack $w.fratext.scr -anchor center -expand 0 -fill y -side right
+  }
   pack $w.fratext.text -anchor center -expand 1 -fill both -side top -padx 0 -pady {0 0}
   $w.fratext.text configure -background white
   pack $w.fratext -in $w -anchor center -expand 1 -fill both -side top
@@ -11052,7 +11091,9 @@ proc func_page9 {w} {
   text $w.fratext.text -yscrollcommand [list $w.fratext.scr set]  \
   -insertbackground black -bg #f5f5f5 -highlightcolor skyblue -wrap word  -height 31
   ttk::scrollbar $w.fratext.scr  -command [list $w.fratext.text yview]
-  pack $w.fratext.scr -anchor center -expand 0 -fill y -side right
+  if {!$::typetlf} {
+    pack $w.fratext.scr -anchor center -expand 0 -fill y -side right
+  }
   pack $w.fratext.text -anchor center -expand 1 -fill both -side top -padx 0 -pady {0 0}
   contentabout $w.fratext
   $w.fratext.text configure -state disabled
@@ -11065,7 +11106,9 @@ proc func_page10 {w} {
   text $w.fratext.text -yscrollcommand [list $w.fratext.scr set]  \
   -insertbackground black -bg #f5f5f5 -highlightcolor skyblue -wrap word  -height 31
   ttk::scrollbar $w.fratext.scr  -command [list $w.fratext.text yview]
-  pack $w.fratext.scr -anchor center -expand 0 -fill y -side right
+  if {!$::typetlf} {
+    pack $w.fratext.scr -anchor center -expand 0 -fill y -side right
+  }
   pack $w.fratext.text -anchor center -expand 1 -fill both -side top -padx 0 -pady {0 0}
   contentcreatetok $w.fratext
   $w.fratext.text configure -state disabled

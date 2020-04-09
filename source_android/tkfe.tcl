@@ -437,7 +437,7 @@ namespace eval FE {
 	set rg1 [string range $rgeom $rg+1 end]
 	if {$rw <= $tw} {
 #Окно fe уже главного окна
-    	    append geometr $rg1
+    	    append geometr +$rg1
         } else {
 	    set off [expr ($rw - $tw) / 2]
 	    set rg2 [string first "+" $rg1]
@@ -564,7 +564,9 @@ namespace eval FE {
     pack $fm.filter -anchor ne -expand 0 -fill both -side top
     pack $fm.seldir -anchor se -expand 0 -fill both -side bottom
     pack $fm.tekdir -anchor ne -expand 0 -fill x -side bottom
-    pack $fm.fr.y -anchor ne -expand 0 -fill y -side right
+    if {!$::typetlf} {
+	pack $fm.fr.y -anchor ne -expand 0 -fill y -side right
+    }
     pack $fm.fr.t -anchor center -expand 1 -fill both -side top
 
     pack $fm.fr -fill both -expand 1 -side top -padx 1mm -anchor nw
@@ -929,9 +931,23 @@ puts "\n$newdir\n$oldname\n$newd\n$oldn"
     initfe $typew $w $tekdir dir $rr ""
     return "FE::$rr"
   }
+  proc all_disable {parent} {
+    set widgets [info commands $parent*]
+    foreach w $widgets {
+	catch {$w configure -state disabled}
+    }
+  }
+  proc all_enable {parent} {
+    set widgets [info commands $parent*]
+    foreach w $widgets {
+	catch {$w configure -state normal}
+    }
+  }
 
   namespace export fe_getsavefile
   namespace export fe_getopenfile
   namespace export fe_choosedir
+  namespace export all_enable
+  namespace export all_disable
 }
 
