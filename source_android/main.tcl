@@ -1684,6 +1684,49 @@ proc exitPKCS {} {
   after 5000 [list $round delete ::rectend]
 
 }
+
+proc read_password {tit w} {
+    global yespas
+    global pass
+    set tit_orig "$::labpas"
+    if {$tit != ""} {
+	set ::labpas "$tit"
+    }
+    if {$w == ".fn11"} {
+	tk busy hold $w.butop
+	tk busy hold $w.lfr1
+	tk busy hold $w.lfr2
+	tk busy hold $w.licfr
+    
+    } else {
+	tk busy hold $w
+    }
+    set xshift $::scrwidth
+    if {$::typetlf} {
+	set xshift 0
+    } else {
+	set xshift $::scrwidth
+    }
+    place .topPinPw -in .labtitul  -width  [expr {$::scrwidth - 4 * $::px2mm}]  -rely 3.0   -x [expr $xshift + 2 * $::px2mm]
+    set yespas ""
+    focus .topPinPw.labFrPw.entryPw
+    vwait yespas
+    if {$w == ".fn11"} {
+	tk busy forget $w.butop
+	tk busy forget $w.lfr1
+	tk busy forget $w.lfr2
+	tk busy forget $w.licfr
+    } else {
+	tk busy forget $w
+    }
+    if {$tit != ""} {
+	set ::labpas "$tit_orig"
+    }
+    place forget .topPinPw
+    return $yespas
+}
+
+
 #Создаем заголовок титульной страницы с иконкой продукта и его названием
 set name_product "CryptoArmPKCS-A"
 
@@ -3557,8 +3600,6 @@ set imagefe [CaptureWindow $w.fratext]
     canvas .canvas -width $ws -height $hs -relief flat -bd 0  -highlightthickness 0
     .canvas create image 0 0 -image tiled -anchor nw
 
-#    FE::all_disable $w.fratext
-
     place .canvas -in $w.fratext  -x $xoff  -y $yoff
     set arrow up
     set roundmes1 [roundRect  .canvas  0 $radius [expr 0 + $x1 + 1 * $radius] [expr 0 + $y1 + $radius] $radius "$tinfo" $arrow  -fill "cyan2"  -tag ::rectm1]
@@ -3718,16 +3759,8 @@ proc ::sign_file {w typekey} {
   if {$typekey == "pkcs11"} {
     #puts "f_sign=$f_sign"
     #Ввод PIN-кода
-    FE::all_disable $w
-    set ::labpas "PIN-код токена \"$::slotid_teklab\""
-    place .topPinPw -in .fn1 -relx 0.01 -rely 0.27 -relwidth 0.98
-    after 100
-    update
-    focus .topPinPw.labFrPw.entryPw
-    set yespass ""
-    vwait yespas
-    place forget .topPinPw
-    FE::all_enable $w
+    read_password "PIN-код токена \"$::slotid_teklab\"" $w
+    
     if { $yespas == "no" } {
       set pass ""
       return 0
@@ -3773,10 +3806,9 @@ proc ::sign_file {w typekey} {
   }
 
   set waitsign 1
-  #    wm state . withdraw
   .topclock configure -text "Подписание документа"
   .topclock.lclock configure -text "Начался процесс подписания\nдокумента из файла\n[file tail $doc_for_sign]\nПодождите некоторое время!"
-  FE::all_disable $w
+  tk busy hold $w
   place .topclock -in $w -relx 0.1 -rely 0.2
   after 100
   update
@@ -3795,14 +3827,14 @@ proc ::sign_file {w typekey} {
     -detail "Подпись сохранена в файле:\n$pathsign\nБудете проверить на Госуслугах?" \
     -type yesno]
     place forget .topclock
-    FE::all_enable $w
+    tk busy forget $w
     if {$answer == "yes"} {
       borg activity android.intent.action.VIEW https://www.gosuslugi.ru/pgu/eds/  text/html
     }
     set err 0
     return
   }
-  FE::all_enable $w
+  tk busy forget $w
   if {$err != 0} {
     tk_messageBox -title "Подписать документ" -message "Документ подписать не удалось" -detail "$err" -icon error
   }
@@ -6253,7 +6285,7 @@ proc ::renamecert {w pkcs11_id} {
   #Ввод МЕТКИ
   set yespas ""
   set pass ""
-  FE::all_disable $w.fratext
+  tk busy hold $w.fratext
   set ::labpas  "Введите метку для сертификата"
 
   pack forget .topPinPw.labFrPw.entryPw
@@ -6282,7 +6314,7 @@ proc ::renamecert {w pkcs11_id} {
   pack .topPinPw.labFrPw.entryPw -fill x -expand 1 -padx 5 -pady 5  -ipady 2 -sid top -pady 20
   pack .topPinPw.labFrPw.butPw .topPinPw.labFrPw.butOk -pady {0 5} -sid right -padx 5 -pady {0 20}
 
-  FE::all_enable $w.fratext
+  tk busy forget $w.fratext
   if { $yespas == "no" } {
     set pass ""
     set pass ""
@@ -6294,15 +6326,7 @@ proc ::renamecert {w pkcs11_id} {
   set yespas ""
   set pass ""
   #Ввод PIN-кода
-  FE::all_disable $w.fratext
-  place .topPinPw -in $w -relx 0.01 -rely 0.27 -relwidth 0.98
-  after 100
-  update
-  focus .topPinPw.labFrPw.entryPw
-  set yespass ""
-  vwait yespas
-  place forget .topPinPw
-  FE::all_enable $w.fratext
+  read_password "" $w.fratext
   if { $yespas == "no" } {
     set pass ""
     return
@@ -6409,16 +6433,8 @@ proc ::workOpCertP11 {w opnum} {
         return
       }
       #Ввод PIN-кода
-      FE::all_disable $w
-      set ::labpas "PIN-код токена \"$::slotid_teklab\""
-      place .topPinPw -in $w.fratext -relx 0.01 -rely 0.27 -relwidth 0.98
-      after 100
-      update
-      focus .topPinPw.labFrPw.entryPw
-      set yespass ""
-      vwait yespas
-      place forget .topPinPw
-      FE::all_enable $w
+      read_password "PIN-код токена \"$::slotid_teklab\"" $w.fratext
+
       if { $yespas == "no" } {
         set pass ""
         return
@@ -6599,16 +6615,8 @@ proc ::workOpCert {w} {
       #Ввод PIN-кода
       set yespas ""
       set pass ""
-      set titpin "[mc {Token}]: $::slotid_teklab"
-      FE::all_disable $w.fratext
-      place .topPinPw -in $w -relx 0.01 -rely 0.27 -relwidth 0.98
-      after 100
-      update
-      focus .topPinPw.labFrPw.entryPw
-      set yespas ""
-      vwait yespas
-      place forget .topPinPw
-      FE::all_enable $w.fratext
+      read_password "PIN-код токена \"$::slotid_teklab\"" $w.fratext
+
       if { $yespas == "no" } {
         return
       }
@@ -6805,21 +6813,8 @@ proc ::workOpP12 {w} {
       set labcert [createnick $cert_parse(issuer) $cert_parse(subject)]
       #puts "labcert=$labcert"
       #Ввод PIN-кода
-      set yespas ""
-      set pass ""
-      set titpin "[mc {Token}]: $::slotid_teklab"
-      #Ввод PIN-кода
-      FE::all_disable $w
-      place .topPinPw -in .fn7 -relx 0.01 -rely 0.27 -relwidth 0.98
+      read_password "PIN-код токена \"$::slotid_teklab\"" $w
 
-      after 100
-      update
-      focus .topPinPw.labFrPw.entryPw
-      set yespass ""
-      vwait yespas
-      FE::all_enable $w
-      place forget .topPinPw
-      #Ввод пароля
       if { $yespas == "no" } {
         return
       }
@@ -6863,18 +6858,8 @@ proc ::workOpP12 {w} {
       }
       set yespas ""
       set pass ""
-      set titpin "[mc {Token}]: $::slotid_teklab"
       #Ввод PIN-кода
-      FE::all_disable $w
-      place .topPinPw -in .fn7 -relx 0.01 -rely 0.27 -relwidth 0.98
-      after 100
-      update
-      focus .topPinPw.labFrPw.entryPw
-      set yespass ""
-      vwait yespas
-      place forget .topPinPw
-      FE::all_enable $w
-      #Ввод пароля
+      read_password "PIN-код токена \"$::slotid_teklab\"" $w
       if { $yespas == "no" } {
         return
       }
@@ -7156,17 +7141,8 @@ proc ::workOp {w} {
         return
       }
       #puts "sifn_file=$nickCert"
-      ##################
       #Ввод PIN-кода
-      FE::all_disable $w.fratext
-      place .topPinPw -in $w -relx 0.01 -rely 0.27 -relwidth 0.98
-      after 100
-      update
-      focus .topPinPw.labFrPw.entryPw
-      set yespass ""
-      vwait yespas
-      place forget .topPinPw
-      FE::all_enable $w.fratext
+      read_password "PIN-код токена \"$::slotid_teklab\"" $w
       if { $yespas == "no" } {
         return 0
       }
@@ -7797,7 +7773,6 @@ proc trace_pfx {name index op} {
   variable varTypeSign
   variable ::listx509
   variable ::lcerts
-  set c ".st.fr1.fr2_list8"
   #puts "TRACE_PFX=$name"
   upvar 1 $name pfx
   if {$pfx == ""} {
@@ -7811,19 +7786,10 @@ proc trace_pfx {name index op} {
   fconfigure $file -translation binary
   set indata [read $file]
   close $file
-  set ::labpas "Введите пароль для \n\"[file tail $pfx]\""
-  #Ввод PIN-кода
-  FE::all_disable .fn7.fratext
-  place .topPinPw -in .fn7.fratext.fr00.e1 -relx 0.0 -rely 1.0 -relwidth 0.98
-  after 100
-  update
-  focus .topPinPw.labFrPw.entryPw
-  set yespass ""
-  vwait yespas
-  place forget .topPinPw
-  FE::all_enable .fn7.fratext
   #Ввод пароля
-  set ::labpas "PIN-код токена \"$::slotid_teklab\""
+  read_password "Введите пароль для \n\"[file tail $pfx]\"" ".fn7.fratext"
+ 
+#  set ::labpas "PIN-код токена \"$::slotid_teklab\""
   if { $yespas == "no" } {
     set pfx_fn ""
     set friendly ""
@@ -7947,15 +7913,7 @@ proc addsignature {w} {
   puts "Добавляем подпись"
   if {$storage == 0} {
     #Ввод PIN-кода
-    FE::all_disable $w.fratext
-    place .topPinPw -in $w -relx 0.01 -rely 0.27 -relwidth 0.98
-    after 100
-    update
-    focus .topPinPw.labFrPw.entryPw
-    set yespass ""
-    vwait yespas
-    place forget .topPinPw
-    FE::all_enable $w.fratext
+    read_password "PIN-код токена \"$::slotid_teklab\"" $w.fratext
 
     if { $yespas == "no" } {
       return 0
@@ -10258,17 +10216,9 @@ proc ::deleteallobj {w} {
   variable ::handleObj
   variable ::listObjs
   catch {::pki::pkcs11::logout $::handle $::slotid_tek}
-  wm title .topPinPw "Токен: $::slotid_teklab"
-  wm state .topPinPw normal
-  wm state .topPinPw withdraw
-  wm state .topPinPw normal
-  raise .topPinPw
-  grab .topPinPw
-  focus .topPinPw.labFrPw.entryPw
-  set yespass ""
-  vwait yespas
-  grab release .topPinPw
   #Ввод пароля
+  read_password "PIN-код токена \"$::slotid_teklab\"" "$w"
+
   if { $yespas == "no" } {
     return 0
   }
@@ -11103,17 +11053,8 @@ proc ::updateobj {w} {
   set ::handleObj [lindex $::listObjs 0]
   catch {::pki::pkcs11::logout $::handle $::slotid_tek}
   #Ввод PIN-кода
-  pack forget $w.
-  place .topPinPw -in .fn6 -relx 0.01 -rely 0.27 -relwidth 0.98
-  after 100
-  update
-  focus .topPinPw.labFrPw.entryPw
-  set yespass ""
-  vwait yespas
-  place forget .topPinPw
-  pack $w -side bottom
-  #Ввод пароля
-  if { $yespas == "no" } {
+  read_password "PIN-код токена \"$::slotid_teklab\"" $w.fratext
+if { $yespas == "no" } {
     return 0
   }
   set yespas "no"
@@ -11149,48 +11090,6 @@ proc ::updateobj {w} {
   set ::handleObj [lindex $::listObjs 0]
   $c.frhd.lobj configure -state readonly
   return $allobjs
-}
-
-proc ::deleteallobj {w} {
-  global yespas
-  global pass
-  variable ::handleObj
-  variable ::listObjs
-  #Ввод пароля
-  FE::all_disable $w
-  set ::labpas "PIN-код токена \"$::slotid_teklab\""
-  place .topPinPw -in $w -relx 0.01 -rely 0.27 -relwidth 0.98
-  after 100
-  update
-  focus .topPinPw.labFrPw.entryPw
-  set yespass ""
-  vwait yespas
-  place forget .topPinPw
-  FE::all_enable $w
-  if { $yespas == "no" } {
-    return 0
-  }
-  set yespas "no"
-  set password $pass
-  set pass ""
-          	
-  if { [pki::pkcs11::login $::handle $::slotid_tek $password] == 0 } {
-    tk_messageBox -title "Очистить токен" -message "Доступ к токену не получен" -detail "Проверьте PIN-код" -icon error
-    return 0
-  }
-  set password ""
-
-  set allobjs [::pki::pkcs11::listobjects $::handle $::slotid_tek "all"]
-  #    catch {::pki::pkcs11::logout $::handle $::slotid_tek}
-  foreach obj $allobjs {
-    #	puts "$obj"
-    set aa [dict create pkcs11_handle $::handle pkcs11_slotid $::slotid_tek]
-    lappend aa "hobj"
-    lappend aa [lindex $obj 1]
-    set err [::pki::pkcs11::delete obj $aa]
-  }
-  ::updatetok
-  return 1
 }
 
 #Информация об объектах токене
