@@ -3,6 +3,8 @@ package require textutil
 package require http
 package require ip
 package require tls
+package require Img
+
 namespace import ::msgcat::mc
 
 image create photo signattach -data {
@@ -670,7 +672,24 @@ if {[file exists $::libcloud]} {
   }
 }
 
-proc roundRect { w x0 y0 x3 y3 radius text  args } {
+proc CaptureWindow {win {baseImg ""} {px 0} {py 0}} {
+   # create the base image of win (the root of capturing process)
+   if {$baseImg eq ""} {
+     set baseImg [image create photo -format window -data $win]
+   }
+   # paste images of win's children on the base image
+   foreach child [winfo children $win] {
+     if {![winfo ismapped $child]} continue
+     set childImg [image create photo -format window -data $child]
+     regexp {\+(\d*)\+(\d*)} [winfo geometry $child] -> x y
+     $baseImg copy $childImg -to [incr x $px] [incr y $py]
+     image delete $childImg
+     CaptureWindow $child $baseImg $x $y
+   }
+   return $baseImg
+}
+
+proc roundRect { w x0 y0 x3 y3 radius text  arrow args } {
   #puts "$w $x0 $y0 $x3 $y3 $radius $text"
   set r [winfo pixels $w $radius]
   set d [expr { 2 * $r }]
@@ -693,7 +712,7 @@ proc roundRect { w x0 y0 x3 y3 radius text  args } {
   #puts "x0=$x0 x3=$x3 y0=$y0 y3=$y3 rd=$radius"
 
 
-  set cmd [list $w.can create polygon]
+  set cmd [list $w create polygon]
   lappend cmd $x0 $y0
   #puts "$x0 $y0"
   lappend cmd $x1 $y0
@@ -721,29 +740,38 @@ proc roundRect { w x0 y0 x3 y3 radius text  args } {
   lappend cmd $x0 $y1
   #puts "$x0 $y1"
   lappend cmd -smooth 1
+  
   #################################################################
-  set cmd1 [list $w.can create polygon]
+  eval $cmd $args
+  set cmd1 [list $w create polygon]
   set df [expr $d / 2]
-  set yf [expr $y3 + $df]
+  
   set xf [expr ($x3 - $x0) / 2 + $x0 ]
 
-  if {1} {
+  if {$arrow == "down"} {
+    set yf [expr $y3 + $df]
     lappend cmd1 [expr $xf + $df] $y3
     lappend cmd1 [expr $xf + $df - $df] [expr $y3 + $df * 2]
     lappend cmd1 [expr $xf - $df] $y3
     lappend cmd1 [expr $xf - $df] $y3
+    eval $cmd1 $args
+  } elseif {$arrow == "up" } {
+    set yf [expr $y0 - $df]
+    lappend cmd1 [expr $xf + $df] $y0
+    lappend cmd1 [expr $xf + $df - $df] [expr $y0 - $df * 2]
+    lappend cmd1 [expr $xf - $df] $y0
+    lappend cmd1 [expr $xf - $df] $y0
+    eval $cmd1 $args
   }
-  eval $cmd1 $args
-  eval $cmd $args
   set i 2
   array set aa $args
   #parray aa
   #Высота строки
   set yfont [font metrics TkDefaultFont -linespace]
 
-  $w.can create text [expr $x0 + $yfont ] [expr $y0 + $yfont] -anchor nw -text "$text" -fill navy  -tag $aa(-tag)
+  $w create text [expr $x0 + $yfont ] [expr $y0 + $yfont] -anchor nw -text "$text" -fill navy  -tag $aa(-tag)
 
-  return "$w.can"
+  return "$w"
 }
 
 
@@ -1187,7 +1215,9 @@ proc butImg {img} {
       #Центрирование инф. окна по X
       set xoff [expr ($::scrwidth - $x1) / 2]
       set radius [expr $::scrwidth / 10]
-      set round [roundRect  .fr1 $xoff $yoff [expr $x1 + $xoff ] [expr $y1 + $yoff] $radius "$tinfo"   -fill "white smoke" -tag ::rect]
+#      set round [roundRect  .fr1 $xoff $yoff [expr $x1 + $xoff ] [expr $y1 + $yoff] $radius "$tinfo"   -fill "white smoke" -tag ::rect]
+      set arrow down
+      set round [roundRect  .fr1.can $xoff $yoff [expr $x1 + $xoff ] [expr $y1 + $yoff] $radius "$tinfo" $arrow    -fill "white smoke" -tag ::rect]
       after 100
       update
       set ret [::updatetok]
@@ -1326,7 +1356,9 @@ proc butImg {img} {
     #Центрирование инф. окна по X
     set xoff [expr ($::scrwidth - $x1) / 2]
     set radius [expr $::scrwidth / 10]
-    set round [roundRect  .fr1 $xoff $yoff [expr $x1 + $xoff ] [expr $y1 + $yoff] $radius "$tinfo"   -fill "white smoke" -tag ::rect]
+#    set round [roundRect  .fr1 $xoff $yoff [expr $x1 + $xoff ] [expr $y1 + $yoff] $radius "$tinfo"   -fill "white smoke" -tag ::rect]
+    set arrow down
+    set round [roundRect  .fr1.can $xoff $yoff [expr $x1 + $xoff ] [expr $y1 + $yoff] $radius "$tinfo" $arrow  -fill "white smoke" -tag ::rect]
     after 100
     update
     set ::pkcs11_module $::libother
@@ -1461,7 +1493,9 @@ proc butImg {img} {
   #Высота виджеты = высота строки * кол-во строк (\n)
   set y1 [expr $yfont * ($lentinfo + 2)]
   set radius [expr $::scrwidth / 10]
-  set round [roundRect  .fr1 $xoff $yoff [expr $x1 + $xoff ] [expr $yoff + $y1] $radius "$tinfo" -fill "white smoke" -tag ::rect1]
+#  set round [roundRect  .fr1 $xoff $yoff [expr $x1 + $xoff ] [expr $yoff + $y1] $radius "$tinfo" -fill "white smoke" -tag ::rect1]
+  set arrow down
+  set round [roundRect  .fr1.can $xoff $yoff [expr $x1 + $xoff ] [expr $yoff + $y1] $radius "$tinfo" $arrow -fill "white smoke" -tag ::rect1]
   set cmd "$round bind ::rect1 <1>  {$round delete ::rect1}"
   set cmd [subst $cmd]
   eval $cmd
@@ -1642,7 +1676,8 @@ proc exitPKCS {} {
   #Высота виджеты = высота строки * кол-во строк (\n)
   set y1 [expr $yfont * 3]
   set radius [expr $::scrwidth / 16]
-  set round [roundRect  .fr0 $xoff $yoff [expr $x1 + $xoff ] [expr $yoff + $y1] $radius "$tinfo" -fill "white smoke" -tag ::rectend]
+  set arrow down
+  set round [roundRect  .fr0.can $xoff $yoff [expr $x1 + $xoff ] [expr $yoff + $y1] $radius "$tinfo" $arrow -fill "white smoke" -tag ::rectend]
   set cmd "$round bind ::rectend <1>  {$round delete ::rectend; exit}"
   set cmd [subst $cmd]
   eval $cmd
@@ -3465,13 +3500,74 @@ proc ::viewCert {type nick} {
 }
 
 
-proc ::viewCSR {file type} {
+proc delmes {w roundmes1 } {
+      $roundmes1 delete ::rect
+      $roundmes1 delete ::tt
+    destroy .canvas
+#    pack $w.fratext -in $w -anchor center -expand 0 -fill both -side top -pady 0 -padx 0
+#FE::all_enable $w.fratext
+tk busy forget $w.fratext
+}
+
+
+proc ::viewCSR {w file type} {
   #type 1 - view csr; 7 - create certificate
   variable dir_crt
+#Делаем скриншот нужного widget
+set imagefe [CaptureWindow $w.fratext]
+#$imagefe write -format png "screenshot.png"
   if {$file == ""} {
-    tk_messageBox -title "Просмотр запроса на сертификат" -icon info -message "Не выбран файл с запросом на сертификат"
+    tk busy hold $w.fratext
+	set imagefe [CaptureWindow $w.fratext]
+#$imagefe write -format png "screenshot.png"
+	set ws [image width $imagefe]
+	set hs [image height $imagefe]
+
+	set ww "$w.fratext.lsep0"
+	set x [winfo x $ww]
+	set y [winfo y $ww]
+	set wd [winfo width $ww]
+	set h [winfo height $ww]
+	puts "workOpCert geom=$x $y $wd $h"
+#	set rootx [winfo rootx $ww]
+#	set rooty [winfo rooty $ww]
+#	puts "workOpCert rootx=$rootx rooty=$rooty"
+      #Высота строки
+      set yfont [font metrics TkDefaultFont -linespace]
+      #Высота виджеты = высота строки * (кол-во строк (\n) + 2)
+      set y1 [expr $yfont * 4]
+      #Смещение по Y
+      #Отображаемый текст
+      set tinfo "Не выбран файл с\nзапросом на сертификат!"
+      #Длина строки
+      set x1 [font measure TkDefaultFont "запросом на сертификат!"]
+      #Ширина инф. окна
+      set radius [expr $y1 / 3]
+      set x1 [expr $x1 + 1 * $radius]
+      #Центрирование инф. окна по X
+      set xoff [expr {($ws - $x1 ) / 2}]
+      set yoff [expr {$y  +  $h * 2 }]
+#Вырезаем прямоугольник
+    image create photo tiled
+    tiled copy $imagefe -from  $xoff $yoff  [expr $x1 + $xoff + $radius] [expr $y1 + $yoff + 2 * $radius ]
+#tiled write -format png "screenshot_tile_cert.png"
+#РАЗМЕЩВЕМ screenshot
+    set ws [image width tiled]
+    set hs [image height tiled]
+    canvas .canvas -width $ws -height $hs -relief flat -bd 0  -highlightthickness 0
+    .canvas create image 0 0 -image tiled -anchor nw
+
+#    FE::all_disable $w.fratext
+
+    place .canvas -in $w.fratext  -x $xoff  -y $yoff
+    set arrow up
+    set roundmes1 [roundRect  .canvas  0 $radius [expr 0 + $x1 + 1 * $radius] [expr 0 + $y1 + $radius] $radius "$tinfo" $arrow  -fill "cyan2"  -tag ::rectm1]
+#     -outline black  gainsboro
+    eval "$roundmes1 bind ::rectm1 <1>  {delmes $w $roundmes1}"
+    update
     return
   }
+
   set mes ""
   if {$type == 7 } {
     if {$dir_crt == ""} {
@@ -6378,9 +6474,63 @@ proc ::workOpCert {w} {
   #    puts "WORKOP:c=$c"
   set i 0
   if {$cert_fn == ""} {
-    tk_messageBox -title "Работа с сертификатом" -icon error -message "Не выбран файл с сертификатом"
+#Делаем скриншот нужного widget
+#    FE::all_disable $w.fratext
+    tk busy hold $w.fratext
+	set imagefe [CaptureWindow $w.fratext]
+#$imagefe write -format png "screenshot.png"
+	set ws [image width $imagefe]
+	set hs [image height $imagefe]
+
+	set ww "$w.fratext.lsep"
+	set x [winfo x $ww]
+	set y [winfo y $ww]
+	set wd [winfo width $ww]
+	set h [winfo height $ww]
+	puts "workOpCert geom=$x $y $wd $h"
+#	set rootx [winfo rootx $ww]
+#	set rooty [winfo rooty $ww]
+#	puts "workOpCert rootx=$rootx rooty=$rooty"
+      #Высота строки
+      set yfont [font metrics TkDefaultFont -linespace]
+      #Высота виджеты = высота строки * (кол-во строк (\n) + 2)
+      set y1 [expr $yfont * 3]
+      #Смещение по Y
+      #Отображаемый текст
+      set tinfo "Не выбран файл с сертификатом!"
+      #Длина строки
+      set x1 [font measure TkDefaultFont "Не выбран файл с сертификатом!"]
+      #Ширина инф. окна
+      set radius [expr $y1 / 3]
+      set x1 [expr $x1 + 1 * $radius]
+      #Центрирование инф. окна по X
+      set xoff [expr {($ws - $x1 ) / 2}]
+      set yoff [expr {$y  +  $h * 2 }]
+#Вырезаем прямоугольник
+    image create photo tiled
+    tiled copy $imagefe -from  $xoff $yoff  [expr $x1 + $xoff + $radius] [expr $y1 + $yoff + 2 * $radius ]
+#tiled write -format png "screenshot_tile_cert.png"
+
+#РАЗМЕЩВЕМ screenshot
+    set ws [image width tiled]
+    set hs [image height tiled]
+    canvas .canvas -width $ws -height $hs -relief flat -bd 0  -highlightthickness 0 -bg gainsboro
+    .canvas create image 0 0 -image tiled -anchor nw
+
+#    FE::all_disable $w.fratext
+
+    place .canvas -in $w.fratext  -x $xoff  -y $yoff
+    set arrow up
+    set roundmes1 [roundRect  .canvas  0 $radius [expr 0 + $x1 + 1 * $radius] [expr 0 + $y1 + $radius] $radius "$tinfo" $arrow  -fill "cyan2"  -tag ::rectm1]
+#     -outline black 
+    eval "$roundmes1 bind ::rectm1 <1>  {delmes $w $roundmes1}"
+#    place .canvas -in $w.fratext  -x [expr $xoff + 2 * $radius] -y $yoff
+    update
+
+#    tk_messageBox -title "Работа с сертификатом" -icon error -message "Не выбран файл с сертификатом"
     return
   }
+    puts "::workOpCert H=[$w.fratext.fcrt.e2.entry bbox 0]"
   set fd [open $cert_fn]
   chan configure $fd -translation binary
   set data [read $fd]
@@ -6404,6 +6554,7 @@ proc ::workOpCert {w} {
       loadcrl $cert_hex 0
     }
     2 {
+    
       ::viewCert "file" $cert_fn
     }
     3 {
@@ -9831,8 +9982,8 @@ proc func_page4 {c} {
     {{Любой тип}    *}
   }
   set corig $c
-  frame $c.fratext -borderwidth 0 -relief flat -bg #bee9fd
-  pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
+  frame $c.fratext -borderwidth 0 -relief flat -bg #bee9fd -highlightthickness 0
+  pack $c.fratext -in $c -anchor center -expand 0 -fill both -side top 
   set c "$c.fratext"
 
   labelframe $c.tok -text "Сертификаты токена"  -bd $::bdlf -bg wheat -relief groove
@@ -9866,7 +10017,8 @@ proc func_page4 {c} {
   -initialdir $::myHOME \
   -filetypes $ft
   pack $c.fscr.e1 -side left -expand 1 -fill both
-  button  $c.fscr.viewscr -command {variable csr_fn;::viewCSR  $csr_fn 1} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0
+  eval "button  $c.fscr.viewscr -command {after 1 {variable csr_fn;::viewCSR $corig \$csr_fn 1}} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0"
+#  eval "button  $c.fscr.viewscr -command {variable csr_fn;::viewCSR $corig \$csr_fn 1} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0"
   pack $c.fscr.viewscr -side right -padx {4 0} -pady 0 -expand 0 -fill none
   eval "pack $c.fscr -fill both -side top -padx $::intpx2mm"
   set msk "*.p10 *.csr *.req* *.der .pem *"

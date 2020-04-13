@@ -150,7 +150,7 @@ namespace eval FE {
   }
 
   #Процедура смены языка и синхронный перевод
-  proc changelang {w} {
+  proc changelang {w typew} {
     #Смена языка и синхронный перевод
     #Смена иконки на кнопке
     if  {[msgcat::mclocale] == "ru"} {
@@ -177,6 +177,11 @@ namespace eval FE {
     $w.fr.t heading {size} -text [mc "$r"]
     set r  [$w.filter cget -text]
     $w.filter configure -text [mc "$r"]
+    if {$typew == "window"} {
+	set r [wm title $w]
+	wm title $w [mc "$r"]
+    }
+
   }
 
   proc readName ent {
@@ -225,6 +230,7 @@ namespace eval FE {
   set aa [expr $::px2mm + 0.5]
   set ::intpx2mm [expr {int($aa)}]
   #Проверяем, что это телефон
+  set ::typetlf 0
   if {$::scrwidth < $::scrheight} {
     ttk::style configure TCombobox  -arrowsize [expr 5 * $::px2mm]
     set ::typetlf 1
@@ -478,8 +484,8 @@ namespace eval FE {
       $fm.fr.t column "#0" -stretch 1 -width 75 -anchor nw
     }
 
-    eval "bind $fm.fr.t <Double-1> {[namespace current]::selectobj $fm.fr.t $typefb 2 $otv}"
-    eval "bind $fm.fr.t <ButtonRelease-1> {[namespace current]::selectobj $fm.fr.t $typefb 1 $otv}"
+    eval "bind $fm.fr.t <Double-1> {[namespace current]::selectobj $fm.fr.t $typew $typefb 2 $otv}"
+    eval "bind $fm.fr.t <ButtonRelease-1> {[namespace current]::selectobj $fm.fr.t $typew $typefb 1 $otv}"
     eval "bind $fm.fr.t <ButtonPress-3> {[namespace current]::showContextMenu %W %x %y %X %Y $w $typefb}"
 
     frame $fm.buts -bg white
@@ -497,9 +503,9 @@ namespace eval FE {
     }
     label $fm.titul.lab -text $ltit -relief flat -bg skyblue -justify center
     if {[msgcat::mclocale] == "ru" } {
-      eval "button $fm.titul.lang -relief flat -image ru_24x16 -command {[namespace current]::changelang $fm} -bg white"
+      eval "button $fm.titul.lang -relief flat -image ru_24x16 -command {[namespace current]::changelang $fm $typew} -bg white"
     } else {
-      eval "button $fm.titul.lang -relief flat -image usa_24x16 -command {[namespace current]::changelang $fm} -bg white"
+      eval "button $fm.titul.lang -relief flat -image usa_24x16 -command {[namespace current]::changelang $fm $typew} -bg white"
     }
     eval "bind  $fm.titul.lang <Enter> {[namespace current]::helptools $fm.helpview $fm.titul.lab 0.5 {[mc {Сменить язык}]}}"
     eval "bind  $fm.titul.lang <Leave> {place forget $fm.helpview}"
@@ -521,8 +527,8 @@ namespace eval FE {
     if {$typefb != "dir"} {
       ttk::combobox $fm.filter.entdir -width 0 -values $msk
       pack $fm.filter.entdir -side left -anchor w -fill both -expand 1
-      eval "bind $fm.filter.entdir <<ComboboxSelected>> {[namespace current]::selectobj $fm.fr.t $typefb 3 $otv}"
-      eval "bind $fm.filter.entdir <Key-Return> {[namespace current]::selectobj $fm.fr.t $typefb 3 $otv}"
+      eval "bind $fm.filter.entdir <<ComboboxSelected>> {[namespace current]::selectobj $fm.fr.t $typew $typefb 3 $otv}"
+      eval "bind $fm.filter.entdir <Key-Return> {[namespace current]::selectobj $fm.fr.t $typew $typefb 3 $otv}"
       $fm.filter.entdir delete 0 end
       $fm.filter.entdir insert end [lindex $msk 0]
       $fm.filter.entdir configure -state readonly
@@ -530,7 +536,7 @@ namespace eval FE {
     }
     variable [namespace current]::hiddencb
     set [namespace current]::hiddencb 0
-    eval "ttk::checkbutton $fm.filter.hiddencb -image eye_hidden -padding {1mm 0 0 0} -variable [namespace current]::hiddencb -command {[namespace current]::selectobj $fm.fr.t $typefb 3 $otv}"
+    eval "ttk::checkbutton $fm.filter.hiddencb -image eye_hidden -padding {1mm 0 0 0} -variable [namespace current]::hiddencb -command {[namespace current]::selectobj $fm.fr.t $typew $typefb 3 $otv}"
     eval "bind $fm.filter.hiddencb <Enter> {[namespace current]::helptools $fm.helpview $fm.filter 0.20 {[mc {Добавить скрытые папки:}]}}"
 
     eval "bind $fm.filter.hiddencb <Leave> {place forget $fm.helpview}"
@@ -577,11 +583,12 @@ namespace eval FE {
     populateRoots "$fm.fr.t" "$initdir" $typefb
     if {$typew != "frame"} {
       tkwait visibility $w
-      grab set $w
+      tk busy hold [winfo parent $w]
+#      grab set $w
     }
     }
 
-  proc selectobj {w typefb click otv} {
+  proc selectobj {w typew typefb click otv} {
     if {$click == 3} {
       set w1 [string range $w 0 end-5]
       set tekdir "[$w1.tekdir.entdir get]"
@@ -590,11 +597,9 @@ namespace eval FE {
       } else {
         set mask "*"
       }
-#      foreach dir [lsort -dictionary "$tekdir"] {}
       set dir "$tekdir"
         populateTree $typefb $mask $w [$w insert {} end -text "$dir" \
         -values [list "$dir" directory]]
-#      {}
     }
     set num [$w selection]
     set titem [$w item $num -value]
@@ -636,9 +641,9 @@ namespace eval FE {
 
     if {$click == 2 && [lindex $titem 1] == "file"} {
       set fm [string range $w 0 end-5]
-      set typew window
       #Это очень важно выполнение в другом потоке
       after 10 [namespace current]::fereturn $typew $fm $typefb $otv
+#after 100
     }
   }
 
@@ -663,23 +668,25 @@ namespace eval FE {
 
     set $otv $ret
     if {$typew != "frame"} {
-      grab release $w
+	tk busy forget [winfo parent $w]
+#      grab release $w
     }
     catch {destroy $w}
     return $otv
   }
 
   proc fecancel {typew w typefb otv} {
+    if {$typew != "frame"} {
+	tk busy forget [winfo parent $w]
+#      grab release $w
+    }
     catch {destroy $w}
     variable $otv
     set $otv ""
-    if {$typew != "frame"} {
-      grab release $w
-    }
     return $otv
   }
 
-  ## Code to populate the roots of the tree (can be more than one on Windows)
+  ## Code to populate the roots of the tree 
   proc populateRoots {tree dir typefb} {
     global env
 
@@ -694,11 +701,9 @@ namespace eval FE {
     } else {
       set mask "*"
     }
-#    foreach dir [lsort -dictionary "$tekdir"] {}
     set dir "$tekdir"
       populateTree $typefb $mask $tree "[$tree insert {} end -text "$dir" \
       -values [list "$dir" directory]]"
-#    {}
   }
 
   ## Code to populate a node of the tree

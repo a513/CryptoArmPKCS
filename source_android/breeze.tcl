@@ -159,13 +159,10 @@ GNUwqoGeGgAWkgtw6lHz0gAAAABJRU5ErkJggg==
 }]
 
 set I(scrollbar-trough-vert-active) [image create photo  -data {
-iVBORw0KGgoAAAANSUhEUgAAABQAAAA4CAYAAAD959hAAAABhWlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AYht/+SEWqDnYQcYhSnSyIijhqFYpQIdQKrTqYXPoHTRqS
-FBdHwbXg4M9i1cHFWVcHV0EQ/AFxcnRSdJESv0sKLWK847iH97735e47wF8vM9UMjgOqZhmpRFzIZFeF0CuCNHswhGGJmfqcKCbhOb7u4eP7XYxnedf9ObqVnMkAn0A8
-y3TDIt4gnt60dM77xBFWlBTic+Ixgy5I/Mh12eU3zgWH/TwzYqRT88QRYqHQxnIbs6KhEk8RRxVVo3x/xmWF8xZntVxlzXvyF4Zz2soy12kNIoFFLEGEABlVlFCGhRjt
-GikmUnQe9/APOH6RXDK5SmDkWEAFKiTHD/4Hv3tr5icn3KRwHOh4se2PESC0CzRqtv19bNuNEyDwDFxpLX+lDsx8kl5radEjoHcbuLhuafIecLkD9D/pkiE5UoCWP58H
-3s/om7JA3y3Qteb2rXmO0wcgTb1K3gAHh8BogbLXPd7d2d63f2ua/fsBSEZylgWSZiIAAAAGYktHRAD/AP8A/6C9p5MAAAAJcEhZcwAALiMAAC4jAXilP3YAAAAHdElN
-RQfkBAQOKRhmV+gUAAAAGXRFWHRDb21tZW50AENyZWF0ZWQgd2l0aCBHSU1QV4EOFwAAAE5JREFUWMPtzLEJACAQBEHfhswEe7BcexDMrEhTwVc+EEz2woUbcZeFmLLW
-e6vl9PHu8QABAQEBAQEBAQEBAQEBAQE/gDJszQiK7GetrZtQ9wh0fGlLIQAAAABJRU5ErkJggg==
+R0lGODlhFAA4AIABAK+vr////yH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAAEA
+LAAAAAAUADgAAAJojB+gi93LnIRKTmodBfnhfmxg+I3imJTgaaodu7oZ/MoWPdsX
+hKY8irvpNEPPr3WMJWvLXFP43EWQU2WVeXVmoVtpBVhEBL0ccJR4NnbRa/WX+rbG
+sXNtnXsn98bsfL8MBygnSEdoUAAAOw==
 }]
 
 set I(scrollbar-trough-vert-active_ORIG) [image create photo  -data {
@@ -460,13 +457,18 @@ igGlg5r46SZL9siQYaSMffKr24fx26XH10bPgE4i0mi6Jm/Vici3vepO5WxEzodW
 Vn8dAAAAAElFTkSuQmCC
 }]
 
-set I(scrollbar-trough-horiz-active) [image create photo  -data {
+set I(scrollbar-trough-horiz-active-old) [image create photo  -data {
 iVBORw0KGgoAAAANSUhEUgAAADgAAAAUCAYAAADY6P5TAAAABmJLR0QA/wD/AP+g
 vaeTAAAAy0lEQVRYhe3TuwrCQBAF0DsTQxQNsfHV24mSD7CwzT9bWPgBabRKaaGC
 jyCCGDdro5IoFkI0BuZ0O9PcyzKAEEII8RY9D1x3VEfp1INhOFrHnEeoTxFxDKVC
 XMoz35/skzsj+eh6nmWej0MQVQH9Uv5/aQJRBYbq2IP+YhsE6r5J/ZC9DNsAzJ/n
 y47prA+t5CBVkJn1b/N8X6pg2LRXAKKcsmQhunV4SN3gNghUp9HdEKsaMVtFuUMi
 jknrHUWWP5+Oj3nnEUIIURhXog40I5tPlhsAAAAASUVORK5CYII=
+}]
+set I(scrollbar-trough-horiz-active) [image create photo  -data {
+R0lGODlhOAAUAIABAK+vr////yH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAAEA
+LAAAAAA4ABQAAAIvjI+py+0Po5y02ouz3rz7LwHiSJbmiabqyrbuC8fyTNf2jecr
+yPf+DwwKh8QirwAAOw==
 }]
 
 set I(notebook-client) [image create photo  -data {
