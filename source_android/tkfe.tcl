@@ -13,6 +13,7 @@ namespace import -force msgcat::mcset
 namespace eval FE {
 
   mcset en "Текущий каталог" "Current directory"
+  mcset en "Перейти вверх" "Go up"
   mcset en "Выбранный каталог" "Selected directory"
   mcset en "Выбранный файл" "Selected file"
   mcset en "Выбранный файл/каталог" "Selected file/directory"
@@ -41,6 +42,7 @@ namespace eval FE {
   mcset en "Выберите библиотеку PKCS11" "Select PKCS11 library"
   ###################################################################
   mcset ru "Current directory" "Текущий каталог"
+  mcset en "Go up" "Перейти вверх"
   mcset ru "Selected directory" "Выбранный каталог"
   mcset ru "Selected file" "Выбранный файл"
   mcset ru "Selected file/directory" "Выбранный файл/каталог"
@@ -57,7 +59,8 @@ namespace eval FE {
   mcset ru "Change language" "Сменить язык"
   mcset ru "Select PKCS11 library" "Выберите библиотеку PKCS11"
 
-  ttk::style configure Treeview  -background snow  -padding 0 -arrowsize 20
+  ttk::style configure Treeview  -background snow  -padding 0
+#   -arrowsize 20
   ttk::style configure TCheckbutton  -background snow  -padding {1mm 0 0 0}
 
   image create photo upArrow -data {
@@ -232,10 +235,10 @@ namespace eval FE {
   #Проверяем, что это телефон
   set ::typetlf 0
   if {$::scrwidth < $::scrheight} {
-    ttk::style configure TCombobox  -arrowsize [expr 5 * $::px2mm]
+    ttk::style configure TCombobox -arrowsize [expr 5 * $::px2mm]
     set ::typetlf 1
   } else {
-    ttk::style configure TCombobox  -arrowsize [expr 5 * $::px2mm]
+#    ttk::style configure TCombobox  -arrowsize [expr 5 * $::px2mm]
     #Конфигурирование виджета под смартфон
     #Ширина 75 mm
     set ::scrwidth [expr {int(75 * $px2mm)}]
@@ -394,11 +397,14 @@ namespace eval FE {
     }
   }
 
-  proc   helptools {fromw tow xtow text } {
+  proc   helptools {fromw tow xtow text anchor} {
+    catch {destroy $fromw}
+    label $fromw -text "Подсказка" -anchor nw -justify left -bg #ffe0a6
     set tr [mc $text]
     place forget $fromw
     $fromw configure -text $tr
-    place $fromw  -in $tow -relx $xtow -rely 1.0
+    raise $tow
+    place $fromw  -in $tow -relx $xtow -rely 1.0 -anchor $anchor
   }
 
   proc initfe {typew w initdir typefb otv msk} {
@@ -411,7 +417,9 @@ namespace eval FE {
       }
     }
     catch {destroy $w}
+    set wres [wm resizable .]
     if {$typew == "frame"} {
+#Главное окно неизменяемое на время работы проводника
       frame $w -bg white
     } else {
       toplevel $w -bd 3  -relief groove -bg white
@@ -501,18 +509,19 @@ namespace eval FE {
     } else {
       set ltit [mc "Выберите файл"]
     }
+
     label $fm.titul.lab -text $ltit -relief flat -bg skyblue -justify center
     if {[msgcat::mclocale] == "ru" } {
-      eval "button $fm.titul.lang -relief flat -image ru_24x16 -command {[namespace current]::changelang $fm $typew} -bg white"
+      eval "button $fm.titul.lang -relief flat -image ru_24x16 -command {[namespace current]::changelang $fm $typew} -bg white -bd 0 -activebackground white -padx 0 -pady 0"
     } else {
-      eval "button $fm.titul.lang -relief flat -image usa_24x16 -command {[namespace current]::changelang $fm $typew} -bg white"
+      eval "button $fm.titul.lang -relief flat -image usa_24x16 -command {[namespace current]::changelang $fm $typew} -bg white -bd 0 -activebackground white -padx 0 -pady 0"
     }
-    eval "bind  $fm.titul.lang <Enter> {[namespace current]::helptools $fm.helpview $fm.titul.lab 0.5 {[mc {Сменить язык}]}}"
+    eval "bind  $fm.titul.lang <Enter> {[namespace current]::helptools $fm.helpview $fm.titul.lab 1.0 {[mc {Сменить язык}]} ne}"
     eval "bind  $fm.titul.lang <Leave> {place forget $fm.helpview}"
 
-    eval "button $fm.titul.tools -relief flat -image icontools -command {} -bg white "
+    eval "button $fm.titul.tools -relief flat -image icontools -bg white -activebackground white -bd 0 -padx 0 -pady 0"
     eval "bind $fm.titul.tools <ButtonRelease-1> {[namespace current]::showContextMenu %W %x %y %X %Y $fm $typefb}"
-    eval "bind  $fm.titul.tools <Enter> {[namespace current]::helptools $fm.helpview $fm.titul.lab 0.0 {[mc {Инструменты}]}}"
+    eval "bind  $fm.titul.tools <Enter> {[namespace current]::helptools $fm.helpview $fm.titul.lab 0.0 {[mc {Инструменты}]} nw}"
     eval "bind  $fm.titul.tools <Leave> {place forget $fm.helpview}"
 
     pack $fm.titul.tools -side left -anchor nw
@@ -537,16 +546,20 @@ namespace eval FE {
     variable [namespace current]::hiddencb
     set [namespace current]::hiddencb 0
     eval "ttk::checkbutton $fm.filter.hiddencb -image eye_hidden -padding {1mm 0 0 0} -variable [namespace current]::hiddencb -command {[namespace current]::selectobj $fm.fr.t $typew $typefb 3 $otv}"
-    eval "bind $fm.filter.hiddencb <Enter> {[namespace current]::helptools $fm.helpview $fm.filter 0.20 {[mc {Добавить скрытые папки:}]}}"
+    eval "bind $fm.filter.hiddencb <Enter> {[namespace current]::helptools $fm.helpview $fm.filter 1.0 {[mc {Добавить скрытые папки:}]} ne }"
 
     eval "bind $fm.filter.hiddencb <Leave> {place forget $fm.helpview}"
-    pack $fm.filter.hiddencb -side right -anchor ne -padx 0 -pady 0
+    pack $fm.filter.hiddencb -side right -anchor ne -padx 0 -pady 0 -fill y
 
-    label $fm.helpview -text "Подсказка" -anchor nw -justify left -bg #ffe0a6
 
     labelframe $fm.tekdir -text [mc "Текущий каталог"] -bg skyblue -bd 0 -labelanchor n
-    entry $fm.tekdir.entdir -relief flat -bg white -highlightcolor blue
-    pack $fm.tekdir.entdir -side right -anchor ne -fill x -expand 1
+    eval "button $fm.tekdir.up -relief flat -image icondirup -command {[namespace current]::goup $fm $typefb} -bg white -activebackground white -bd 0 -padx 0 -pady 0 "
+    eval "bind  $fm.tekdir.up <Enter> {[namespace current]::helptools $fm.helpview $fm.tekdir.entdir 1.0 {[mc {Перейти вверх}]} ne}"
+    pack $fm.tekdir.up -side right -anchor nw -fill none -expand 0
+
+    eval "bind  $fm.tekdir.up <Leave> {place forget $fm.helpview}"
+    entry $fm.tekdir.entdir -relief flat -bg white -highlightthickness 0 -highlightbackground skyblue -highlightcolor blue 
+    pack $fm.tekdir.entdir -side right -anchor ne -fill both -expand 1
     $fm.tekdir.entdir delete 0 end
     if {$typefb == "dir"} {
       set ltit [mc "Выбранный каталог"]
@@ -554,7 +567,7 @@ namespace eval FE {
       set ltit [mc "Выбранный файл/каталог"]
     }
     labelframe $fm.seldir -text $ltit -bg skyblue -bd 0 -labelanchor n
-    entry $fm.seldir.entdir -relief flat -bg white -highlightthickness 1 -highlightbackground skyblue -highlightcolor blue
+    entry $fm.seldir.entdir -relief flat -bg white -highlightthickness 0 -highlightbackground skyblue -highlightcolor blue
     pack $fm.seldir.entdir -side right -anchor ne -fill x -expand 1
     $fm.seldir.entdir delete 0 end
     if {$typefb == "dir"} {
@@ -585,8 +598,25 @@ namespace eval FE {
       tkwait visibility $w
       tk busy hold [winfo parent $w]
 #      grab set $w
+    } 
+  }
+
+  proc goup {w typefb} {
+    $w.tekdir.entdir configure -state normal
+    set tdir [$w.tekdir.entdir get]
+    $w.tekdir.entdir configure -state readonly
+    set tdir [file dirname $tdir ]
+    set rr [file readable "$tdir"]
+    if {$rr == 0} {
+      tk_messageBox -title "Просмотр папки" -icon info -message "Каталог не доступен:\n$tdir"
+      return
     }
-    }
+    $w.seldir.entdir configure -state normal
+    $w.seldir.entdir delete 0 end
+    $w.seldir.entdir configure -state readonly
+
+    populateRoots "$w.fr.t" "$tdir" $typefb
+  }
 
   proc selectobj {w typew typefb click otv} {
     if {$click == 3} {
