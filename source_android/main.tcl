@@ -2776,8 +2776,10 @@ proc aboutUtil {w type parse_csr} {
       append csr_parse(extensions_bin) [createpointCA $::pointca]
     }
     #	parray csr_parse
-  } elseif {$type == 3 || $type == 4 || $type == 5} {
+  } elseif {$type == 3 || $type == 5} {
     set title "Просмотр сертификата:\n\"$parse_csr\""
+  } elseif {$type == 4} {
+    set title "Сертификат подписанта"
   } elseif {$type == 6 } {
     set title "Просмотр сертификата (PKCS12)"
   } elseif {$type == 8 || $type == 9} {
