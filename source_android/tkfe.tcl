@@ -588,7 +588,7 @@ namespace eval FE {
     }
     pack $fm.fr.t -anchor center -expand 1 -fill both -side top
 
-    pack $fm.fr -fill both -expand 1 -side top -padx 1mm -anchor nw
+    pack $fm.fr -fill both -expand 1 -side top -padx 0 -anchor nw
 
     ##################################################
 
