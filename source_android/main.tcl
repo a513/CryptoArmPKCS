@@ -225,6 +225,29 @@ image create photo creator_small -data {
   03YwB60sz5PAjFFbCtS8CtZTQMCgC+KAdoeIDQDZCY3gCJ3QC7WQDL/wB+QMpF2QA548zIiAwYrTCY5wBmc7B6JwzErMjN8gzZlQCiNN0sDgDfdwD7mlDtZwC8XkCI6Q
   B3RAB6CADr/wiOKD0OccCRhcCJjsB1LQAoEQfxNMBoGgCBg9CQEBADs=
 }
+image create photo frameBorderME_old -data {
+R0lGODlhDwATAMZAAImSloyVmoyWm5GWmI2XnI2Yno+ZnpKZnJGan46boY+boZKbn5GepZKepJGfpZGfppSfpZWgpZSkrJSlrZmtt5quuJ2vt6mtr5uxu6Cwt6musK2x
+s6O+yqO+y6jBzqzL26zM27HN2sPLz7PX6LPY6c7X27ri9brj9rvl+NDi7L7o/L7p/L7p/dTk7NXk7Nbo8d/o7Ofx9uny9u/y8+f2/vX3+Pj6+/T7/vT7//T8//j9//r+
+//v+//z+//z//////+/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w
+8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w
+8e/w8e/w8e/w8e/w8SH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAEAALAAAAAAPABMAAAdygCwqHxIGC4eHCA4cKCwrGBkwNTaUlTMiCScgFjc/np+gJRUTLaCmnj0D
+BDGnpxcCMq2mG7CyoLSxtp64uru1vbzAv7rBxMO2tKy9GgwvvT4HHR44ui4PKAohNDo83d07OSkFJCwmFAANEerqEAEMIyyBADs=
+}
+image create photo frameBorderME -data {
+R0lGODlhDwATAMZAAImSloyVmoyWm5GWmI2XnI2Yno+ZnpKZnJGan46boY+boZKbn5GepZKepJGfpZGfppSfpZWgpZSkrJSlrZmtt5quuJ2vt6mtr5uxu6Cwt6musK2x
+s6O+yqO+y6jBzqzL26zM27HN2sPLz7PX6LPY6c7X27ri9brj9rvl+NDi7L7o/L7p/L7p/dTk7NXk7Nbo8d/o7Ofx9uny9u/y8+f2/vX3+Pj6+/T7/vT7//T8//j9//r+
+//v+//z+//z//////+/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w
+8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w
+8e/w8e/w8e/w8e/w8SH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAEAALAAAAAAPABMAAAdygCwqHxIGC4eHCA4cKCwrGBkwNTaUlTMiCScgFjc/np+gJRUTLaCmnj0D
+BDGnpxcCMq2mG7CyoLSxtp64uru1vbzAv7rBxMO2tKy9GgwvvT4HHR44ui4PKAohNDo83d07OSkFJCwmFAANEerqEAEMIyyBADs=
+}
+image create photo frameBorderME_with_invert -data {
+R0lGODlhDwATAKUuAICAgIiMjYqSloyWm42Wm46Wmo2XnI+aoI+boZGboJCco5OcoJGepZGfppSfpZKgppahppSkrJSlrZipsZmtt5quuKGutJ6wuZuxu6a2vaO+yqO+
+y6nCzqvJ16zL26zM27rO17XQ3bfT4LfU4rPX6LPY6bva6bri9brj9rvl+L7o/L7p/L7p/czt/O/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w8e/w
+8e/w8e/w8e/w8e/w8SH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAD8ALAAAAAAPABMAAAZXQJbKE0ksjsiHJsVaYSagn3QqtShQnwt1K81UJCIuN2AQcwED8xatprLb
+0jdc3qar7Wa8WH9Ow38ADCZ/BRsccCENKQgdLWYjByUsJxQCDhCYmQQMJCxBADs=
+}
+
 variable p7s_fn
 set p7sfn ""
 set ::lp7 ""
@@ -398,6 +421,7 @@ set ::handle ""
 set ::tektoken "sw"
 set ::pkcs11_module "libls11sw2016.so"
 set ::listx509 {}
+set ::listx509S {}
 set ::slotid_teklab ""
 set ::slotid_tek -1
 set ::dercert ""
@@ -656,10 +680,25 @@ if {$::scrwidth < $::scrheight} {
 if {$::typetlf} {
   set userpath $env(EXTERNAL_STORAGE)
   set ::libcloud [file join $userpath "ls11cloud" "libls11cloud.so"]
+  set bdfr 16
 } else {
   set userpath $env(HOME)
   set ::libcloud [file join $userpath "ls11cloud" "libls11cloud.so"]
+  set bdfr 4
 }
+ttk::style element create RoundedFrame image \
+    {frameBorderME focus frameBorderME} \
+    -border $bdfr -sticky nsew
+ttk::style layout RoundedFrame {
+    RoundedFrame -sticky nsew
+}
+ttk::style configure RoundedFrame -padding {1mm 0 1mm 1mm} 
+#skyblue
+ttk::style configure RoundedFrame.Label -background wheat2
+ttk::style configure RoundedFrame -background  #bee9fd
+ttk::style configure Me.RoundedFrame -background  white
+
+
 if {[file exists $::libcloud]} {
   set myHOME1 $env(HOME)
   set mm [file join $myHOME1 "libls11cloud.so"]
@@ -1557,13 +1596,13 @@ proc scaleImage {im xfactor {yfactor 0}} {
 
 
 
-image create photo logo_product -file [file join $mydir "imageme" "validcertkey_51x24.png"]
-image create photo logo_ls -file [file join $mydir "imageme" "lissi_soft.png"] -format "png -alpha 1.0"
+image create photo logo_product -file [file join $mydir "imageme" "validcertkey_51x24.gif"]
+image create photo logo_ls -file [file join $mydir "imageme" "lissi_soft.gif"]
 #image create photo logo_ls -file [file join $mydir "imageme" "я_орел_160x75.png"] -format "png -alpha 1.0"
-image create photo logo_and -file [file join $mydir "imageme" "AndTk_inv_147x173.png"] -format "png -alpha 1.0"
-image create photo svitok -file [file join $mydir "imageme" "blue_svitok.png"] -format "png -alpha 1.0"
-image create photo logo_awish -file [file join $mydir "imageme" "logo_awish_152x150.png"] -format "png -alpha 1.0"
-image create photo logobic -file [file join $mydir "imageme" "logo-bic_token_96x96.png"]
+image create photo logo_and -file [file join $mydir "imageme" "AndTk_inv_147x173.gif"]
+image create photo svitok -file [file join $mydir "imageme" "blue_svitok.gif"] 
+image create photo logo_awish -file [file join $mydir "imageme" "logo_awish_152x150.gif"] 
+image create photo logobic -file [file join $mydir "imageme" "logo-bic_token_96x96.gif"]
 
 set ::padls 20
 set ::padlx 15
@@ -1592,10 +1631,13 @@ if {[tk windowingsystem] == "win32"}  {
   #Андроида tcl/tk
   if { $::px2mm > 15} {
     scaleImage logo_and 4
+    scaleImage frameBorderME 4
   } elseif { $::px2mm > 10} {
     scaleImage logo_and 3
+    scaleImage frameBorderME 3
   } elseif { $::px2mm > 5} {
     scaleImage logo_and 2
+    scaleImage frameBorderME 2
   }
   #Свиток опечатанный
   scaleImage svitok 4
@@ -1607,6 +1649,9 @@ if {[tk windowingsystem] == "win32"}  {
 } else {
   package provide ttk::theme::Breeze 0.6
   ttk::style theme use Breeze
+ttk::style configure RoundedFrame -padding {4 0 4 1mm} 
+ttk::style configure RoundedFrame -background  #bee9fd
+ttk::style configure TLabelframe -background  #bee9fd
   scaleImage logo_awish -2
 }
 
@@ -1614,12 +1659,13 @@ source [file join $mydir "GostPfx.tcl"]
 source [file join $mydir "alloids.tcl"]
 
 ttk::style configure TCheckbutton  -background white
-ttk::style configure TLabelframe -background  white -borderwidth 6
+ttk::style configure TLabelframe -background  skyblue -borderwidth 2 -relief flat
 #skyblue
 ttk::style configure TLabelframe.Label -background  white -borderwidth 6
 #skyblue
 ttk::style configure TRadiobutton  -background wheat -pad 0
 ttk::style configure TRadiobutton  -font {-family "Roboto" -size 8}
+ttk::style configure Me.TRadiobutton  -background white -pad 0
 
 #option add *Labelframe.background	wheat
 option add *Labelframe.background	gray97
@@ -7680,7 +7726,7 @@ proc trace_signedcert {name index op } {
 proc trace_p7s {name index op} {
   variable p7s_fn
   variable varTypeSign
-  variable ::listx509
+  variable ::listx509S
   variable ::lcerts
   variable varTypeSign
   variable varescTS
@@ -7688,8 +7734,8 @@ proc trace_p7s {name index op} {
   set c ".fn2.fratext"
   upvar 1 $name p7s
   if {$p7s == ""} {
-    set ::listx509 {}
-    $c.frc.listCert configure -values $::listx509
+    set ::listx509S {}
+    $c.frc.listCert configure -values $::listx509S
     set ::signedCert ""
     return
   }
@@ -7720,7 +7766,7 @@ proc trace_p7s {name index op} {
   }
   #puts "CERTS=$lcerts"
 
-  set ::listx509 {}
+  set ::listx509S {}
   set i 0
   set ::signedCert ""
   foreach p7t $::lp7 {
@@ -7733,10 +7779,10 @@ proc trace_p7s {name index op} {
       incr i
     }
     #Ищем подписанта
-    lappend ::listx509 $p7(nickcert)
+    lappend ::listx509S $p7(nickcert)
   }
   #puts "lnicks=$::listx509"
-  $c.frc.listCert configure -values $::listx509
+  $c.frc.listCert configure -values $::listx509S
   #puts "varescTS=$varescTS"
   switch $varescTS {
     0 {
@@ -8143,18 +8189,21 @@ proc func_page1 {c} {
   pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
   set c_orig $c
   set c "$c.fratext"
-  labelframe $c.tok -text "Выберите токен и сертификат" -bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm -width 400
+  ttk::labelframe $c.tok -text "Выберите токен и сертификат" -labelanchor n -style RoundedFrame -padding {4 0 4 0}
+  #-bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm -width 400
   ttk::combobox $c.tok.listTok -textvariable ::nickTok -values $::listtok
   set ::nickTok [lindex $::listtok 0]
   pack $c.tok.listTok -side top  -padx 0 -pady {1 0} -ipady 1  -expand 1 -fill x
-  pack $c.tok -fill both -side top -padx $::intpx2mm -pady $::intpx2mm -anchor nw
-  labelframe $c.cert -text "Сертификаты токена"  -borderwidth 0 -relief flat
+  pack $c.tok -fill both -side top -padx 0 -pady $::intpx2mm -anchor nw
+  ttk::labelframe $c.cert -text "Сертификаты токена" -labelanchor nw -style Me.RoundedFrame
+#  -borderwidth 0 -relief flat
   ttk::combobox $c.cert.listCert -textvariable nickCert -values $::listx509
   button $c.cert.viewcert -command {if {[info exists nickCert]} {::viewCert "pkcs11" $nickCert}} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0
   pack $c.cert.listCert -side left  -padx {0 1} -pady {1 0} -ipady 1  -expand 1 -fill x
-  pack $c.cert.viewcert -side right -padx {0 5} -pady 0 -expand 0 -fill none
+  pack $c.cert.viewcert -side right -padx {1mm 0} -pady 0 -expand 0 -fill none
   eval "pack $c.cert -in $c.tok -fill both -side top -padx {2 1} -pady $::intpx2mm -expand 1"
-  labelframe $c.frdoc -text "Документ для подписи:" -relief flat -bd 0 -padx 0 -pady 0
+  ttk::labelframe $c.frdoc -text "Документ для подписи:" -style RoundedFrame
+#   -relief flat -bd 0 -padx 0 -pady 0
   set wd 0
   if {$macos} {
     set ft ""
@@ -8169,42 +8218,46 @@ proc func_page1 {c} {
   -initialdir $::myHOME \
   -filetypes $ft
   eval "pack $c.frdoc.e1 -side left  -padx 0 -pady {0 $::intpx2mm} -ipady 0  -expand 1 -fill x"
-  pack $c.frdoc -fill x -side top -padx $::intpx2mm
+  pack $c.frdoc -fill x -side top -padx 0
   set msk "*.txt *.doc* *.xml* *.bin .* *"
   eval "$c.frdoc.e1.but configure -command {catch {destroy {.hhh}};feselect open $c_orig frame {Выберите документ для подписи} $::myHOME doc_for_sign [list $msk]}"
 
-  labelframe $c.frdir -text "Папка для подписи:" -relief flat -bd 0 -padx 0 -pady 0
+  ttk::labelframe $c.frdir -text "Папка для подписи:"  -style RoundedFrame
+#  -relief flat -bd 0 -padx 0 -pady 0
   cagui::FileEntry $c.frdir.e2 -dialogtype directory \
   -title "Папка для хранения подписи" \
   -width $wd \
   -variable  file_for_sign \
   -initialdir $::myHOME
   eval "pack $c.frdir.e2 -side left  -padx 0 -pady {0 $::intpx2mm} -ipady 0  -expand 1 -fill x"
-  eval "pack $c.frdir -fill both -side top -padx $::intpx2mm  -pady {[expr $::intpx2mm * 2] }"
+  eval "pack $c.frdir -fill both -side top -padx 0  -pady {[expr $::intpx2mm * 2] }"
   eval "$c.frdir.e2.but configure -command {catch {destroy {.hhh1}};feselect dir $c_orig frame {Выберите папку для подписи} $::myHOME file_for_sign {}}"
 
 
-  labelframe $c.lfr0 -text "Тип электронной подписи"  -labelanchor n -bg wheat -relief groove -bd $::bdlf -padx $::intpx2mm
-  ttk::radiobutton $c.lfr0.rb1 -value 1 -variable typesig -image signattach
+  ttk::labelframe $c.lfr0 -text "Тип электронной подписи"  -labelanchor n  -style RoundedFrame
+  # -bg wheat -relief groove -bd $::bdlf -padx $::intpx2mm
+  ttk::radiobutton $c.lfr0.rb1 -value 1 -variable typesig -image signattach -style Me.TRadiobutton
   #   -text "Присоединенная"
-  ttk::radiobutton $c.lfr0.rb2 -value 0 -variable typesig -image signdetach
+  ttk::radiobutton $c.lfr0.rb2 -value 0 -variable typesig -image signdetach -style Me.TRadiobutton
   # -text "Отсоединенная"
-  eval "grid $c.lfr0.rb1 -row 0 -column 0 -sticky wsen -padx {8 0} -pady $::intpx2mm"
-  grid $c.lfr0.rb2 -row 0 -column 1 -sticky ns -padx {0 0} -pady {0 4}
-  grid columnconfigure $c.lfr0 0 -weight 1
-  grid columnconfigure $c.lfr0.rb1 0 -weight 1
-  eval "pack $c.lfr0 -fill both -side top -padx $::intpx2mm -pady {0 $::intpx2mm}"
-  labelframe $c.lfr1 -text "Формат ЭП CAdes" -labelanchor n -bg wheat -relief groove -bd $::bdlf -padx $::intpx2mm
-  ttk::radiobutton $c.lfr1.chb1 -value 0 -variable createescTS -text "- BES"
-  ttk::radiobutton $c.lfr1.chb2 -value 1 -variable createescTS -text "- T"
-  ttk::radiobutton $c.lfr1.chb3 -value 2 -variable createescTS -text "- XLT1   "
+  eval "grid $c.lfr0.rb1 -row 0 -column 0 -sticky wn -padx 5mm -pady 0"
+  grid $c.lfr0.rb2 -row 0 -column 1 -sticky en -padx 5mm -pady 0
+#  grid columnconfigure $c.lfr0 1 -weight 1
+#  grid columnconfigure $c.lfr0.rb1 0 -weight 1
+  eval "pack $c.lfr0 -fill y -side top -padx $::intpx2mm -pady {0 $::intpx2mm}"
+  ttk::labelframe $c.lfr1 -text "Формат ЭП CAdes" -labelanchor n -style RoundedFrame
+  # -bg wheat -relief groove -bd $::bdlf -padx $::intpx2mm
+  ttk::radiobutton $c.lfr1.chb1 -value 0 -variable createescTS -text "- BES" -style Me.TRadiobutton
+  ttk::radiobutton $c.lfr1.chb2 -value 1 -variable createescTS -text "- T" -style Me.TRadiobutton
+  ttk::radiobutton $c.lfr1.chb3 -value 2 -variable createescTS -text "- XLT1   " -style Me.TRadiobutton
   grid $c.lfr1.chb1 -row 0 -column 0 -sticky w -padx {8 8}
   grid $c.lfr1.chb2 -row 0 -column 1 -sticky ns
   eval "grid $c.lfr1.chb3 -row 0 -column 2 -sticky ns -padx $::intpx2mm -pady {0 $::intpx2mm}"
   grid columnconfigure $c.lfr1 1 -weight 1
-  pack $c.lfr1 -fill both -side top -padx $::intpx2mm
+  pack $c.lfr1 -fill both -side top -padx 2mm
   #########################
-  labelframe $c.tsp -text "Сервер TSP:" -bd 0 -padx 0 -pady 0
+  ttk::labelframe $c.tsp -text "Сервер TSP:" -style RoundedFrame
+  # -bd 0 -padx 0 -pady 0
   # -bg #bee9fd
   if {$macos} {
     spinbox $c.tsp.listTSP  -textvariable ::tekTSP -values $::listtsp -width $wd -background white
@@ -8212,10 +8265,14 @@ proc func_page1 {c} {
     ttk::combobox $c.tsp.listTSP  -textvariable ::tekTSP -values $::listtsp -width $wd -background white -style TCombobox
   }
   set ::tekTSP [lindex $::listtsp 0]
-  eval "pack $c.tsp -side top -fill both -pady $::intpx2mm -padx $::intpx2mm"
+  eval "pack $c.tsp -side top -fill both -pady $::intpx2mm -padx 0"
   pack $c.tsp.listTSP -side left -fill x -expand 1 -pady 0 -padx 0
+#  ttk::frame $c.fcl  -style Me.TRadiobutton
+  ttk::frame $c.fcl  -style Me.RoundedFrame -padding $::intpx2mm 
+  pack $c.fcl -side top -anchor center -pady 4 -fill x
+  
   label $c.tekclock -textvariable myclock -background skyblue
-  pack $c.tekclock -side top -anchor center -pady 4 -fill x -padx $::intpx2mm
+  pack $c.tekclock -in $c.fcl -side top -anchor center -pady  $::intpx2mm -fill x -padx $::intpx2mm
 
   set com "ttk::button  $c.b2 -command {::sign_file  $c \"pkcs11\"} -text \"Подписать документ\""
   eval [subst $com]
@@ -8259,7 +8316,7 @@ proc func_page2 {c} {
   button $c.tok.viewcert -command {if {[info exists nickCert]} {::viewCert "pkcs11" $nickCert}} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -highlightthickness 0
   pack $c.tok.listCert -side left  -pady 0 -ipady 1  -expand 1 -fill x -padx 0
   pack $c.tok.viewcert -side right -pady 0 -expand 0 -fill none -padx 0
-  pack $c.tok -fill both -side top -padx $::intpx2mm
+  pack $c.tok -fill both -side top -padx 0
 
   labelframe $c.fr0 -text "Файл с электронной подписью (PKCS7)"  -bd 0
   cagui::FileEntry $c.fr0.e1 -dialogtype open \
@@ -8270,36 +8327,37 @@ proc func_page2 {c} {
   -initialdir $::myHOME \
   -filetypes $filetypep7s
   pack $c.fr0.e1 -side right  -padx 0 -pady {1 0} -ipady 1  -expand 1 -fill x
-  pack $c.fr0 -fill both -side top  -padx $::intpx2mm
+  pack $c.fr0 -fill both -side top  -padx 0
   set msk "*.p7s *.p7* *.sig *.bin *"
   eval "$c.fr0.e1.but configure -command {catch {destroy {.hp7}};feselect open $corig frame {Файл с электронной подписью} $::myHOME p7s_fn [list $msk]}"
 
-  labelframe $c.lfr0 -text "Тип и формат электронной подписи" -labelanchor n -bg wheat -relief groove -bd $::bdlf  -padx $::intpx2mm -pady $::intpx2mm
+  ttk::labelframe $c.lfr0 -text "Тип и формат электронной подписи" -labelanchor n -style RoundedFrame
+  # -bg wheat -relief groove -bd $::bdlf  -padx $::intpx2mm -pady $::intpx2mm
 
   variable typesig1
   variable createescTS1
   set typesig1 1
   set createescTS1 0
-  ttk::checkbutton $c.lfr0.chb0 -variable typesig1 -text "Формат подписи" -pad 0  -command {variable typesig1;set typesig1 1}
-  ttk::radiobutton $c.lfr0.chb1 -value 0 -variable createescTS1 -text "Тип подписи" -pad 0
+  ttk::checkbutton $c.lfr0.chb0 -variable typesig1 -text "Формат подписи" -pad 0  -command {variable typesig1;set typesig1 1} -style TCheckbutton
+  ttk::radiobutton $c.lfr0.chb1 -value 0 -variable createescTS1 -text "Тип подписи" -pad 0 -style Me.TRadiobutton
   grid $c.lfr0.chb0 -row 0 -column 0 -sticky w -padx 0 -pady 0
   grid $c.lfr0.chb1 -row 0 -column 1 -sticky nwse -padx 0 -pady 0
   grid columnconfigure $c.lfr0 0  -weight 1
-  eval "pack $c.lfr0 -fill both -side top  -padx $::intpx2mm -pady $::intpx2mm"
+  eval "pack $c.lfr0 -fill both -side top  -padx 0 -pady $::intpx2mm"
 
   labelframe $c.frc -text "Сертификаты подписантов" -bd 0
   set ::nomacver 0
-  ttk::combobox $c.frc.listCert -textvariable ::signedCert  -values $::listx509 -background white -style TCombobox
+  ttk::combobox $c.frc.listCert -textvariable ::signedCert  -values $::listx509S -background white -style TCombobox
   pack $c.frc.listCert -side left  -padx 0 -pady 0 -expand 1 -fill x
   button  $c.frc.viewcert -command {if {[info exists ::signedCert]} {::viewCert "pkcs7" $::signedCert}} -image ::img::view_18x16 -compound left -pady 0 -bd 0 -bg white -activebackground white -highlightthickness 0
   pack $c.frc.viewcert -side right -padx 0 -pady 0 -expand 0 -fill none
-  eval "pack $c.frc -fill both -side top -padx $::intpx2mm -pady $::intpx2mm"
+  eval "pack $c.frc -fill both -side top -padx 0 -pady $::intpx2mm"
   label $c.l3 -text "Документ подписан:" -textvariable ::dateSign -anchor w -bg skyblue  -width 0 -height 0 -pady 0
-  pack $c.l3 -fill both -side top -padx $::intpx2mm -pady 0
+  pack $c.l3 -fill both -side top -padx 0 -pady 0
   label $c.l4 -text "Метка времени получена:" -textvariable ::dateSignTST -anchor w -bg white  -width 0 -height 0 -pady 0
-  pack $c.l4 -fill both -side top -padx $::intpx2mm -pady 0
+  pack $c.l4 -fill both -side top -padx 0 -pady 0
   label $c.l5 -text "Метка утверждена:" -textvariable ::dateSignEscTS -anchor w -bg white  -width 0 -height 0 -pady 0
-  pack $c.l5 -fill both -side top -padx $::intpx2mm -pady 0
+  pack $c.l5 -fill both -side top -padx 0 -pady 0
 
   labelframe $c.frdoc -text "Подписанный документ:" -bd 0
   if {$macos} {
@@ -8314,7 +8372,7 @@ proc func_page2 {c} {
   -initialdir $::myHOME \
   -filetypes $ft
   pack $c.frdoc.e1 -side right  -padx 0 -pady {1 0} -ipady 1  -expand 1 -fill x
-  pack $c.frdoc -fill both -side top -padx $::intpx2mm
+  pack $c.frdoc -fill both -side top -padx 0
   set msk "*.txt *.doc* *.xml* *.bin *.xl* .* *"
   eval "$c.frdoc.e1.but configure -command {catch {destroy {.hd7}};feselect open $corig frame {Выберите полписанный документ} $::myHOME src_fn [list $msk]}"
 
@@ -8328,7 +8386,7 @@ proc func_page2 {c} {
   set ::tekTSP [lindex $::listtsp 0]
   pack $c.tsp.tsp -side left
   pack $c.tsp.listTSP -side left -fill x -expand 1
-  pack $c.tsp -fill both -side top -padx $::intpx2mm
+  pack $c.tsp -fill both -side top -padx 0
   labelframe $c.lfr1 -text "Дополнительные операции" -relief groove -bd $::bdlf -bg wheat -padx $::intpx2mm
   ttk::radiobutton $c.lfr1.rb1 -value 0 -variable typeop -text "Проверить подпись"  -pad 0
   ttk::radiobutton $c.lfr1.rb2 -value 1 -variable typeop -text "Извлечь док-т" -pad 0
@@ -8343,23 +8401,24 @@ proc func_page2 {c} {
   grid $c.lfr1.ch4 -row 3 -column 1 -sticky e -padx {0 0} -pady {0 0}
   grid $c.lfr1.rb5 -row 4 -column 0 -columnspan 2 -sticky w -padx 0 -pady {0 1}
   grid $c.lfr1.ch5 -row 4 -column 1 -sticky e -padx {0 0} -pady {0 1}
-  eval "pack $c.lfr1 -fill both -side top -padx $::intpx2mm -pady $::intpx2mm"
+  eval "pack $c.lfr1 -fill both -side top -padx 0 -pady $::intpx2mm"
 
   eval "ttk::button  $c.b2 -command {::workOp $corig} -text {Выполнить операцию}"
   eval "pack $c.b2 -side top  -pady $::intpx2mm -anchor ne"
 
-  labelframe $c.lfr2 -text "Добавить подписанта" -relief groove -bd $::bdlf -bg wheat
+  ttk::labelframe $c.lfr2 -text "Добавить подписанта" -labelanchor n -style RoundedFrame
+  # -relief groove -bd $::bdlf -bg wheat
   variable storage
   set storage 1
-  ttk::radiobutton $c.lfr2.st1 -value 0 -variable storage -text "PKCS11" -command {}
-  ttk::radiobutton $c.lfr2.st2 -value 1 -variable storage -text "PKCS12" -command {}
+  ttk::radiobutton $c.lfr2.st1 -value 0 -variable storage -text "PKCS11" -style Me.TRadiobutton
+  ttk::radiobutton $c.lfr2.st2 -value 1 -variable storage -text "PKCS12" -style Me.TRadiobutton
   set cmd "ttk::button  $c.lfr2.b1 -command {addsignature $corig} -text {Добавить ЭП}"
   set cmd [subst $cmd]
   eval $cmd
   pack $c.lfr2.st1 -side left -padx {0 0}
   pack $c.lfr2.st2 -side left -padx {0 0}
   eval "pack $c.lfr2.b1 -side right -padx {0 $::intpx2mm} -pady $::intpx2mm -anchor ne"
-  eval "pack $c.lfr2 -fill both -side top -pady $::intpx2mm -padx $::intpx2mm"
+  eval "pack $c.lfr2 -fill both -side top -pady $::intpx2mm -padx 0"
 
   trace variable p7s_fn w trace_p7s
   trace variable ::signedCert w trace_signedcert
@@ -8629,46 +8688,16 @@ proc CreateRequestTCL {profilename attributes} {
   }
   set temp ""
 
-  # + 32768 для неэкспортируемого ключа
-  set tpkey 0
   set typegost ""
   switch -- $tkey($attr(typekey)) {
     "gost3410-2012-256" {
       set typegost g12_256
-      set tpkey 8192
       set stribog stribog256
-      switch -- $attr(parkey) {
-        "1.2.643.2.2.35.1" {
-        }
-        "1.2.643.2.2.35.2" {
-          incr tpkey
-        }
-        "1.2.643.2.2.35.3" {
-          incr tpkey 2
-        }
-        "1.2.643.2.2.36.0" {
-          incr tpkey 3
-        }
-        "1.2.643.2.2.36.1" {
-          incr tpkey 4
-        }
-      }
     }
     "gost3410-2012-512" {
       set typegost g12_512
-      set tpkey 16384
       set stribog stribog512
-      switch -- $attr(parkey) {
-        "1.2.643.7.1.2.1.2.1" {
-        }
-        "1.2.643.7.1.2.1.2.2" {
-          incr tpkey
-        }
-      }
     }
-  }
-  if {$attr(expkey) == 1} {
-    incr tpkey 32768
   }
   set token_slotid $::slotid_tek
   puts "token_slotid=$token_slotid"
@@ -8677,7 +8706,7 @@ proc CreateRequestTCL {profilename attributes} {
     return ""
   }
   set aa [list "pkcs11_handle" $::handle "pkcs11_slotid" $token_slotid]
-  array set genkey [::pki::pkcs11::keypair $typegost A $aa ]
+  array set genkey [::pki::pkcs11::keypair $typegost $attr(parkey) $aa ]
   #puts "Ключевая пара $typegost создана"
   #parray genkey
   lappend aa "pkcs11_id"
