@@ -4976,7 +4976,14 @@ proc ::parse_pkcs7 {type p7file sfile} {
     asn::asnGetSequence asn_cont1 asn_cont4
     ::asn::asnGetObjectIdentifier asn_cont4 oiddata
     #puts "OIDDATA=$oiddata"
-    if {[string length $asn_cont4] > 0 } {
+    set lc [string length $asn_cont4]
+    set lc_hex ""
+    if {$lc == 2 } {
+#Переводим два файта в HEX (проверяем BER-кодировку)
+	binary scan $asn_cont4  H* lc_hex
+#puts "CONTEXT=\"$lc_hex\""
+    }
+    if {[string length $asn_cont4] > 0 && $lc_hex != "0000"} {
       set ret(attached) 1
 
       ::asn::asnGetContext asn_cont4 - octcontext
@@ -5063,6 +5070,11 @@ proc ::parse_pkcs7 {type p7file sfile} {
   if {$peek_tag == 0xA0} {
     ::asn::asnGetContext asn_cont1 - listcert
     while {[string length $listcert] > 0 } {
+#Проверка BER-кодировки
+      if {[string length $listcert] == 2 } {
+	    break
+      }
+
       asn::asnGetSequence listcert cert
       set cert [asn::asnSequence $cert]
       binary scan $cert  H* cert_hex
