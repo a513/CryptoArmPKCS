@@ -6300,14 +6300,13 @@ proc readca {url} {
   set cer ""
   #Проверяем тип протокола
   if { "https://" == [string range $url 0 7]} {
-    #    puts "HTTPS=$url"
+#    puts "HTTPS=$url"
     http::register https 443 ::tls::socket
   }
   #Читаем сертификат в бинарном виде
   if {[catch {set token [http::geturl $url -binary 1]
     #получаем статус выполнения функции
     #	http::wait $token
-    update
     set ere [http::status $token]
     if {$ere == "ok"} {
       #Получаем код возврата с которым был прочитан сертификат
@@ -6317,8 +6316,15 @@ proc readca {url} {
         set cer [http::data $token]
       } elseif {$code == 301 || $code == 302} {
         #Сертификат перемещен в другое место, получаем его
-        update
-        set newURL [dict get [http::meta $token] location]
+	array set mm [http::meta $token]
+#parray mm
+        if {[info exists mm(location)]} {
+#    	    set newURL [dict get [http::meta $token] "location"]
+    	    set newURL $mm(location)
+        } elseif {[info exists mm(Location)]} {
+#    	    set newURL [dict get [http::meta $token] "Location"]
+    	    set newURL $mm(Location)
+        } 
         #puts "newURL=$newURL"
         #Читаем сертификат с другого сервера
         set cer [readca $newURL]

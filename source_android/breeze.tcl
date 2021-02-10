@@ -968,10 +968,10 @@ if {0} {
                         {hover !disabled} $I(entry-active) \
                         disabled $I(entry-insensitive)] \
             -border 3 -padding {6 8} -sticky news
-
+if {1} {
         ttk::style element create Labelframe.border image $I(labelframe) \
             -border 4 -padding 24 -sticky news
-
+}
         ttk::style element create Menubutton.button \
             image [list $I(button) \
                         pressed  $I(button-active) \
@@ -997,7 +997,7 @@ if {0} {
                 {focus}    $I(entry-focus) \
                 {focus hover}    $I(entry-focus) \
                 {hover}    $I(entry-active) \
-            ] -border 4 -padding {1 1}
+            ] -border 4 -padding {5 1}
 #LISSI
 #             -border 4 -padding {6 8}
 
