@@ -30,7 +30,7 @@ namespace eval FE {
   mcset en "Удалить файл" "Delete file"
   mcset en "Удалить каталог" "Delete directory"
   mcset en "Создать каталог" "Create directory"
-  mcset en "Создать пустой файл" "Create empty file"
+  mcset en "Создать пустой файл" "Create an empty file"
   mcset en "Нет доступа" "No access"
   mcset en "Переименовать каталог" "Rename directory"
   mcset en "Переименовать файл" "Rename file"
@@ -121,13 +121,15 @@ namespace eval FE {
   }
 
   image create photo icondir -data {
-    R0lGODlhEAAQAMYAAAAAAFhYWP+oWP/cqPLy8P39+/z8+vHx8vz8+/f3+O7u8N3d3vX19e/v8Ojo6eLi4dXV1vT09O7u7ufn5+Hh4Nra29TU1M3NzcbGxby8u7Cwru3t
-    7efn6N/f39vb29PT1MvLzMXFxcHBwbu7u7Gxsufn6d7e39fX2dDQ0crKy8PDwr29vbm5urOzs6ioqN7e4NfX2M/P0MnJycLCw7y8vLW1tLCwsaurq6Kios3NzsfHxsDA
-    v62trKmpqKSkpJubm7a2t7KysqWlpKKioZ2dnZWVlKCgoJ2dnpqampmZmZKSkJKSkZWVk42NjP//////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /////////////////yH5BAEKAH8ALAAAAAAQABAAAAeYgH9/AAEAgoeIh4QCAwCGiYgABAEBjI6XiQAFBgeUjAMDAo+CmggJCguVoAMBkQgMDQ4PEJSeowAREhMUFRYX
-    GBkaAAKKGxwdHh8gISIjJMOKJSYnKCkqKywtLtCkLzAxMjM0NTY3ONyDADk6O9k8PT4/6KQAQEE3QkNERfOKAEZHkCRR0i8SgCVMCIoaBclRk2GOIGXCFAgAOw==
+    iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAYAAAAbBi9cAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4wYXCDgNebfI9AAAAgZJ
+    REFUOMuNkz9PFUEUxX/3zuxbQAlSkGhhaWEwRhNbY6Extmhi7Kz5CH4P/RZY2FnYEG20sKOSaExEBNTn44+P3Tdzr8U8Hw8k4G0mszvn5PzO7MrrO/PcfLXCSfPm3pXr
+    9bnwLtQS8SMvFZqttCwAbxeuznY/9BfcCQcnisL3SDPzE4/mF8/f7cxViEp5bg6tE6ciK0/XiADd1f7Da08uPtOACoK7I5WgAFGQCZE4HQ6Fsex4MthLuHkxcqeuJlVj
+    LSK1IB1BRJApxRsjnlXcIXrA1BGHrJABQkkYAVK3az64gHcEiQEUpFLUgQ5IE1B1jIRkcBfwDA4SO2AQt148eD59+fYNjb8LvgqFCeRIqYfqc8j9lv7Hl0gUos7N3a8v
+    LY6dEP53rPeN9v3SAVqZ3eFWjokwFgMbWw0VGTfKuPdAAhBOSZYYadgGP2S0A/KjiD2AnIDnBmLFUH7hB7dmwAbwtRhJOAZr1ApIGqZNwC4iERgQsQxs4qwNseQELB8Z
+    iifE+5AFHCJmwHfUNgDFVE8xy6g5WAJaDMXxv2hdaDYhhvIRov/6+BANIDlYhpRHNUSJWjaxLSVbUbkabo7j5Uc1QV2LLghEJ2TDg2KND+L+6pfl9fWlW4PeLm030/40
+    9rcb0p7R9MCahJ6pqCedaiZQz1R0ZiOdWSVMKe3nwafBjj3+A1B95HRZw8dhAAAAAElFTkSuQmCC
   }
+
   image create photo icondirup -data {
     R0lGODlhEAAQAKUAABJNbwoSHxVUdIGeuhdYeggeMRlKat3v+BOQtBVWeAcXKBtLav38/VnD2jzX4RVaehtPb3HR4Bmzzg6gxUjf6RKQtRNUdgcYKhJMbeLw+Q6Xvxyi
     wxBTdQYQHSA3TwEDBAAAABFHYJ3e7iK60RWavA9dfgABAc3r9hGXuUPV3iKUsQomO/36/SqYswonOyzH1ReOrIDC21isxRSDnwoZKQgcLQccLP//////////////////
@@ -136,11 +138,11 @@ namespace eval FE {
   }
 
   image create photo iconfile -data {
-    iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABnUlEQVR42mNkgAJBORNWObMYbyCTnQENsDAx/v9xb/PGq2f2/ESXY4Qx1F0r4jU8ahYwYAEcrAwMnjr/
-    tvdXhQVePLHjJ1YDFKzTsvQC+6ZiNYCNgSHAmI3h188fGIYgDLBKy9INwm4AKzPQABNWkFdAhuzorQgJuHxq108UA+RBBuBwAdgQhu8MDN9fMfwHsq/vnZx+8+CMWRgG
-    6OAxAAT+/PjC8OvbB4bbu1uzn5xZPA3DAO0A/AaADfn1neHapvLsJ6fmoRogZ4kwINT0HwM/J6rGj0AfrD7NBGT9Z7i6sTT70bEZmAZoQQ0wkv/PwMmKasD33wwM5x5C
-    lF/fVJr98Oh0TAM0/SEG6Mn8B8c9MvgBNODSE4QBj46hGSCLZICP/n8GXo7/KAZ8/sHIsOUiRPkNrAZYpGVpQA0IN0OEwen7jAznHzGiGHZzMxYDZEAG+BGOBbABW0qz
-    H2MzQJ1IA24BXfD4OJoBksZxSZpB0+YSY8CN9TnJz84smIdiACMzK7eIumc4kGbHp/n/398/39zcsfL/319fQXwAnA23EZaHOEYAAAAASUVORK5CYII=
+    R0lGODlhEAAQAKU7AACFvQCGvQCGvwCHvQCHvwCQyACU0gCU1ACU1wCW1ACW1wCY2ACZ1wCb1QCb3QCc1gCc2ACc2gCd2wCe1gCe2ACg1wCo6ACp7ACu7gCu8ACv7wCv
+    8gCw8ACw8zep2Dqp2C+35DG55jO86DO86kPC8nC31HC31nO31Ha31na51nO61nO613O62UHH92682Xa61na62UTH93m62TrR/3nH5oXO7YfY94XZ+Yfb+4rb+4re++/w
+    8e/w8e/w8e/w8e/w8SH+SUNvcHlyaWdodCBJTkNPUlMgR21iSCAod3d3Lmljb25leHBlcmllbmNlLmNvbSkgLSBVbmxpY2Vuc2VkIHByZXZpZXcgaW1hZ2UAIfkEAQoA
+    PwAsAAAAABAAEAAABo3A369BgRiND6FSSYnpnrEOJbRUTjiZbLYjAlV/kxZu3MpwZiPqMjzGtTgczEIQWGO1nE3EoACsYzmBgTQnMB8DdngWBgcHCYhWYmM2KyYqLB6Q
+    Qmw4Ny4lKpeZdhwaEoyNjppggDUnL7AvhqtXF6ipqksUJCkoMri5ShUOBwgICsjIDARLBQAE0NHSQkEAOw==
   }
   image create photo iconfiledenied -data {
     R0lGODlhEAAQAMZNAO0AAPEAAPADA/MSEs8fH/IWFs0uLtgvMOA2NuE3N986ROE9Pp9QYMdMekF52N9ZdOxbXEeD6FCC1VGC1UaE6+5cXkKF9EOG9ESG9EWH9EaI9EeI
@@ -151,7 +153,16 @@ namespace eval FE {
     DoYgra6uFIYeHjxFtkU8Hh2GOkE7ODfBMxwchRUyLi8tNTQ0MBsbhQABAwUCDz4+ORoahARDTEtKSQcxGecZhAY2SEdGQA0Y8vKFCwgICQohF/z8hQwqIHxIYaGgwUYI
     CQUCADs=
   }
-
+  image create photo addfile -data {
+    R0lGODlhEAAQAIABADMzM////yH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAAEA
+    LAAAAAAQABAAAAIpDI4Qy3ttFDQT1Wqb1ElP9oCfs1HjdUKl2q3gA49W95UZpswJ
+    vKekVAAAOw==
+  }
+  image create photo adddir -data {
+    R0lGODlhEAAQAIABADMzM////yH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAAEA
+    LAAAAAAQABAAAAInDH6hy+gMnZwGWgXqjXqvnHlfJ4Iit0lkk7RpOyEYa6g1mLzP
+    KQcFADs=
+  }
   #Процедура смены языка и синхронный перевод
   proc changelang {w typew} {
     #Смена языка и синхронный перевод
@@ -246,10 +257,12 @@ namespace eval FE {
     set ::scrheight [expr int(160 * $px2mm)]
   }
   set upz 1
-  if { $::px2mm > 15} {
-    set upz 6
-  } elseif { $::px2mm > 10} {
+  if { $::px2mm > 20} {
     set upz 5
+  } elseif { $::px2mm > 15} {
+    set upz 4
+  } elseif { $::px2mm > 10} {
+    set upz 3
   } elseif { $::px2mm > 5} {
     set upz 3
   }
@@ -259,9 +272,12 @@ namespace eval FE {
     scaleImage eye_hidden $upz
     scaleImage icontools $upz
     scaleImage icondirdenied $upz
-    scaleImage icondir $upz
+#    scaleImage icondir $upz
+    scaleImage icondir [expr $upz - 1]
+    scaleImage adddir $upz
     scaleImage icondirup $upz
     scaleImage iconfile $upz
+    scaleImage addfile $upz
     scaleImage iconfiledenied $upz
     scaleImage usa_24x16 $upz
     scaleImage ru_24x16 $upz
@@ -273,7 +289,7 @@ namespace eval FE {
   ttk::style configure Treeview  -rowheight [expr $ha + 2]
 
   proc filedel {w file typefb} {
-    set answer [tk_messageBox -title "Удаление папки/файла" -icon question -message "Вы действительно\nхотите уничтожить\n$file ?" -type yesno]
+    set answer [tk_messageBox -title "Удаление папки/файла" -icon question -message "Вы действительно\nхотите уничтожить\n$file ?" -type yesno -parent $w]
     if {$answer != "yes"} {
       return
     }
@@ -403,7 +419,7 @@ namespace eval FE {
     set tr [mc $text]
     place forget $fromw
     $fromw configure -text $tr
-    raise $tow
+#    raise $tow
     place $fromw  -in $tow -relx $xtow -rely 1.0 -anchor $anchor
   }
 
@@ -422,17 +438,8 @@ namespace eval FE {
 #Главное окно неизменяемое на время работы проводника
       frame $w -bg white
     } else {
-      toplevel $w -bd 3  -relief groove -bg white
-      if {$typefb == "dir"} {
-        wm title $w [mc "Выберите каталог"]
-        wm iconphoto $w icondir
-      } else {
-        wm title $w [mc "Выберите файл"]
-        wm iconphoto $w iconfile
-      }
       set tw $::scrwidth
       set th [expr $::scrheight - 100]
-      wm minsize $w $::scrwidth  [expr $::scrheight - 100]
       set geometr $tw
       append geometr "x"
       append geometr $th
@@ -466,7 +473,17 @@ namespace eval FE {
 
         }
       }
+      toplevel $w -bd 2  -relief groove -bg white
       wm geometry $w $geometr
+#Окно не может перекрываться (yes)
+      wm attributes $w -topmost yes   ;# stays on top - needed for Linux
+      if {$typefb == "dir"} {
+        wm title $w [mc "Выберите каталог"]
+        wm iconphoto $w icondir
+      } else {
+        wm title $w [mc "Выберите файл"]
+        wm iconphoto $w iconfile
+      }
       #Убрать обрамление
       #	wm overrideredirect $w 1
     }
@@ -540,7 +557,7 @@ namespace eval FE {
       eval "bind $fm.filter.entdir <Key-Return> {[namespace current]::selectobj $fm.fr.t $typew $typefb 3 $otv}"
       $fm.filter.entdir delete 0 end
       $fm.filter.entdir insert end [lindex $msk 0]
-      $fm.filter.entdir configure -state readonly
+#      $fm.filter.entdir configure -state readonly
       $fm.filter configure -text [mc "Фильтр файлов:"]
     }
     variable [namespace current]::hiddencb
@@ -554,10 +571,20 @@ namespace eval FE {
 
     labelframe $fm.tekdir -text [mc "Текущий каталог"] -bg skyblue -bd 0 -labelanchor n
     eval "button $fm.tekdir.up -relief flat -image icondirup -command {[namespace current]::goup $fm $typefb} -bg white -activebackground white -bd 0 -padx 0 -pady 0 "
-    eval "bind  $fm.tekdir.up <Enter> {[namespace current]::helptools $fm.helpview $fm.tekdir.entdir 1.0 {[mc {Перейти вверх}]} ne}"
+    eval "bind  $fm.tekdir.up <Enter> {[namespace current]::helptools $fm.helpview $fm.tekdir.up 1.0 {[mc {Перейти вверх}]} ne}"
     pack $fm.tekdir.up -side right -anchor nw -fill none -expand 0
+    if {$typefb != "dir"} {
+	eval "button $fm.tekdir.addfile -relief flat -image addfile -command {[namespace current]::createdir file $fm.titul.lab $fm $typefb} -bg white -activebackground white -bd 0 -padx 0 -pady 0 "
+	eval "bind  $fm.tekdir.addfile <Enter> {[namespace current]::helptools $fm.helpview $fm.tekdir.addfile 1.0 {[mc {Создать пустой файл}]} ne}"
+	pack $fm.tekdir.addfile -side right -anchor nw -fill none -expand 0
+	eval "bind  $fm.tekdir.addfile <Leave> {place forget $fm.helpview}"
+    }
+    eval "button $fm.tekdir.adddir -relief flat -image adddir -command {[namespace current]::createdir dir $fm.titul.lab $fm $typefb} -bg white -activebackground white -bd 0 -padx 0 -pady 0 "
+    eval "bind  $fm.tekdir.adddir <Enter> {[namespace current]::helptools $fm.helpview $fm.tekdir.adddir 1.0 {[mc {Создать каталог}]} ne}"
+    pack $fm.tekdir.adddir -side right -anchor nw -fill none -expand 0
 
     eval "bind  $fm.tekdir.up <Leave> {place forget $fm.helpview}"
+    eval "bind  $fm.tekdir.adddir <Leave> {place forget $fm.helpview}"
     entry $fm.tekdir.entdir -relief flat -bg white -highlightthickness 0 -highlightbackground skyblue -highlightcolor blue 
     pack $fm.tekdir.entdir -side right -anchor ne -fill both -expand 1
     $fm.tekdir.entdir delete 0 end
@@ -608,7 +635,7 @@ namespace eval FE {
     set tdir [file dirname $tdir ]
     set rr [file readable "$tdir"]
     if {$rr == 0} {
-      tk_messageBox -title "Просмотр папки" -icon info -message "Каталог не доступен:\n$tdir"
+      tk_messageBox -title "Просмотр папки" -icon info -message "Каталог не доступен:\n$tdir" -parent $w
       return
     }
     $w.seldir.entdir configure -state normal
@@ -751,14 +778,14 @@ namespace eval FE {
 
     set rr [file readable "$path"]
     if {$rr == 0} {
-      tk_messageBox -title "Просмотр папки" -icon info -message "Каталог не доступен:\n$path"
+      tk_messageBox -title "Просмотр папки" -icon info -message "Каталог не доступен:\n$path -parent ."
       set ::tekPATH $path
       return
     }
 
     set directory_list [lsort -dictionary [glob -nocomplain -types d -directory "$path" "*"]]
     if {$FE::hiddencb} {
-      set directory_list1 [lsort -dictionary [glob -nocomplain -types d -directory "$path" ".*"]]
+      set directory_list1 [lsort -dictionary [glob -nocomplain -types {d hidden} -directory "$path" "*"]]
       set ptr [string first "/.. " $directory_list1]
       if {$ptr != -1} {
         append directory_list [string range $directory_list1 [expr $ptr + 3] end ]
@@ -772,7 +799,7 @@ namespace eval FE {
     set id [$tree insert $node end -image icondirup -text ".." \
     -values [list $levelup $type]]
     $tree item $id -text ".."
-    foreach f $directory_list {
+    foreach f [lsort -dictionary $directory_list] {
       set type [file type "$f"]
       set rr [file readable "$f"]
       if {$rr == 0} {
@@ -925,7 +952,7 @@ puts "\n$newdir\n$oldname\n$newd\n$oldn"
 
     if {[file exists $newd]} {
       if {$type == "file"} {
-        set answer [tk_messageBox -title "Переименование файла" -icon question -message "Файл с таким именем есть:\n$oldname\nПродолжить операцию ?" -type yesno]
+        set answer [tk_messageBox -title "Переименование файла" -icon question -message "Файл с таким именем есть:\n$oldname\nПродолжить операцию ?" -type yesno  -parent $w]
         if {$answer != "yes"} {
           return
         }

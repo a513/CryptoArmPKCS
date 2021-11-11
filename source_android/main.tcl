@@ -263,6 +263,7 @@ array set wizDatacsr {
   L ""
   CN ""
   INN ""
+  INNLE ""
   SNILS ""
   OGRN ""
   OGRNIP ""
@@ -1006,9 +1007,15 @@ proc ::updatetok {} {
 
 set ::pki::oids(2.5.4.42)  "givenName"
 set ::pki::oids(1.2.643.100.1)  "OGRN"
-set ::pki::oids(1.2.643.100.5)  "OGRNIP"
 set ::pki::oids(1.2.643.3.131.1.1) "INN"
 set ::pki::oids(1.2.643.100.3) "SNILS"
+#ВВЕДЕНЫ Приказом ФСБ России от 29.01.2021 N31
+set ::listkind [list "0 - personal (Личное присутствие)" "1 - remote_cert (Электронная подпись)" "2 - remote_passport(Биометрический загранпаспорт)" "3 - remote_system (ЕСИА и ЕБС)" "Не включать в сертификат"]
+#Для юридического лица
+set ::pki::oids(1.2.643.100.4) "INNLE"
+#Для ИП
+set ::pki::oids(1.2.643.100.5)  "OGRNIP"
+
 #Для КПП ЕГАИС
 set ::pki::oids(1.2.840.113549.1.9.2) "UN"
 #set ::pki::oids(1.2.840.113549.1.9.2) "unstructuredName"
@@ -1043,13 +1050,13 @@ array set ::payoid1 {
 array set dn_fields {
   C "Country" ST "State" L "Locality" STREET "Adress" TITLE "Title"
   O "Organization" OU "Organizational Unit"
-  CN "Common Name" SN "Surname" GN "Given Name" INN "INN" OGRN "OGRN" OGRNIP "OGRNIP" SNILS "SNILS" EMAIL "Email Address"
+  CN "Common Name" SN "Surname" GN "Given Name" INN "INN" INNLE "INNLE" OGRN "OGRN" OGRNIP "OGRNIP" SNILS "SNILS" EMAIL "Email Address"
   UN "KPP"
 }
 array set dn_fields_ru {
   C "Страна" ST "Регион" L "Местность" STREET "Адрес" TITLE "Название"
   O "Организация" OU "Подразделение"
-  CN "Общепринятое имя" SN "Фамилия" GN "Имя, отчество" GIVENNAME "Имя,отчество" INN "ИНН" OGRN "ОГРН" OGRNIP "ОГРНИП" SNILS "СНИЛС" EMAIL "Адрес эл.почты"
+  CN "Общепринятое имя" SN "Фамилия" GN "Имя, отчество" GIVENNAME "Имя,отчество" INN "ИНН" INNLE "ИННЮЛ" OGRN "ОГРН" OGRNIP "ОГРНИП" SNILS "СНИЛС" EMAIL "Адрес эл.почты"
   UN "unstructuredName"
 }
 # GOST R 34.10-2012 TC 26 parameter sets: (0~Test, 1~A, 2~B, 3~C, 4~ExA, 5~ExB)
@@ -2637,6 +2644,23 @@ proc ::fileWithCert {w nick cert_hex typecert} {
     unset extcert(id-ce-subjectAltName)
   }
 
+  if {[info exists extcert(1.2.643.100.114)]} {
+#IdentificationKind - как выдавался сертификат
+    $w insert end "Identification Kind (1.2.643.100.114)" bold
+    $w insert end "\n"
+    #	puts "CRL=$extcert(2.5.29.31)"
+    set ikind [idkind [lindex $extcert(1.2.643.100.114) 1]]
+#    set crit [lindex $extcert(1.2.643.100.114) 0]
+    if {[lindex $extcert(1.2.643.100.114) 0] == 1} {
+      set crit [mc "Yes"]
+    } else {
+      set crit [mc "No"]
+    }
+    $w insert end "\tType Identification Kind:\t$ikind\n"  margins1
+    $w insert end "\t[mc "Critical"]:\t$crit\n"  margins1
+    unset extcert(1.2.643.100.114)
+  }
+
   set listext [array get extcert]
   foreach {a b} $listext {
     $w insert end [mc "Extension"] bold
@@ -3172,6 +3196,22 @@ proc crlpoints {crl_hex} {
     ::asn::asnGetContext c_par ux
     #	puts $c_par
     lappend ret $c_par
+  }
+  return $ret
+}
+
+proc idkind {idkind_hex} {
+  set ret ""
+  set kind [binary format H* $idkind_hex]
+  ::asn::asnGetInteger kind idk
+  switch $idk {
+    0 { set ret [lindex $::listkind 0]}
+    1 { set ret [lindex $::listkind 1]}
+    2 { set ret [lindex $::listkind 2]}
+    3 { set ret [lindex $::listkind 3]}
+    default {
+	set ret "$idk - неизвестный тип идентификации"
+    }
   }
   return $ret
 }
@@ -5343,7 +5383,7 @@ proc ::parse_pkcs7 {type p7file sfile} {
 proc list_to_dn_tc26 {name} {
   set ret ""
   foreach {oid_name value} $name {
-    if {$oid_name == "INN" || $oid_name == "OGRN" || $oid_name == "OGRNIP" || $oid_name == "SNILS" } {
+    if {$oid_name == "INN" || $oid_name == "INNLE" || $oid_name == "OGRN" || $oid_name == "OGRNIP" || $oid_name == "SNILS" } {
       set asnValue [::asn::asnNumericString $value]
     } elseif {[string tolower $oid_name] == "email"} {
       set value_em [string map {"@" "A"} $value]
@@ -8738,7 +8778,8 @@ proc CreateRequestTCL {profilename attributes} {
       set inn $attr(INN)
     } else {
       set lenkpp [string length $attr(UN)]
-      set inn [string trimleft $attr(INN) "0"]
+      set inn $attr(INNLE)
+#      set inn [string trimleft $attr(INN) "0"]
     }
     if {$lenkpp != 0 && $lenkpp != 9 } {
       tk_messageBox -title "Запрос на сертификат" -message "Ошибка в поле КПП." -detail "Поле должно быть пустым или содеожать 9 цифр" -icon error
@@ -8833,14 +8874,6 @@ proc ::finalizeCSR {tpage} {
     update
     foreach {req labk} [CreateRequestTCL $profile attr] {}
     append detok "\nМетка ключевой пары:\n$labk"
-  } else {
-    if {$::rpw != $::pw || $::rpw == ""} {
-      tk_messageBox -title "Выпуск сертификата" -message "Ошибка в пароле для Вашего PKCS#12.\nВернитесь на шаг назад и задайте пароль" -detail "(Пароль не может быть пустым)" -icon error
-      place forget .topclock
-      return -code break
-    }
-
-    set req [CreateSelfCertTCL $profile attr]
   }
 
   if {$req == "" } {
@@ -8957,29 +8990,18 @@ proc nextStep {tpage numpage} {
       set leninn [string length $wizData(INN)]
       if {$leninn != 12} {
         tk_messageBox -title "Запрос на сертификат" -message "Неправильная длина поля ИНН." \
-        -detail "Для юрлиц ИНН имеет 10 цифр, дополненные слева двумя нулями.\nДля физлиц и ИП это 12 цифр." -icon error
+        -detail "Для физлиц и ИП ИНН должен содержать 12 цифр." \
+        -icon error  -parent .
         return 0
       }
-      if { $wizData(type) == "Юридическое лицо" } {
-        if {[string range $wizData(INN) 0 1] != "00" } {
-          tk_messageBox -title "Запрос на сертификат" -message "Первые две цифры в ИНН для юрлица должны быть 00.\n(Это вынужденное дополнение)" \
-          -detail "Для юрлиц ИНН имеет 10 цифр, дополненные слева двумя нулями.\nДля физлиц и ИП это 12 цифр." \
-          -icon error
-          return 0
-        }
-        if {[string range $wizData(INN) 2 2] == "0" } {
-          tk_messageBox -title "Запрос на сертификат" -message "Первая цифра ИНН не может быть нулем." \
-          -detail "Для юрлиц ИНН имеет 10 цифр, дополненные слева двумя нулями.\nДля физлиц и ИП это 12 цифр." \
-          -icon error
-          return 0
-        }
-      } else {
-        if {[string range $wizData(INN) 0 0] == "0" } {
-          tk_messageBox -title "Запрос на сертификат" -message "Первая цифра ИНН не может быть нулем." \
-          -detail "Для юрлиц ИНН имеет 10 цифр, дополненные слева двумя нулями.\nДля физлиц и ИП это 12 цифр." \
-          -icon error
-          return 0
-        }
+    }
+    if {$wizData(INNLE) != ""} {
+      set leninn [string length $wizData(INNLE)]
+      if {$leninn != 10} {
+        tk_messageBox -title "Запрос на сертификат" -message "Неправильная длина поля ИНН." \
+        -detail "Для юрлиц ИННЮЛ имеет 10 цифр" \
+        -icon error  -parent .
+        return 0
       }
     }
     if {$missingvalue && $tpage == "csr"} {
@@ -9312,7 +9334,7 @@ proc create_csr_list1 {tpage c num} {
 }
 
 set typeCert  {"Физическое лицо" reqFL "Индивидуальный предприниматель" reqIP "Юридическое лицо" reqUL}
-array set atrkval {ИНН 12 ОГРН 13 ОГРНИП 15 СНИЛС 11 {ИНН *} 12 {ОГРН *} 13 {ОГРНИП *} 15 {СНИЛС *} 11 КПП 9}
+array set atrkval {ИНН 12 ИННЮЛ 10 ОГРН 13 ОГРНИП 15 СНИЛС 11 {ИНН *} 12 {ОГРН *} 13 {ОГРНИП *} 15 {СНИЛС *} 11 КПП 9}
 array set sodCert {reqFL  "{C} {Страна} {ST} {Регион} {CN} {ФИО} {SN} {Фамилия} {givenName} {Имя, Отчество} {E} {Электронная почта}
 {L} {Населенный пункт}
 {street} {Улица, номер дома}
@@ -9328,7 +9350,7 @@ reqUL  "{C} {Страна} {ST} {Регион} {CN} {Организация}
 {SN} {Фамилия}
 {givenName} {Имя, Отчество}
 {OGRN} {ОГРН}
-{INN} {ИНН}
+{INNLE} {ИННЮЛ}
 {UN} {КПП}"
 reqIP "{C} {Страна} {ST} {Регион} {CN} {ФИО}
 {SN} {Фамилия}

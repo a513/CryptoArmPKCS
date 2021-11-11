@@ -444,65 +444,64 @@ proc ::GostPfx::pfxTbsParse {tbs} {
   
   set data $tbs
   set dres [dict create]
-#  set dres [list]
 
-  set tag_len [asn::asnPeekTag data tag_var tag_type_var constr_var]
-  if {$tag_var == $SEQUENCE_TAG} {
-    asn::asnGetSequence data seqValue1
+  set certsPbeData 0
+  set encrCerts 0
+while {$data > 0} { 
+    set tag_len [asn::asnPeekTag data tag_var tag_type_var constr_var]
 
-    set tag_len [asn::asnPeekTag seqValue1 tag_var tag_type_var constr_var]
     if {$tag_var == $SEQUENCE_TAG} {
-      asn::asnGetSequence seqValue1 seqValue2
-      set tag_len [asn::asnPeekTag seqValue2 tag_var tag_type_var constr_var]
-      if {$tag_var == $OBJECT_IDENTIFIER_TAG} {
-        asn::asnGetObjectIdentifier seqValue2 oid2
+	asn::asnGetSequence data seqValue1
+	set tag_len [asn::asnPeekTag seqValue1 tag_var tag_type_var constr_var]
+	if {$tag_var == $SEQUENCE_TAG} {
+        asn::asnGetSequence seqValue1 seqValue2
+        set tag_len [asn::asnPeekTag seqValue2 tag_var tag_type_var constr_var]
+        if {$tag_var == $OBJECT_IDENTIFIER_TAG} {
+    	    asn::asnGetObjectIdentifier seqValue2 oid2
 
-        if {$oid2 == $oid_pkcs7_encrypted_data} {
-	  set dres [::GostPfx::p7mParse $seqValue2]
-        } elseif {$oid2 == $oid_pkcs7_data} {
-#    	    set gg [dict create]
-    	    set gg [list]
-	    set gg [::GostPfx::p7dParse $seqValue2]
-	    foreach {l l1} $gg {
-		dict set dres $l $l1
-	    }
-
-	} else {
-          error "pfxTbsParse: Invalid encrypted certificates structure 9 oid2=$oid2, oid_pkcs7_encrypted_data=$oid_pkcs7_encrypted_data"
-        }        
-      } else {
-        error "pfxTbsParse: Invalid encrypted certificates structure 10"
-      }
-    }
-    set tag_len [asn::asnPeekTag seqValue1 tag_var tag_type_var constr_var]
-    if {$tag_var == $SEQUENCE_TAG} {
-      asn::asnGetSequence seqValue1 seqValue2
-      set tag_len [asn::asnPeekTag seqValue2 tag_var tag_type_var constr_var]
-      if {$tag_var == $OBJECT_IDENTIFIER_TAG} {
-        asn::asnGetObjectIdentifier seqValue2 oid2
-        if {$oid2 == $oid_pkcs7_data} {
-#    	    set gg [dict create]
-    	    set gg [list]
-	    set gg [::GostPfx::p7dParse $seqValue2]
-	    foreach {l l1} $gg {
-		dict set dres $l $l1
-	    }
-
-        } elseif {$oid2 == $oid_pkcs7_encrypted_data} {
-    	    set gg [list]
-	    set gg [::GostPfx::p7mParse $seqValue2]
-	    foreach {l l1} $gg {
-		dict set dres $l $l1
-	    }
+    	    if {$oid2 == $oid_pkcs7_encrypted_data} {
+    		set gg [list]
+		set gg [::GostPfx::p7mParse $seqValue2]
+		foreach {l l1} $gg {
+        	    if {[dict exists $dres $l]} {
+			if {$l == "certsPbeData"} {
+			    if {$certsPbeData == 1} {
+				dict set dres $l $l1
+			    }
+			    set certsPbeData 1
+			} elseif {$l == "encrCerts"} {
+			    if {$encrCerts == 1} {
+				dict set dres $l $l1
+			    }
+			    set encrCerts 1
+			} else {
+			    dict set dres $l $l1
+			}
+        	    } else {
+			dict set dres $l $l1
+		    }
+		}
+    	    } elseif {$oid2 == $oid_pkcs7_data} {
+    		set gg [list]
+		set gg [::GostPfx::p7dParse $seqValue2]
+		foreach {l l1} $gg {
+        	    if {[dict exists $dres $l]} {
+			dict set dres $l $l1
+        	    } else {
+			dict set dres $l $l1
+		    }
+		}
+	    } else {
+        	error "pfxTbsParse: Invalid encrypted certificates structure 9 oid2=$oid2, oid_pkcs7_encrypted_data=$oid_pkcs7_encrypted_data"
+    	    }        
+    	    set data [asn::asnSequence $seqValue1]
         } else {
-          error "pfxTbsParse: Invalid key bags structure 3"
+    	    error "pfxTbsParse: Invalid encrypted certificates structure 10"
         }
-      } else {
-        error "pfxTbsParse: Invalid key bags structure 4"
       }
+    } else {
+	error "pfxTbsParse: Invalid TBS structure 5"
     }
-  } else {
-    error "pfxTbsParse: Invalid TBS structure 5"
   }
   return $dres
 }
@@ -624,7 +623,7 @@ proc ::GostPfx::pfxPbeDataParse {pbeData} {
 proc ::GostPfx::pfxPbeKey {password hmacAlg hmacKeySalt hmacKeyIter} {
   variable oid_HMACgostR3411_94 
   variable oid_tc26_hmac_gost_3411_2012_512
-  
+
   set key ""
   if {$hmacAlg == $oid_HMACgostR3411_94} {
     set key [lcc_gost3411_94_pkcs5 $password $hmacKeySalt $hmacKeyIter 32]
@@ -641,7 +640,6 @@ proc ::GostPfx::pfxPbeKey {password hmacAlg hmacKeySalt hmacKeyIter} {
 # encrData => decrData
 proc ::GostPfx::pfxDataDecrypt {data alg paramset key iv} {
   variable oid_gost28147_89
-puts "pfxDataDecrypt: paramset=$paramset"
 
   set out ""
   if {$alg == $oid_gost28147_89} {
@@ -700,7 +698,7 @@ proc ::GostPfx::pfxIdentityDataParse {identityData} {
   variable BMP_STRING_TAG
   variable oid_friendlyName 
   variable oid_localKeyID
-  
+
   set data $identityData
   set dres [dict create]
   set tag_len [asn::asnPeekTag data tag_var tag_type_var constr_var]
@@ -737,14 +735,17 @@ proc ::GostPfx::pfxIdentityDataParse {identityData} {
             }
           }
         } else {
-          error "pfxIdentityDataParse: Invalid structure"
+          error "pfxIdentityDataParse: Invalid structure 1 $tag_var"
         }                
       } else {
-        error "pfxIdentityDataParse: Invalid structure"
+        error "pfxIdentityDataParse: Invalid structure 2 $tag_var"
       }
     }
   } else {
-    error "pfxIdentityDataParse: Invalid structure"
+#LISSI
+    dict set dres "friendlyName" "--friendlyname not--"
+    dict set dres "localKeyID" "--localKeyID not--"
+#    error "pfxIdentityDataParse: Invalid structure 3 $tag_var"
   }
   return $dres
 }
@@ -1052,7 +1053,7 @@ if {$nomacver == 0} {
   #puts "pfxGetAuthSafeTbs"
   set tbs [pfxGetAuthSafeTbs $authSafe]
 
-#Для старыз PKXS#12
+#Для старых PKXS#12
 if {0} {
 
   #puts "pfxHmacVerify"
@@ -1107,18 +1108,6 @@ if {0} {
   #puts "pfxCertBagsParse"
   set lcerts [pfxCertBagsParse $certBags]
 
-  set dcert [lindex $lcerts 0]
-  if {[dict exists $dcert "certificate"]} {
-    set cert [dict get $dcert "certificate"]
-    dict set dRes certificate $cert
-  }
-  if {[dict exists $dcert "friendlyName"]} {
-    set cert_friendlyName [dict get $dcert "friendlyName"]
-  }
-  if {[dict exists $dcert "localKeyID"]} {
-    set cert_localKeyID [dict get $dcert "localKeyID"]
-  }
-
   #puts "pfxKeyBagsParse" 
   set lKeyBags [pfxKeyBagsParse $keyBags]
   set dKeyBag [lindex $lKeyBags 0]
@@ -1135,8 +1124,24 @@ if {0} {
   if {[dict exists $dKeyBag localKeyID]} {
     set key_localKeyID [dict get $dKeyBag localKeyID]
     dict set dRes localKeyID $key_localKeyID
-    if {[info exists cert_localKeyID] && ($cert_localKeyID != $key_localKeyID)} {
-      puts "pfxGetSingleKeyCert: Warning: certificate localKeyID is not equal to key localKeyID"
+#Ищем сертификат для ключа
+    foreach dcert $lcerts {
+	if {[dict exists $dcert "localKeyID"]} {
+	    set cert_localKeyID [dict get $dcert "localKeyID"]
+	} else {
+	    continue
+	}
+	if {[info exists cert_localKeyID] && ($cert_localKeyID != $key_localKeyID)} {
+	    continue
+#    	    puts "pfxGetSingleKeyCert: Warning: certificate localKeyID is not equal to key localKeyID"
+	}
+	if {[dict exists $dcert "certificate"]} {
+	    set cert [dict get $dcert "certificate"]
+	    dict set dRes certificate $cert
+	}
+	if {[dict exists $dcert "friendlyName"]} {
+	    set cert_friendlyName [dict get $dcert "friendlyName"]
+	}
     }
   }
 
@@ -1292,7 +1297,7 @@ proc ::GostPfx::pfxCreateLocalKeyID {keyAlg gost3410Paramset privKeyValue} {
     }
   } else {
     if {($keyAlg == $oid_tc26_gost3410_2012_512) || ($keyAlg == $oid_tc26_signwithdigest_gost3410_2012_512)} {
-      set par_id [string map { } {.} $gost3410Paramset]
+      set par_id [string map {" " "."} $gost3410Paramset]
       set group [lcc_gost3410_2012_512_getGroupByOid $par_id]
       if {$group > 0} {
         set pubKey [lcc_gost3410_2012_512_createPublicKey $group $privKeyValue]
