@@ -9430,6 +9430,7 @@ proc aboutUtil {w type parse_csr} {
     array set csr_parse $parse_csr
     set title "Запрос: \"$csr_parse(filecsr)\""
     set titlecrt "Просмотр запроса на сертификат: \"[file tail $csr_parse(filecsr)]\""
+    unset csr_parse(filecsr)
     #	parray csr_parse
   } elseif {$type == 7} {
     set title {Выпуск сертификата}
