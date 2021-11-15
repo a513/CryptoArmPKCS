@@ -121,13 +121,16 @@ namespace eval FE {
   }
 
   image create photo icondir -data {
-    iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAYAAAAbBi9cAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4wYXCDgNebfI9AAAAgZJ
-    REFUOMuNkz9PFUEUxX/3zuxbQAlSkGhhaWEwRhNbY6Extmhi7Kz5CH4P/RZY2FnYEG20sKOSaExEBNTn44+P3Tdzr8U8Hw8k4G0mszvn5PzO7MrrO/PcfLXCSfPm3pXr
-    9bnwLtQS8SMvFZqttCwAbxeuznY/9BfcCQcnisL3SDPzE4/mF8/f7cxViEp5bg6tE6ciK0/XiADd1f7Da08uPtOACoK7I5WgAFGQCZE4HQ6Fsex4MthLuHkxcqeuJlVj
-    LSK1IB1BRJApxRsjnlXcIXrA1BGHrJABQkkYAVK3az64gHcEiQEUpFLUgQ5IE1B1jIRkcBfwDA4SO2AQt148eD59+fYNjb8LvgqFCeRIqYfqc8j9lv7Hl0gUos7N3a8v
-    LY6dEP53rPeN9v3SAVqZ3eFWjokwFgMbWw0VGTfKuPdAAhBOSZYYadgGP2S0A/KjiD2AnIDnBmLFUH7hB7dmwAbwtRhJOAZr1ApIGqZNwC4iERgQsQxs4qwNseQELB8Z
-    iifE+5AFHCJmwHfUNgDFVE8xy6g5WAJaDMXxv2hdaDYhhvIRov/6+BANIDlYhpRHNUSJWjaxLSVbUbkabo7j5Uc1QV2LLghEJ2TDg2KND+L+6pfl9fWlW4PeLm030/40
-    9rcb0p7R9MCahJ6pqCedaiZQz1R0ZiOdWSVMKe3nwafBjj3+A1B95HRZw8dhAAAAAElFTkSuQmCC
+    R0lGODlhEQARAPcAAAAAAJycAM7OY/f39//OAP/OnP//nP//zv//////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////yH5BAEAAAQALAAAAAARABEAAAhtAAkIHEiwYMEACBECMEgwwIADBwwYCLCQYQABGDMKSJhwYACIIENCNCCg4keJKFMaKFBS4EmVK2O2JPASZoGV
+    M2tKvMmTpMmIKnuy/IlS6MqhLg8Y5VkAKU2NUDVWJACgqtWrVxlq3cq1K8OAAAA7
   }
 
   image create photo icondirup -data {
@@ -138,11 +141,16 @@ namespace eval FE {
   }
 
   image create photo iconfile -data {
-    R0lGODlhEAAQAKU7AACFvQCGvQCGvwCHvQCHvwCQyACU0gCU1ACU1wCW1ACW1wCY2ACZ1wCb1QCb3QCc1gCc2ACc2gCd2wCe1gCe2ACg1wCo6ACp7ACu7gCu8ACv7wCv
-    8gCw8ACw8zep2Dqp2C+35DG55jO86DO86kPC8nC31HC31nO31Ha31na51nO61nO613O62UHH92682Xa61na62UTH93m62TrR/3nH5oXO7YfY94XZ+Yfb+4rb+4re++/w
-    8e/w8e/w8e/w8e/w8SH+SUNvcHlyaWdodCBJTkNPUlMgR21iSCAod3d3Lmljb25leHBlcmllbmNlLmNvbSkgLSBVbmxpY2Vuc2VkIHByZXZpZXcgaW1hZ2UAIfkEAQoA
-    PwAsAAAAABAAEAAABo3A369BgRiND6FSSYnpnrEOJbRUTjiZbLYjAlV/kxZu3MpwZiPqMjzGtTgczEIQWGO1nE3EoACsYzmBgTQnMB8DdngWBgcHCYhWYmM2KyYqLB6Q
-    Qmw4Ny4lKpeZdhwaEoyNjppggDUnL7AvhqtXF6ipqksUJCkoMri5ShUOBwgICsjIDARLBQAE0NHSQkEAOw==
+    R0lGODlhEAAQAPcAAAAAAAAAMwAAZgAAmQAAzAAA/wAzAAAzMwAzZgAzmQAzzAAz/wBmAABmMwBmZgBmmQBmzABm/wCZAACZMwCZZgCZmQCZzACZ/wDMAADMMwDMZgDM
+    mQDMzADM/wD/AAD/MwD/ZgD/mQD/zAD//zMAADMAMzMAZjMAmTMAzDMA/zMzADMzMzMzZjMzmTMzzDMz/zNmADNmMzNmZjNmmTNmzDNm/zOZADOZMzOZZjOZmTOZzDOZ
+    /zPMADPMMzPMZjPMmTPMzDPM/zP/ADP/MzP/ZjP/mTP/zDP//2YAAGYAM2YAZmYAmWYAzGYA/2YzAGYzM2YzZmYzmWYzzGYz/2ZmAGZmM2ZmZmZmmWZmzGZm/2aZAGaZ
+    M2aZZmaZmWaZzGaZ/2bMAGbMM2bMZmbMmWbMzGbM/2b/AGb/M2b/Zmb/mWb/zGb//5kAAJkAM5kAZpkAmZkAzJkA/5kzAJkzM5kzZpkzmZkzzJkz/5lmAJlmM5lmZplm
+    mZlmzJlm/5mZAJmZM5mZZpmZmZmZzJmZ/5nMAJnMM5nMZpnMmZnMzJnM/5n/AJn/M5n/Zpn/mZn/zJn//8wAAMwAM8wAZswAmcwAzMwA/8wzAMwzM8wzZswzmcwzzMwz
+    /8xmAMxmM8xmZsxmmcxmzMxm/8yZAMyZM8yZZsyZmcyZzMyZ/8zMAMzMM8zMZszMmczMzMzM/8z/AMz/M8z/Zsz/mcz/zMz///8AAP8AM/8AZv8Amf8AzP8A//8zAP8z
+    M/8zZv8zmf8zzP8z//9mAP9mM/9mZv9mmf9mzP9m//+ZAP+ZM/+ZZv+Zmf+ZzP+Z///MAP/MM//MZv/Mmf/MzP/M////AP//M///Zv//mf//zP////i/JAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+    AAAAAAAAAAAAAAAAACH5BAEAANgALAAAAAAQABAAAAhjAK9dC2SFoMGCVgQqvJZwoUBWrBoqDHQNIiuFFyMulLiQYkWJFFkFgijwoEeGDlOCrCgS4siLAxVyTImyZMWX
+    FmXqpDmxp8WRQAVKnJnyZEicJIXu5BnTJtOaDE1aQYjwWkAAADs=
   }
   image create photo iconfiledenied -data {
     R0lGODlhEAAQAMZNAO0AAPEAAPADA/MSEs8fH/IWFs0uLtgvMOA2NuE3N986ROE9Pp9QYMdMekF52N9ZdOxbXEeD6FCC1VGC1UaE6+5cXkKF9EOG9ESG9EWH9EaI9EeI
@@ -502,11 +510,11 @@ namespace eval FE {
     eval "$fm.fr.t heading {#0} -text {[mc {Папки и файлы}]} -image upArrow -command {[namespace current]::columnSort $fm.fr.t {#0} 0} "
     eval "$fm.fr.t heading size -text {[mc {Размер файла}]} -image upArrow -command {[namespace current]::columnSort $fm.fr.t size 0}"
     if {$typefb != "dir"} {
-      $fm.fr.t column size -stretch 1 -width 80 -anchor ne
-      $fm.fr.t column "#0" -stretch 1 -width 170 -anchor nw
+      $fm.fr.t column size -stretch 1 -width 80 -anchor e
+      $fm.fr.t column "#0" -stretch 1 -width 170 -anchor w
     } else {
-      $fm.fr.t column size -stretch 1 -width 0 -anchor ne
-      $fm.fr.t column "#0" -stretch 1 -width 75 -anchor nw
+      $fm.fr.t column size -stretch 1 -width 0 -anchor e
+      $fm.fr.t column "#0" -stretch 1 -width 75 -anchor w
     }
 
     eval "bind $fm.fr.t <Double-1> {[namespace current]::selectobj $fm.fr.t $typew $typefb 2 $otv}"

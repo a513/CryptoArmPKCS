@@ -1368,11 +1368,8 @@ proc setTempDir {} {
       set tempDir $::env(TEMP)
       set pwdt [pwd]
       if {$::tcl_platform(bits) == 32} {
-        set tcltls [file join $myDir tcltls32.dll]
-#Не смог собрать для 32-х разрядной пакет tcltls
-#пока оставляем из tclexecomp_v1.0.4 старый без tls1.3
-	package require tls 
-#	load $tcltls32 Tls
+        set tcltls32 [file join $myDir tcltls32.dll]
+	load $tcltls32 Tls
       }
     }
     "unix" - default {
