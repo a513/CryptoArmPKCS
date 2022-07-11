@@ -4,7 +4,15 @@ package require textutil
 package require http
 package require ip
 source [file join [file dirname [info script]] classtoken.tcl]
+source [file join [file dirname [info script]] mesWarning.tcl]
 
+set ::feguipkcs ""
+if {[llength $argv] == 1} {
+    set arg [lindex $argv 0]
+    if {$arg == "window" || $arg == "frame"} {
+	set ::feguipkcs [lindex $argv 0]
+    }
+}
 array set ::tokenlist []
 set ::tokenls11sw0 "tokenls11sw0"
 
@@ -2231,7 +2239,11 @@ proc cagui::FileEntry {w args} {
     set opts(-initialdir) [string map {"\\" "/"} $tekdir]
   }
 
-  set buttoncommand "catch {destroy {.hhh}}; feselectKDE $opts(-dialogtype) $rr $opts(-typewd) {\"$opts(-title)\"} {$opts(-initialdir)} $opts(-variable) {$opts(-defaultextension) *}"
+  if {![info exists opts(-filetypes)]} {
+    set buttoncommand [subst "catch {destroy {.canvas};destroy {.hhh}}; feselectKDE $opts(-dialogtype) $rr $opts(-typewd) {$opts(-title)} {$opts(-initialdir)} $opts(-variable) {$opts(-defaultextension) *}"]
+  } else {
+    set buttoncommand [subst "catch {destroy {.canvas};destroy {.hhh}}; feselectKDE $opts(-dialogtype) $rr $opts(-typewd) {$opts(-title)} {$opts(-initialdir)} $opts(-variable) \"$opts(-filetypes)\""]
+  }
 
   #  set entrycommand [list entry $w.entry -textvariable $opts(-variable) -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue]
   set entrycommand [list ttk::entry $w.entry -textvariable $opts(-variable)]
@@ -4509,6 +4521,8 @@ proc page_csr_view {c} {
   -initialdir $env(HOME) \
   -filetypes $ft
   pack $c.fscr.e1 -side left -expand 1 -fill both
+#global c11
+#set c11 $c
   button  $c.fscr.viewscr -command {variable csr_fn;::viewCSR  $csr_fn 1} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0
   set lc "bind $c.fscr.viewscr <Enter> {.helpview configure -text \"Просмотр запроса\";place .helpview -in $c.fscr.e1 -relx 0.77 -rely 1.0}"
   set lc [subst $lc]
@@ -4598,7 +4612,7 @@ proc page_csr_view {c} {
   -variable  cert_fn \
   -initialdir $env(HOME) \
   -filetypes $ft
-  pack $c.fcrt.e2 -side left -expand 1 -fill both
+  pack $c.fcrt.e2 -side left -expand 1 -fill x
   button  $c.fcrt.viewcrt -command {variable opcert; set z $opcert;set opcert 2;::workOpCert;set opcert $z} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0
   set lc "bind $c.fcrt.viewcrt <Enter> {.helpview configure -text \"Просмотр сертификата\";place .helpview -in $c.fcrt.e2 -relx 0.70 -rely 1.0}"
   set lc [subst $lc]
@@ -4641,7 +4655,10 @@ proc ::viewasn1 {clip} {
   variable asntype
   variable asnraw
   if {$clip == 0 && $asn_fn == ""} {
-    tk_messageBox -title "Просмотр ASN1-структуры" -message "Файл не выбран" -icon info  -parent .
+    destroy .canvas
+    set w ".st.fr1.fr2_list6"
+    set wpoint  "$w.fcrt.e2"
+    mesWarn $w $wpoint "up" "Файл для просмотра\nASN1-структуры\nне выбран" 0
     return
   }
   set ::prettyColumn -1;
@@ -4732,7 +4749,7 @@ proc page_asn1view {c} {
   -filetypes $ft
   pack $c.fcrt.e2 -side left -expand 1 -fill both
   button  $c.fcrt.viewcrt -command {variable asn_fn; ::viewasn1 0} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0
-  set lc "bind $c.fcrt.viewcrt <Enter> {.helpview configure -text \"Просмотр ASN1-структуры\";place .helpview -in $c.fcrt.e2 -relx 1.0 -rely 1.0 -anchor ne}"
+  set lc "bind $c.fcrt.viewcrt <Enter> {.helpview configure -text \"Просмотр ASN1-структуры\";place .helpview -in $c.fcrt.e2 -relx 1.0 -rely -0.5 -anchor ne}"
   set lc [subst $lc]
   eval $lc
   bind $c.fcrt.viewcrt <Leave> {place forget .helpview}
@@ -4773,6 +4790,7 @@ proc clock:set var {
   global $var
   set $var "Текущее время: [clock format [clock seconds] -format {%H:%M:%S %d.%m.%Y}]"
   after 1000 [list clock:set $var]
+
 }
 
 proc readPw ent {
@@ -4784,8 +4802,6 @@ proc readPw ent {
   $ent delete 0 end
   set yespas "yes"
 }
-
-
 
 proc ::sign_file {w typekey} {
   global ttt
@@ -4800,23 +4816,32 @@ proc ::sign_file {w typekey} {
   variable doc_for_sign
   variable typesig
   variable doc_for_sign
-  if {0} {
-    if {$nickCert == "" } {
-      tk_messageBox -title "Подписать документ" -message "Нет сертификата подписанта" -detail "AR=[array size ::certs_p11]" -icon error  -parent .
-      return
-    }
-  }
-  #  if {[array size ::certs_p11] == "0" } {}
   if { $typekey == "pkcs11" && [llength [array names ::certs_p11]] < 1} {
     tk_messageBox -title "Подписать документ" -message "На токене нет сертификатов" -icon info  -parent .
     return
   }
   if {$doc_for_sign == "" } {
-    tk_messageBox -title "Подписать документ" -message "Не выбран документ для подписания" -icon error  -parent .
+    destroy .canvas
+    if {$typekey == "pkcs11"} {
+	set w ".st.fr1.fr2_list1"
+	set wpoint  "$w.e1"
+    } else {
+	set w ".st.fr1.fr2_list8"
+	set wpoint  "$w.e1"
+    }
+    mesWarn $w $wpoint "up" "Не выбран документ\nдля подписания!"
     return
   }
   if {$file_for_sign == "" } {
-    tk_messageBox -title "Подписать документ" -message "Не выбран файл для хранения ЭП" -icon error  -parent .
+    destroy .canvas
+    if {$typekey == "pkcs11"} {
+	set w ".st.fr1.fr2_list1"
+	set wpoint  "$w.e2"
+    } else {
+	set w ".st.fr1.fr2_list8"
+	set wpoint  "$w.e2"
+    }
+    mesWarn $w $wpoint "up" "Не выбран каталог\nдля хранения файла с ЭП!"
     return
   }
 
@@ -4840,11 +4865,17 @@ proc ::sign_file {w typekey} {
     return
   }
   if {$cert_hex == ""} {
+    destroy .canvas
     if {$typekey == "pkcs11"} {
-      tk_messageBox -title "Подписать документ" -message "На токене отсутствует (не выбран) сертификат подписанта!" -icon error  -parent .
+	set w ".st.fr1.fr2_list1"
+	set wpoint  "$w.e2"
+        set mes1 "На токене отсутствует (не выбран)\nсертификат подписанта!"
     } else {
-      tk_messageBox -title "Подписать документ" -message "Отсутствует контейнер PKCS12 подписанта"  -icon error  -parent .
+	set w ".st.fr1.fr2_list8"
+	set wpoint  "$w.fr0.e1"
+        set mes1 "Отсутствует контейнер\nPKCS12 подписанта"
     }
+    mesWarn $w $wpoint "up" $mes1
     return
   }
   set fd [open $doc_for_sign]
@@ -5015,9 +5046,9 @@ proc page_pkcs7_sign {c} {
 
   ttk::frame  $c.framefortime -style RoundedFrameME -padding {10 10 0 0}
 
-  label $c.l3 -textvariable myclock -background #43cafa -font TkDefaultFontBold -padx 0 -pady 1mm
+  label $c.framefortime.l3 -textvariable myclock -background #43cafa -font TkDefaultFontBold -padx 0 -pady 1mm
   # -padx 3mm -pady 3mm
-  pack $c.l3 -in $c.framefortime -fill x -padx 3mm -pady {0 3mm} -anchor nw
+  pack $c.framefortime.l3 -in $c.framefortime -fill x -padx 3mm -pady {0 3mm} -anchor nw
 
   grid $c.framefortime -row 5 -column 0 -columnspan 2 -sticky n -padx {8 0} -pady {5mm 5mm}
 
@@ -5460,60 +5491,33 @@ proc trace_pfx {name index op} {
   }
 
 proc feselectKDE {tdialog c typew titul tekdir var msk } {
-  global wizDatacsr
-  global wizDatacert
-  set wizDatacsr(csr_fn)
-  #tdialog - open|save|dir
+  global wizDatacsr;
+  #rdialog - open|save|dir
+  #Из-за массивов ставим catch
   catch {  variable $var}
+#puts "deselectKDE: tdialog=$tdialog c=$c typew=$typew titul=$titul tekdir=$tekdir var=$var msk=$msk"
+  if {$::feguipkcs != "" } {
+	set typew $::feguipkcs
+  }
+
   switch -- $tdialog {
     "open"        {
-      set vrr [FE::fe_getopenfile $typew "$c" $::lastDoc $msk]
+      set vrr1 [FE::fe_getopenfile -title $titul -typew $typew -widget "$c" -initialdir $tekdir -filetypes $msk -details 1 -width 600 -height 500]
     }
     "save" {
-      set vrr [FE::fe_getsavefile $typew "$c" $::lastSave $msk]
+      set vrr1 [FE::fe_getsavefile -title $titul -typew $typew -widget "$c" -initialdir $tekdir -filetypes $msk -width 600 -height 500]
     }
+    "directory" - 
     "dir" {
-      set vrr [FE::fe_choosedir $typew "$c" $::lastDir]
+      set vrr1 [FE::fe_choosedir -title $titul -typew $typew -widget "$c" -initialdir $tekdir -width 600 -height 500]
     }
     default {
       tk_messageBox -title "Файловый проводник" -icon info -message "Неизвестная операция=$tdialog"
       return
     }
   }
-  $c.titul.lab configure -text $titul
-  #  puts "vrr=$vrr"
-  if {$typew == "frame"} {
-    $c configure -relief groove -bd 2 -bg white  -highlightbackground #c0bab4 -highlightcolor skyblue  -highlightthickness 5
-    place $c -in .st.fr1.fr2_certs.labCert  -relx 1.0 -rely 0.0 -relwidth 4.0
-    tk busy hold ".st.fr1"
-    tk busy hold ".st.fr3"
-  }
-  #  puts "wait ::otv"
-  vwait $vrr
-  if {$typew == "frame"} {
-    tk busy forget ".st.fr1"
-    tk busy forget ".st.fr3"
-  }
-
-  #  puts "var=$var"
-  set selectobj [subst $$vrr]
-    puts "subst=$selectobj"
-  if {$selectobj != ""} {
-    switch -- $tdialog {
-	"open"        {
-    	    set ::lastDoc [file dirname $selectobj ]
-	}
-	"save" {
-    	    set ::lastSave [file dirname $selectobj ]
-	}
-	"dir" {
-    	    set ::lastDir $selectobj
-	}
-    }
-  }
-  
-  set $var $selectobj
-  return $selectobj
+  set $var $vrr1
+#  return $vrr1
 }
 
 proc page_pkcs7_view {c} {
@@ -6072,8 +6076,8 @@ proc page_pkcs12 {c} {
     RoundedFrameME -sticky nsew
   }
   ttk::frame  $c.framefortime -style RoundedFrameME -padding {10 10 0 0}
-  label $c.l3 -textvariable myclock -background #43cafa -font TkDefaultFontBold -padx 0 -pady 0
-  pack $c.l3 -in $c.framefortime -fill x -padx 3mm -pady {0 3mm} -anchor nw
+  label $c.framefortime.l3 -textvariable myclock -background #43cafa -font TkDefaultFontBold -padx 0 -pady 0
+  pack $c.framefortime.l3 -in $c.framefortime -fill x -padx 3mm -pady {0 3mm} -anchor nw
   grid $c.framefortime -row 6 -column 0 -columnspan 2 -sticky n -padx {8 0}
 
   set com "ttk::button  $c.b2 -command {::sign_file  $c \"pkcs12\"} -text \"Подписать документ\" -style My.TButton -padding 4"
@@ -7531,7 +7535,10 @@ proc ::workOpCert {} {
   #    puts "WORKOP:c=$c"
   set i 0
   if {$cert_fn == ""} {
-    tk_messageBox -title "Работа с сертификатом" -icon error -message "Не выбран файл с сертификатом" -parent .
+    destroy .canvas
+    set w ".st.fr1.fr2_list4"
+    set wpoint  "$w.fcrt.e2"
+    mesWarn "$w" "$wpoint" "down" "Не выбран файл\nс сертификатом!"
     return
   }
   set fd [open $cert_fn]
@@ -7709,7 +7716,10 @@ proc ::workOpP12 {} {
   puts "WORKOpP12:top12=$top12;typesave=$ts12"
   set i 0
   if {$::certfrompfx == ""} {
-    tk_messageBox -title "Работа с PKCS12" -icon error -message "Не выбран файл с контейнером" -parent .
+    destroy .canvas
+    set w ".st.fr1.fr2_list8"
+    set wpoint  "$w.fr0.e1"
+    mesWarn $w $wpoint "up" "Не выбран файл с контейнером!"
     return
   }
   set cert_hex $::certfrompfx
@@ -7827,7 +7837,10 @@ proc ::workOp {} {
   #    puts "WORKOP:c=$c"
   set i 0
   if {$p7s_fn == ""} {
-    tk_messageBox -title [mc "Работа с PKCS7"] -icon error -message [mc "Не выбран файл с электронной подписью"] -parent .
+    destroy .canvas
+    set w ".st.fr1.fr2_list2"
+    set wpoint  "$w.fr0.e1"
+    mesWarn $w $wpoint "up" "Не выбран файл с\nэлектронной подписью!"
     return
   }
   array set p7 []
@@ -7845,7 +7858,10 @@ proc ::workOp {} {
   switch $typeop {
     0 {
       if {$src_fn == "" } {
-        tk_messageBox -title [mc "Verify signature"] -icon info -message [mc "Не выбран документ для проверки"] -parent .
+	destroy .canvas
+	set w ".st.fr1.fr2_list2"
+	set wpoint  "$w.e2"
+	mesWarn $w $wpoint "up" "Не выбран документ,\nдля которого создана подпись.\nПроверить подпись невозможно! "
         return
       }
 #      if {$p7(messageDigestTek) != ""} {}
@@ -8780,14 +8796,14 @@ proc ::selectLib { w ent  type list } {
   switch [tk windowingsystem] {
     classic - aqua  {
       set  types $typesOth
-      set msk "*.dylib *.so *.so* *.dll *"
+      set msk $typesOth
     }
     x11 {
-      set  types $typesX11
+      set  msk $typesX11
     }
     win32 {
       set  types $typesWin32
-      set msk "*.dll *.so *.so* *.dylib *"
+      set  msk $typesWin32
     }
     default {
       set  types $typesOth
@@ -8818,21 +8834,7 @@ proc ::selectLib { w ent  type list } {
       set lastdir [string map {"\\" "/"} $tekdir]
     }
 
-    set vrr [FE::fe_getopenfile  $typew ".fe" $lastdir $msk]
-    if {$typew == "frame"} {
-      pack $w -fill both -expand 1
-    } else {
-      wm minsize ".fe" 400  400
-    }
-    $wfe.titul.lab configure -text "Выберите библиотеку PKCS11"
-    wm iconphoto $wfe icon11_24x24
-
-    #Ждем результата
-    vwait $vrr
-    set r ""
-    #Записываем результат в переменную r
-    set r [subst $$vrr]
-    set file $r
+     set file [FE::fe_getopenfile -title "Выберите библиотеку PKCS11" -typew $typew -widget ".fe" -initialdir $lastdir -filetypes $msk -details 0 -width 600 -height 500]
 
     #	    puts "FILE=$file"
     if {$typesys == "win32" } {
@@ -8868,6 +8870,7 @@ proc ::selectLib { w ent  type list } {
     return $file
   }
 }
+
 
 #Список токенов со слотами
 proc listts {handle} {
@@ -10740,7 +10743,10 @@ proc ::viewCert {type nick} {
   set certp7 ""
   if {$type == "pkcs7"} {
     if {$nick == "" } {
-      tk_messageBox -title "Просмотр сертификата" -icon info -message "Не выбран файл с электронной подписью"
+	destroy .canvas
+	set w ".st.fr1.fr2_list2"
+	set wpoint  "$w.fr0.e1"
+	mesWarn $w $wpoint "up" "Не выбран файл с\nэлектронной подписью!"
       return
     }
     #    puts "View from PKCS7=$nick"
@@ -10767,8 +10773,11 @@ proc ::viewCert {type nick} {
   }
   if {$type == "pkcs12"} {
     if {$nick == ""} {
-      tk_messageBox -title "Просмотр сертификата из PKCS12" -icon info -message "Не выбран файл с контейнером PKCS12"  -parent .
-      return
+	destroy .canvas
+        set w ".st.fr1.fr2_list8"
+	set wpoint  "$w.fr0.e1"
+	mesWarn $w $wpoint "up" "Не выбран файл с\nконтейнером PKCS12!"
+        return
     }
     aboutUtil .about 6 $nick
     return
@@ -10779,13 +10788,22 @@ proc ::viewCSR {file type} {
   #type 1 - view csr; 7 - create certificate
   variable dir_crt
   if {$file == ""} {
-    tk_messageBox -title "Просмотр запроса на сертификат" -icon info -message "Не выбран файл с запросом на сертификат"  -parent .
+    destroy .canvas
+    set w ".st.fr1.fr2_list4"
+    set wpoint  "$w.fscr.e1"
+    mesWarn $w $wpoint "up" "Не выбран файл с\nзапросом на сертификат!"
     return
   }
   set mes ""
   if {$type == 7 } {
     if {$dir_crt == ""} {
-      tk_messageBox -title "Выпуск сертификата" -message "Не выбран каталог для хранения сертификатов и ключей." -icon error  -parent .
+    destroy .canvas
+    set w ".st.fr1.fr2_list4"
+    set wpoint  "$w.build.e1"
+    mesWarn $w $wpoint "down" "Не выбран каталог для хранения\nсертификатов и ключей"
+#    set w1 ".st.fr1"
+#    mesWarn $w1 $wpoint "down" "Не выбран каталог для хранения\nсертификатов и ключей"
+#      tk_messageBox -title "Выпуск сертификата" -message "Не выбран каталог для хранения сертификатов и ключей." -icon error  -parent .
       return
     }
     set mes "\nСертификат не может быть создан\n"
@@ -10812,7 +10830,6 @@ proc ::viewCSR {file type} {
     set csr_parse(filecsr) $file
   }
   aboutUtil .about $type [array get csr_parse]
-
 }
 
 proc showTextMenu {w x y rootx rooty} {
@@ -10825,7 +10842,6 @@ proc showTextMenu {w x y rootx rooty} {
   .contextMenu configure -activebackground #39b5da
   .contextMenu configure -background #e0e0da
 }
-
 
 proc showContextMenu {w x y rootx rooty} {
   catch {destroy .contextMenu}
