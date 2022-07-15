@@ -1320,9 +1320,10 @@ proc butImg {img} {
 
   } elseif {$img == "hw"} {
     global env
+
     set typesX11 {
-      {"Библиотеки"		{.so .so.*}	}
-      {"Любые файлы"		*}
+      {{Libraries} {.so .so.*}}
+      {{All Files} *}
     }
     if {$::typetlf} {
       set lastdir $env(EXTERNAL_STORAGE)
@@ -1330,24 +1331,9 @@ proc butImg {img} {
       set lastdir $env(HOME)
     }
     ##################
-    pack forget .fr1.can
     set typew frame
-    set msk "*.so *.so* *"
-    set vrr [FE::fe_getopenfile $typew ".fr1.so" $lastdir $msk]
-    set fm ".fr1.so"
-    $fm.titul.lab configure -text [mc "Выберите библиотеку PKCS11"]
-    #puts "vrr=$vrr"
-    if {$typew == "frame"} {
-      pack ".fr1.so" -fill both -expand 1
-    }
-    #puts "wait ::otv"
-    vwait $vrr
-
-    ###################
-    pack .fr1.can  -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0
-    set flib [subst $$vrr]
-
-    #	set flib [tk_getOpenFile -title "Выбор библиотеки PKCS#11"  -filetypes $typesX11 -initialdir $lastdir]
+    set vrr [feselect open ".fr1" frame "Выберите библиотеку PKCS11" $lastdir flib "$typesX11"]
+    set flib $vrr
     if {$flib == ""} {
       return
     }
@@ -5567,14 +5553,14 @@ proc saveCert { typesave cont} {
   }
 
   set typeCertDer {
-    {"Экспорт сертификата в DER формате"    .der}
-    {"Экспорт сертификата в DER формате"    .cer}
+    {"Экспорт в DER формате"    .der}
+    {"Экспорт в DER формате"    .cer}
     {"Любой"    *}
   }
   set typeCertDer1 {*.der *.cer *}
   set typeCertPem {
-    {"Экспорт сертификата в PEM формате"   .pem}
-    {"Экспорт сертификата в PEM формате"    .crt}
+    {"Экспорт в PEM формате"   .pem}
+    {"Экспорт в PEM формате"    .crt}
     {"Любой"    *}
   }
   set typeCertPem1 {*.crt *.pem *}
@@ -5600,11 +5586,11 @@ proc saveCert { typesave cont} {
   set tsav "."
   if { $typesave == 1 } {
     set typeCert [subst $typeCertPem]
-    set typeTitle "Экспорт сертификата в\nPEM формате"
+    set typeTitle "Экспорт сертификата в PEM формате"
     set msk "$typeCertPem1"
   } elseif { $typesave == 0 } {
     set typeCert [subst $typeCertDer]
-    set typeTitle "Экспорт сертификата в\nDER формате"
+    set typeTitle "Экспорт сертификата в DER формате"
     set msk "$typeCertDer1"
   } elseif { $typesave == 2 }  {
     set typeCert [subst $typeFileAll]
@@ -5635,26 +5621,17 @@ proc saveCert { typesave cont} {
     set ft $typeCert
   }
 
-  #  set file [tk_getSaveFile -title "$typeTitle"  -filetypes $ft  -initialdir "$myHOME"]
   set tekdir "$myHOME"
-  #eval "$c.fcrt.e2.but configure -command {feselect open $corig frame {Выберите файл с сертификатом} $::myHOME cert_fn [list $msk]}"
   #размещение в отдельном окне
   set typew window
   #Выбор катаалога
-  set vrr [FE::fe_getsavefile $typew ".savef" $tekdir $msk ]
+  set vrr [FE::fe_getsavefile -typew $typew -title "$typeTitle" -widget ".savef" -initialdir $tekdir -filetypes "$ft" ]
+  
   if {$typew == "frame"} {
     pack $w -fill both -expand 1
   }
-  #wm title ".savef" "$typeTitle"
-  wm iconphoto ".savef" iconfile
-  .savef.titul.lab configure -text "$typeTitle"
-
-  #Ждем результата
-  vwait $vrr
-  set r ""
   #Записываем результат в переменную r
-  set file [subst $$vrr]
-
+  set file [subst $vrr]
 
   if { $file == "" } {
     return;
@@ -8126,83 +8103,47 @@ proc addsignature {w} {
   place forget .topclock
 
 }
-
 proc feselect {tdialog c typew titul tekdir var msk } {
   global wizDatacsr;
-  #rdialog - open|save|dir
-  ##################
-  variable $var
-  pack forget $c.fratext
-  #    set typew frame
+  #Из-за массивов ставим catch
+  catch {  variable $var}
+#puts "feselect: tdialog=$tdialog c=$c typew=$typew titul=$titul tekdir=$tekdir var=$var msk=$msk"
+    set ydelta 0
+    set c_orig $c
+    if {$typew == "frame"} {
+	if {$c != ".fr1"} {
+	    set ydelta [winfo height $c.can]
+	} else {
+	    foreach {x0 y0 x1 y1} [.fr1.can bbox id_text0] {break}
+	    set y1 [expr {$y1 + 12}]
+	    set ydelta $y1
+	    set yf $y1
+	}
+	set rand [expr int(rand() * 10000)]
+	set c "$c.andr$rand"
+    }
   switch -- $tdialog {
     "open"        {
-      set vrr [FE::fe_getopenfile $typew "$c.sfile" $tekdir $msk]
+	if {$c_orig != ".fr1"} {
+    	    set vrr1 [FE::fe_getopenfile -title $titul -widget "$c" -typew $typew -initialdir $tekdir -filetypes $msk -details 0 -sepfolders 0 -x 0 -y 0 -height -$ydelta -width 0]
+        } else {
+    	    set vrr1 [FE::fe_getopenfile -title $titul -widget "$c" -typew $typew -initialdir $tekdir -filetypes $msk -details 0 -sepfolders 0 -x 0 -y $yf -height -$ydelta -width 0]
+        }
     }
     "save" {
+      set vrr1 [FE::fe_getsavefile -title $titul -typew $typew -widget "$c" -initialdir $tekdir -filetypes $msk  -sepfolders 0 -x 0 -y 0 -height  -$ydelta -width 0]
     }
+    "directory" - 
     "dir" {
-      set vrr [FE::fe_choosedir $typew "$c.sfile" $tekdir]
+      set vrr1 [FE::fe_choosedir -title $titul -typew $typew -widget "$c" -initialdir $tekdir -sepfolders 0 -x 0 -y 0 -height -$ydelta -width 0]
     }
     default {
       tk_messageBox -title "Файловый проводник" -icon info -message "Неизвестная операция=$tdialog"
       return
     }
   }
-
-  set fm "$c.sfile"
-  $fm.titul.lab configure -text $titul
-
-#  puts "vrr=$vrr"
-  if {$typew == "frame"} {
-    pack $c.sfile -fill both -expand 1
-  }
-#  puts "wait ::otv"
-  vwait $vrr
-
-  ###################
-  pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
-#  puts "var=$var"
-#  puts "subst=[subst $$vrr]"
-  set $var [subst $$vrr]
-  return [subst $$vrr]
-}
-
-proc feselect1 {tdialog c typew titul tekdir var msk } {
-  #tdialog - open|save|dir
-  global wizDatacsr;
-  ##################
-  pack forget $c.p4
-  pack forget $c.can
-  update
-  set typew frame
-  switch -- $tdialog {
-    "open"        {
-      set vrr [FE::fe_getopenfile $typew "$c.sfile" $tekdir $msk]
-    }
-    "save" {
-    }
-    "dir" {
-      set vrr [FE::fe_choosedir $typew "$c.sfile" $tekdir]
-    }
-    default {
-      tk_messageBox -title "Файловый проводник" -icon info -message "Неизвестная операция=$tdialog"
-      return
-    }
-  }
-
-  set fm "$c.sfile"
-  $fm.titul.lab configure -text $titul
-  #puts "vrr=$vrr"
-  if {$typew == "frame"} {
-    pack $c.sfile -fill both -expand 1
-  }
-  vwait $vrr
-  ###################
-  pack .fn3.p4 -side top -fill both -expand 1
-  pack .fn3.can  -anchor center -expand 1 -fill both -side bottom  -padx 0 -pady 0
-  set $var [subst $$vrr]
-  #set wizDatacsr(csr_fn) [subst $$vrr]
-  return [subst $$vrr]
+  set $var $vrr1
+#  return $vrr1
 }
 
 #Подписываем документ с токена
@@ -8278,7 +8219,7 @@ proc func_page1 {c} {
   eval "pack $c.frdoc.e1 -side left  -padx 0 -pady {0 $::intpx2mm} -ipady 0  -expand 1 -fill x"
   pack $c.frdoc -fill x -side top -padx 0
   set msk "*.txt *.doc* *.xml* *.bin .* *"
-  eval "$c.frdoc.e1.but configure -command {catch {destroy {.hhh}};feselect open $c_orig frame {Выберите документ для подписи} $::myHOME doc_for_sign [list $msk]}"
+  eval "$c.frdoc.e1.but configure -command {catch {destroy {.hhh}};feselect open $c_orig frame {Выберите документ для подписи} $::myHOME doc_for_sign \"$ft\"}"
 
   ttk::labelframe $c.frdir -text "Папка для подписи:"  -style RoundedFrame
 #  -relief flat -bd 0 -padx 0 -pady 0
@@ -8387,7 +8328,7 @@ proc func_page2 {c} {
   pack $c.fr0.e1 -side right  -padx 0 -pady {1 0} -ipady 1  -expand 1 -fill x
   pack $c.fr0 -fill both -side top  -padx 0
   set msk "*.p7s *.p7* *.sig *.bin *"
-  eval "$c.fr0.e1.but configure -command {catch {destroy {.hp7}};feselect open $corig frame {Файл с электронной подписью} $::myHOME p7s_fn [list $msk]}"
+  eval "$c.fr0.e1.but configure -command {catch {destroy {.hp7}};feselect open $corig frame {Файл с электронной подписью} $::myHOME p7s_fn \"$filetypep7s\"}"
 
   ttk::labelframe $c.lfr0 -text "Тип и формат электронной подписи" -labelanchor n -style RoundedFrame
   # -bg wheat -relief groove -bd $::bdlf  -padx $::intpx2mm -pady $::intpx2mm
@@ -8432,7 +8373,7 @@ proc func_page2 {c} {
   pack $c.frdoc.e1 -side right  -padx 0 -pady {1 0} -ipady 1  -expand 1 -fill x
   pack $c.frdoc -fill both -side top -padx 0
   set msk "*.txt *.doc* *.xml* *.bin *.xl* .* *"
-  eval "$c.frdoc.e1.but configure -command {catch {destroy {.hd7}};feselect open $corig frame {Выберите полписанный документ} $::myHOME src_fn [list $msk]}"
+  eval "$c.frdoc.e1.but configure -command {catch {destroy {.hd7}};feselect open $corig frame {Выберите полписанный документ} $::myHOME src_fn \"$ft\"}"
 
   ttk::frame $c.tsp
   label $c.tsp.tsp -text "Сервер TSP:" -anchor w -bg white  -width 0 -height 0
@@ -9738,7 +9679,7 @@ proc create_csr_list5 {tpage c num} {
     -initialdir $::myHOME \
     -filetypes $typefile
 
-    eval   " $c.e1.but configure -command {feselect1 open .fn3 frame {Файл для сохранения запроса} $::myHOME $csr_fn {*.p10 *.csr *}}"
+    eval   " $c.e1.but configure -command {feselect open .fn3 frame {Файл для сохранения запроса} $::myHOME $csr_fn \"$filetyperequest\"}"
 
 } else {
     cagui::FileEntry $c.e1 -dialogtype directory \
@@ -10051,7 +9992,7 @@ proc func_page4 {c} {
   pack $c.fscr.viewscr -side right -padx {4 0} -pady 0 -expand 0 -fill none
   eval "pack $c.fscr -fill both -side top -padx $::intpx2mm"
   set msk "*.p10 *.csr *.req* *.der .pem *"
-  eval "$c.fscr.e1.but configure -command {feselect open $corig frame {Выберите файл с запросом} $::myHOME csr_fn [list $msk]}"
+  eval "$c.fscr.e1.but configure -command {feselect open $corig frame {Выберите файл с запросом} $::myHOME csr_fn \"$ft\"}"
 
   ################################
   label $c.lsep -text "Работа с сертификатом из файла" -font TkDefaultFontBold -bg #eff0f1 -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue
@@ -10076,7 +10017,7 @@ proc func_page4 {c} {
   pack $c.fcrt.viewcrt -side right -padx {2 0} -pady 0 -expand 0 -fill none
   pack $c.fcrt -fill both -side top -padx $::intpx2mm -pady 0
   set msk "*.crt *.cer *.der .pem *"
-  eval "$c.fcrt.e2.but configure -command {feselect open $corig frame {Выберите файл с сертификатом} $::myHOME cert_fn [list $msk]}"
+  eval "$c.fcrt.e2.but configure -command {feselect open $corig frame {Выберите файл с сертификатом} $::myHOME cert_fn \"$ft\"}"
 
   labelframe $c.lfr1 -text "Операции с сертификатом из файла" -bd $::bdlf -bg wheat -relief groove -padx $::intpx2mm
   ttk::radiobutton $c.lfr1.rb1 -value 0 -variable opcert -text "Цепочка/Проверка подписи" -pad 0
@@ -10187,7 +10128,7 @@ proc func_page7 {c} {
   -filetypes $filetypep12
   pack $c.fr00.e1 -side bottom  -ipady 1  -expand 1 -fill x
   set msk "*.p12 *.pfx *"
-  eval "$c.fr00.e1.but configure -command {catch {destroy {.h12}};feselect open $c_orig frame {Файл с PKCS#12} $::myHOME pfx_fn [list $msk]}"
+  eval "$c.fr00.e1.but configure -command {catch {destroy {.h12}};feselect open $c_orig frame {Файл с PKCS#12} $::myHOME pfx_fn \"$filetypep12\"}"
 
   labelframe $c.frc -text "Просмотр сертификата из контейнера" -bd 0
   set ::nomacver 0
@@ -10214,7 +10155,7 @@ proc func_page7 {c} {
   pack $c.frdoc.e1 -side right  -padx 0  -ipady 1  -expand 1 -fill x
   pack $c.frdoc -fill both -side top -padx $::intpx2mm -pady 0
   set msk "*.txt *.doc* *.xml* *.bin .* *"
-  eval "$c.frdoc.e1.but configure -command {catch {destroy {.hhh}};feselect open $c_orig frame {Выберите документ для подписи} $::myHOME doc_for_sign [list $msk]}"
+  eval "$c.frdoc.e1.but configure -command {catch {destroy {.hhh}};feselect open $c_orig frame {Выберите документ для подписи} $::myHOME doc_for_sign  \"$ft\"}"
 
   labelframe $c.frdir -text "Папка для подписи и/или сертификата:" -bd 0
   cagui::FileEntry $c.frdir.e2 -dialogtype directory \
@@ -10567,7 +10508,7 @@ proc licload {} {
 
 proc licinstall {} {
   set filetype {
-    {"Файл LIC.DAT с лицензией" "LIC.DAT"}
+    {"Файл LIC.DAT" "LIC.DAT"}
     {"Файл с лицензией" ".DAT"}
     {"Любой файл" *}
   }
@@ -10597,7 +10538,8 @@ proc licinstall {} {
     }
   }
 
-  set newlic [tk_getOpenFile  -title "Выберите файл с лицензией токена" -initialdir $::myHOME -filetypes $filetype]
+  set newlic [feselect open ".fn11" frame "Выберите файл с лицензией токена" $::myHOME flib "$filetype"]
+
   if {$newlic == ""} {
     return
   }

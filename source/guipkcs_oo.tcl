@@ -424,6 +424,8 @@ ttk::style layout RoundedLabelFrame {
   RoundedLabelFrame -sticky nsew
 }
 ttk::style configure RoundedLabelFrame -padding 10
+ttk::style configure TPanedwindow -sashwidth 200 -showhandle 1
+ttk::style configure TPanedWindow -sashwidth 200 -showhandle 1
 
 
 ttk::style element create RoundedFrame image \
@@ -443,8 +445,6 @@ ttk::style configure RoundedFrameME -padding 10
 ttk::style configure RoundedFrameME -background red
 ttk::style configure TFrame -background white
 
-# scrollbar: arrows removed; background changes disabled by putting an empty
-# list in ttk::style map
 global myDir
 set mydir [file dirname [info script]]
 set dd [encoding dirs]
@@ -457,24 +457,14 @@ if {1} {
   package provide ttk::theme::Breeze
   source [file join $myDir breeze.tcl]
   ttk::style theme use Breeze
-  #package provide ttk::theme::scid 0.9.1
-  #source scidthemes.tcl
-  #ttk::style theme use scidblue
 }
 msgcat::mclocale ru
 source [file join $mydir tkfe.tcl]
-
-
-# 93cee9 меняем на skyblue
 
 ttk::style map MyBorder.TButton -background [list disabled white pressed gray64 active skyblue !active #e2e2e1]
 
 ttk::style configure MyBorder.TButton -background #e2e2e1  -borderwidth 1
 ttk::style configure MyBorder.TButton  -font TkFixedFont -padding 2
-# ff6a00
-#ttk::style map My.TButton -background [list disabled #c0bab4 pressed gray64  active chocolate ] -foreground [list disabled gray64] -relief [list {pressed !disabled} sunken]
-#ttk::style configure TButton -background skyblue
-#ttk::style configure My.TButton -background skyblue
 ttk::style configure My.TButton  -font TkFixedFont  -padding 6
 ttk::style configure TButton  -padding 6
 set ss [expr int(4)]
@@ -1727,6 +1717,8 @@ switch $typesys {
     set com [subst $com]
     set tlib "dll"
     set myHOME $::env(USERPROFILE)
+    #Заменяем обратную косую в пути на нормальную косую
+    set myHOME [string map {"\\" "/"} $myHOME]
     wm geometry . 910x580+300+105
   }
   x11 {
@@ -1755,27 +1747,9 @@ switch $typesys {
   }
 }
 
-if {[tk windowingsystem] == "win32"} {
-    #Перекодируем путь из кодировки ОС
-    #Для MS Win это скорей всего cp1251
-    set ::lastDir [encoding convertfrom cp1251 $myHOME ]
-    #Заменяем обратную косую в пути на нормальную косую
-    set ::lastDir [string map {"\\" "/"} $::lastDir]
-
-    set ::lastDoc [encoding convertfrom cp1251 $myHOME ]
-    set ::lastDoc [string map {"\\" "/"} $::lastDoc]
-
-    set ::lastSave [encoding convertfrom cp1251 $myHOME ]
-    set ::lastSave [string map {"\\" "/"} $::lastSave]
-} else {
-    set ::lastDir $myHOME
-    set ::lastDoc $myHOME
-    set ::lastSave $myHOME
-}
-#В МАС теперь всё хорошо, отключаем его
-#set macos 0
-
-##################
+set ::lastDir $myHOME
+set ::lastDoc $myHOME
+set ::lastSave $myHOME
 
 wm title . "Криптографический АРМ на базе стандартов с открытым ключом (Russian cryptography)"
 image create photo logoLC -file [file join $myDir "card_and_token_pero_509x316.png"]
@@ -2185,6 +2159,8 @@ namespace eval cagui {
 
 
 proc cagui::FileEntry {w args} {
+  global myHOME
+
   ttk::style map My1.TButton -background [list disabled gray85  active #00ff7f] -foreground [list disabled gray64] -relief [list {pressed !disabled} sunken]
   ttk::style configure My1.TButton -borderwidth 2
 
@@ -2229,20 +2205,11 @@ proc cagui::FileEntry {w args} {
   if {$opts(-dialogtype) == "directory"} {
     set opts(-dialogtype) "dir"
   }
-  set randw [expr int(rand() * 10000)]
-  set rr ".w$randw"
-  if {[tk windowingsystem] == "win32"} {
-    #Перекодируем путь из кодировки ОС
-    #Для MS Win это скорей всего cp1251
-    set tekdir [encoding convertfrom cp1251 $opts(-initialdir) ]
-    #Заменяем обратную косую в пути на нормальную косую
-    set opts(-initialdir) [string map {"\\" "/"} $tekdir]
-  }
 
   if {![info exists opts(-filetypes)]} {
-    set buttoncommand [subst "catch {destroy {.canvas};destroy {.hhh}}; feselectKDE $opts(-dialogtype) $rr $opts(-typewd) {$opts(-title)} {$opts(-initialdir)} $opts(-variable) {$opts(-defaultextension) *}"]
+    set buttoncommand [subst "catch {destroy {.canvas}}; feselectKDE $opts(-dialogtype) {.} $opts(-typewd) {$opts(-title)} {$opts(-initialdir)} $opts(-variable) {$opts(-defaultextension) *}"]
   } else {
-    set buttoncommand [subst "catch {destroy {.canvas};destroy {.hhh}}; feselectKDE $opts(-dialogtype) $rr $opts(-typewd) {$opts(-title)} {$opts(-initialdir)} $opts(-variable) \"$opts(-filetypes)\""]
+    set buttoncommand [subst "catch {destroy {.canvas}}; feselectKDE $opts(-dialogtype) {.} $opts(-typewd) {$opts(-title)} {$opts(-initialdir)} $opts(-variable) \"$opts(-filetypes)\""]
   }
 
   #  set entrycommand [list entry $w.entry -textvariable $opts(-variable) -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue]
@@ -2259,7 +2226,7 @@ proc cagui::FileEntry {w args} {
   frame $w
   #label $w.label -text $opts(-text)
   eval $entrycommand
-  button $w.but -image icon_openfile_18x16  -compound center -command $buttoncommand -bd 0 -background white -activebackground white -highlightthickness 0
+  button $w.but -image icon_openfile_18x16  -compound center -command "$buttoncommand" -bd 0 -background white -activebackground white -highlightthickness 0
 
   pack $w.but -side right -padx {1mm 1mm}
   pack $w.entry -side right -expand 1 -fill x
@@ -4480,6 +4447,7 @@ proc page_csr_view {c} {
   set dir_crt ""
   global macos
   global typesys
+  global myHOME
 
   set filetyperequest {
     {{Запрос на сертификат (DER)} {.p10}}
@@ -4518,7 +4486,7 @@ proc page_csr_view {c} {
   -width $ww \
   -defaultextension "*.csr *.p10 " \
   -variable  csr_fn \
-  -initialdir $env(HOME) \
+  -initialdir $myHOME \
   -filetypes $ft
   pack $c.fscr.e1 -side left -expand 1 -fill both
 #global c11
@@ -4547,7 +4515,7 @@ proc page_csr_view {c} {
   cagui::FileEntry $c.e1 -dialogtype directory \
   -variable dir_crt \
   -title "Каталог для сертификатов" \
-  -initialdir $env(HOME)
+  -initialdir $myHOME
   frame $c.ftype -relief flat -bg white  -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue -padx 0 -pady 0
   label $c.l0 -text "Выберите формат файла:" -bg white -anchor w
   ttk::radiobutton $c.ftype.typeDer -text "DER-формат" -value 0 -variable ::formatCSR
@@ -4610,7 +4578,7 @@ proc page_csr_view {c} {
   -width 54 \
   -defaultextension "*.cer *.crt *.der *.pem " \
   -variable  cert_fn \
-  -initialdir $env(HOME) \
+  -initialdir $myHOME \
   -filetypes $ft
   pack $c.fcrt.e2 -side left -expand 1 -fill x
   button  $c.fcrt.viewcrt -command {variable opcert; set z $opcert;set opcert 2;::workOpCert;set opcert $z} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0
@@ -4724,6 +4692,7 @@ proc page_asn1view {c} {
   variable asntype
   set asntype 0
   global typesys
+  global myHOME
 
   set filetypecert {
     {{Файл в DER формате}    .der}
@@ -4745,7 +4714,7 @@ proc page_asn1view {c} {
   -width 48 \
   -defaultextension "*.der *.pem *.asn* " \
   -variable  asn_fn \
-  -initialdir $env(HOME) \
+  -initialdir $myHOME \
   -filetypes $ft
   pack $c.fcrt.e2 -side left -expand 1 -fill both
   button  $c.fcrt.viewcrt -command {variable asn_fn; ::viewasn1 0} -image ::img::view_18x16 -compound right -bd 0 -background white -activebackground white -highlightthickness 0
@@ -4954,6 +4923,8 @@ proc page_pkcs7_sign {c} {
   global typeCert
   global sodCert
   global typesys
+  global myHOME
+
   variable file_for_sign
   set file_for_sign ""
   variable doc_for_sign
@@ -4977,7 +4948,7 @@ proc page_pkcs7_sign {c} {
   -title "Выберите документ для подписи" \
   -defaultextension "*.txt *.doc* *.pdf *.xml* *.xl*" \
   -variable  doc_for_sign \
-  -initialdir $env(HOME) \
+  -initialdir $myHOME \
   -filetypes $ft \
   -typewd frame
   #  -typewd window
@@ -4987,7 +4958,7 @@ proc page_pkcs7_sign {c} {
   -title "Каталог для хранения подписи" \
   -width $wd \
   -variable  file_for_sign \
-  -initialdir $env(HOME) \
+  -initialdir $myHOME \
   -parent "."
 
   ttk::labelframe $c.lfr0 -text "Тип электронной подписи"  -labelanchor n
@@ -5492,6 +5463,7 @@ proc trace_pfx {name index op} {
 
 proc feselectKDE {tdialog c typew titul tekdir var msk } {
   global wizDatacsr;
+  global myHOME
   #rdialog - open|save|dir
   #Из-за массивов ставим catch
   catch {  variable $var}
@@ -5499,25 +5471,55 @@ proc feselectKDE {tdialog c typew titul tekdir var msk } {
   if {$::feguipkcs != "" } {
 	set typew $::feguipkcs
   }
+    if {[tk windowingsystem] == "win32"} {
+      #Перекодируем путь из кодировки ОС
+      #Для MS Win это скорей всего cp1251
+      set tekdir [encoding convertfrom cp1251 $tekdir]
+      #Заменяем обратную косую в пути на нормальную косую
+#      set tekdir [string map {"\\" "/"} $tekdir1]
+    }
+
+#Размещаем ниже титула - .st.labMain
+    set wplace ".st.labMain"
+#Определяем смещение главного окна
+    set yroot [winfo rooty [winfo toplevel $wplace]]
+    set ywplace [winfo rooty $wplace]
+    set hbut [winfo height $wplace]
+    set dy [expr {$ywplace - $yroot + $hbut}]
+    set hroot [winfo height [winfo toplevel $wplace]]
+    set h1 [winfo height .st.fr3]
+    set wroot [winfo width [winfo toplevel $wplace]]
+    set dx [expr {$wroot / 4}]
+#puts "YROOT=$yroot ywlace=$wplace dy=$dy h root=$hroot"
+    set hfe [expr {$hroot - $dy -$h1}]
+
+  set randw [expr int(rand() * 10000)]
+  if {$c == "." || $c == "" } {
+    set c ".w$randw"
+  } else {
+    set c "$c.w$randw"
+  }
 
   switch -- $tdialog {
     "open"        {
-      set vrr1 [FE::fe_getopenfile -title $titul -typew $typew -widget "$c" -initialdir $tekdir -filetypes $msk -details 1 -width 600 -height 500]
+      set vrr1 [FE::fe_getopenfile -title $titul -typew $typew -widget "$c" -initialdir $tekdir -filetypes $msk -sepfolders 1 -details 1 -x $dx -relwidth 0.5  -height $hfe -relheight 0 -y $dy]
     }
     "save" {
-      set vrr1 [FE::fe_getsavefile -title $titul -typew $typew -widget "$c" -initialdir $tekdir -filetypes $msk -width 600 -height 500]
+      set vrr1 [FE::fe_getsavefile -title $titul -typew $typew -widget "$c" -initialdir $tekdir -filetypes $msk -sepfolders 1 -x $dx -relwidth 0.5 -height $hfe -relheight 0 -y $dy]
     }
     "directory" - 
     "dir" {
-      set vrr1 [FE::fe_choosedir -title $titul -typew $typew -widget "$c" -initialdir $tekdir -width 600 -height 500]
+      set vrr1 [FE::fe_choosedir -title $titul -typew $typew -widget "$c" -initialdir $tekdir -x $dx -relwidth 0.5 -height $hfe -relheight 0 -y $dy]
     }
     default {
       tk_messageBox -title "Файловый проводник" -icon info -message "Неизвестная операция=$tdialog"
       return
     }
   }
-  set $var $vrr1
-#  return $vrr1
+  if {$var != ""} {
+    set $var $vrr1
+  }
+  return $vrr1
 }
 
 proc page_pkcs7_view {c} {
@@ -5527,6 +5529,7 @@ proc page_pkcs7_view {c} {
   global typeCert
   global typesys
   global sodCert
+  global myHOME
   variable p7s_fn
   set p7s_fn ""
   variable src_fn
@@ -5557,7 +5560,7 @@ proc page_pkcs7_view {c} {
   -width 64 \
   -defaultextension "*.p7s *.bin *.sig" \
   -variable p7s_fn \
-  -initialdir $env(HOME) \
+  -initialdir $myHOME \
   -filetypes $ft
   pack $c.fr0.l1  -padx 0 -pady 0 -side left  -expand 0 -fill x
   pack $c.fr0.e1 -side right  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
@@ -5954,6 +5957,7 @@ proc page_pkcs12 {c} {
   global reqFL
   global typeCert
   global sodCert
+  global myHOME
   variable pfx_fn
   set pfx_fn ""
   variable src_fn
@@ -5987,7 +5991,7 @@ proc page_pkcs12 {c} {
   -width 60 \
   -defaultextension "*.pfx *.p12" \
   -variable pfx_fn \
-  -initialdir $env(HOME) \
+  -initialdir $myHOME \
   -filetypes $ft
   pack $c.fr0.l1  -padx 0 -pady 0 -side left  -expand 0 -fill x
   pack $c.fr0.e1 -side right  -padx {2 1} -pady {1 0} -ipady 1  -expand 1 -fill x
@@ -6028,14 +6032,14 @@ proc page_pkcs12 {c} {
   -width $wd \
   -defaultextension "*.txt *.doc* *.pdf *.xml* *.xl*" \
   -variable  doc_for_sign \
-  -initialdir $env(HOME) \
+  -initialdir $myHOME \
   -filetypes $ft
 
   cagui::FileEntry $c.e2 -dialogtype directory \
   -title "Каталог для хранения подписи" \
   -width $wd \
   -variable  file_for_sign \
-  -initialdir $env(HOME) \
+  -initialdir $myHOME \
   -parent "."
   ttk::labelframe $c.lfr0 -text "Тип и формат электронной подписи"  -labelanchor n
   ttk::radiobutton $c.lfr0.rb1 -value 1 -variable typesig -text "Присоединенная" -pad 0
@@ -6182,9 +6186,7 @@ proc saveCert { typesave cont} {
   } else {
     set ft $typeCert
   }
-
-#  set file [tk_getSaveFile -title "$typeTitle"  -filetypes $ft -parent $tsav -initialdir "$myHOME"]
-  set file [tk_getSaveFile -title "$typeTitle"  -filetypes $ft -parent $tsav -initialdir $::lastSave]
+  set file [feselectKDE save {.} frame "$typeTitle" $::lastSave "" "$ft"]
   if { $file == "" } {
     return;
   }
@@ -7145,7 +7147,7 @@ proc ::loadchain {cert type} {
     return -1
   }
   set data $cert
-  set dir [tk_chooseDirectory -initialdir $myHOME -title "Выбор каталога для цепочки"]
+  set dir [feselectKDE dir {.} frame "Выбор каталога для цепочки" $myHOME "" "*"]
   if {$typesys == "win32" } {
     if { "after#" == [string range $dir 0 5] } {
       set dir ""
@@ -7264,8 +7266,7 @@ proc ::verifysign {cert type} {
       } else {
         set ft $typeFile
       }
-
-      set caforver [tk_getOpenFile -title $titleS -filetypes $ft -initialdir $::lastDoc]
+      set caforver [feselectKDE open {.} frame "$titleS" $::lastDoc "" "$ft"]
       if {$caforver == ""} {
         return 0
       }
@@ -8065,7 +8066,7 @@ proc ::workOp {} {
         tk_messageBox -title [mc "Save certificates"] -icon info -message [mc "Нет сертификатов"] -detail "File=$p7s_fn" -parent .
         return
       }
-      set dir [tk_chooseDirectory -initialdir $::lastDir -title "Выберите папку для сертификатов"]
+      set dir [feselectKDE dir {.} frame "Выберите папку для сертификатов" $::lastDir "" "*"]
       #puts "Сохранить все сертификаты в каталоге=$dir"
       if {$typesys == "win32" } {
         if { "after#" == [string range $dir 0 5] } {
@@ -8136,6 +8137,7 @@ proc create_csr_list5 {tpage c num} {
   global wizDatacsr
   global wizDatacert
   global certfor
+  global myHOME
   set filetyperequest {
     {{Запрос на сертификат в DER формате} {.p10}}
     {{Запрос на сертификат в PEM формате} {.csr}}
@@ -8183,7 +8185,7 @@ proc create_csr_list5 {tpage c num} {
       break
     }
   }
-  set wizData(csr_fn) [file join $env(HOME) $wizData(E).csr]
+  set wizData(csr_fn) [file join $myHOME $wizData(E).csr]
 
   label $c.l1 -text $labt
   if {$macos} {
@@ -8196,14 +8198,14 @@ proc create_csr_list5 {tpage c num} {
     -title "Введите имя файла для сохранения запроса" \
     -width 47 \
     -defaultextension "*.p10 *.csr" \
-    -initialdir $env(HOME) \
+    -initialdir $myHOME \
     -filetypes $typefile
   } else {
     cagui::FileEntry $c.e1 -dialogtype directory \
     -variable $csr_fn \
     -title "Каталог для сертификатов и ключей" \
     -width 49 \
-    -initialdir $env(HOME)
+    -initialdir $myHOME
   }
 
   frame $c.ftype -relief flat -bg white  -highlightthickness 1 -highlightbackground skyblue -highlightcolor skyblue -padx 0
@@ -8235,7 +8237,7 @@ proc create_csr_list5 {tpage c num} {
       -title "Введите имя файла для закрытого ключа" \
       -width 47 \
       -defaultextension "*.key" \
-      -initialdir $env(HOME) \
+      -initialdir $myHOME \
       -filetypes $ft \
       -typewd window
     }
@@ -8625,7 +8627,8 @@ pack .st.fr3.ent -in .st.fr3 -side left -expand 1 -fill x -padx {5 0} -pady {0 4
 
 proc dateLIC {} {
   global env
-  set userpath $env(HOME)
+  global myHOME
+  set userpath $myHOME
   set filelic [file join $userpath ".LS11SW2016" "LIC.DAT"]
 
   if {[catch {set fl [open $filelic] } result]} {
@@ -8820,8 +8823,6 @@ proc ::selectLib { w ent  type list } {
         set lastdir [file dirname $::pkcs11_module]
       }
     }
-    #    set file [tk_getOpenFile -title "Выберите библиотеку PKCS#11"  -filetypes $types -parent $w -initialdir $lastdir]
-    #FileExplorer FE
     #размещение в отдельном окне
     set typew window
     #Выбор катаалога
@@ -9349,7 +9350,9 @@ proc openURL {url} {
 proc readdistr {urldistr w} {
   global typesys
   global myHOME
-  set dir [tk_chooseDirectory -initialdir $myHOME -title "Каталог для дистрибутива" -parent $w]
+  global vars
+  set dir [feselectKDE dir {.} frame "Каталог для дистрибутива" $myHOME "" "*"]
+
   if {$typesys == "win32" } {
     if { "after#" == [string range $dir 0 5] } {
       set dir ""
@@ -9360,7 +9363,7 @@ proc readdistr {urldistr w} {
   }
   .topclock.lclock configure -text "Начался процесс загрузки\n\nдистрибутива\n\n[file tail $urldistr]\n\nПодождите некоторое время!"
   .topclock configure -text "Идет процесс загрузки"
-  place .topclock -in .st.fr1.fr2_certs.labCert  -relx 1.0 -rely 0.0 -relwidth 3.5
+  place .topclock -in .st.fr1.fr2_certs.labCert  -relx 1.0 -rely 0.0 -relwidth 3.5 -width $vars(center)
   tk busy hold ".st.fr1"
   tk busy hold ".st.fr3"
 
@@ -11801,8 +11804,8 @@ proc loadcrl {cert_hex type} {
     } else {
       set ft $typeFile
     }
+    set filecrl [feselectKDE open {.} frame "$titleS" $::lastDoc "" "$ft"]
 
-    set filecrl [tk_getOpenFile -title $titleS -filetypes $ft -initialdir $::lastDoc]
     if {$filecrl == ""} {
       return
     }
@@ -11854,7 +11857,8 @@ proc loadcrl {cert_hex type} {
     tk_messageBox -title [mc "Load CRL"] -icon info -message "[mc {Load CRL from}]\n$filecrl" -detail $valc
     return
 }
-  set dir [tk_chooseDirectory -initialdir $myHOME -title [mc "Select a directory to save the CRL"]]
+  set dir [feselectKDE dir {.} frame "Select a directory to save the CRL" "$myHOME" "" "*"]
+
   if {$typesys == "win32" } {
     if { "after#" == [string range $dir 0 5] } {
       set dir ""
@@ -11901,15 +11905,14 @@ proc loadcrl {cert_hex type} {
     } else {
       set ft $typeFile
     }
-
-    set filecrl [tk_getOpenFile -title $titleS -filetypes $ft -initialdir $::lastDoc]
+    set filecrl [feselectKDE open {.} frame "$titleS" $::lastDoc "" "$ft"]
     if {$filecrl == ""} {
       return
     }
     set ::lastDoc [file dirname $filecrl]
 
     #	tk_messageBox -title [mc "Load CRL"] -icon error -message [mc "Cannot load CRL"] -detail [mc "Unable to verify certificate validity"]
-}
+  }
 
   set ss "[mc {File with CRL}]:\n$filecrl"
   set f [open $filecrl r]

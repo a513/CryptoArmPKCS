@@ -82,7 +82,7 @@ GBN3v7Ll++alwMnNzY1fw9b7X7c++ct05/N/YlQzMDB4K3I/+M7MwsDAAFHttesr
 HtXb3KAmMjGQCEY1DA4NLJhxScAGRW6Grfe/EqN017PfKjwMjC/ffSw5+fXBd2aC
 GlR4GIrlPwEARYApx4EpM+MAAAAASUVORK5CYII=
 }
-image create photo unchecked_tick16  -data {
+image create photo fe_unchecked_tick16  -data {
 iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAACXBIWXMAAA7EAAAO
 xAGVKw4bAAAAB3RJTUUH4wIBDAwy8wAQYQAAAB1pVFh0Q29tbWVudAAAAAAAQ3Jl
 YXRlZCB3aXRoIEdJTVBkLmUHAAAAdUlEQVQoz2N8++nTjsc/3v38z0AICLAweMpy
@@ -493,16 +493,21 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     DoYgra6uFIYeHjxFtkU8Hh2GOkE7ODfBMxwchRUyLi8tNTQ0MBsbhQABAwUCDz4+ORoahARDTEtKSQcxGecZhAY2SEdGQA0Y8vKFCwgICQohF/z8hQwqIHxIYaGgwUYI
     CQUCADs=
   }
-  image create photo addfile -data {
-    R0lGODlhEAAQAIABADMzM////yH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAAEA
-    LAAAAAAQABAAAAIpDI4Qy3ttFDQT1Wqb1ElP9oCfs1HjdUKl2q3gA49W95UZpswJ
-    vKekVAAAOw==
-  }
-  image create photo adddir -data {
-    R0lGODlhEAAQAIABADMzM////yH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAAEA
-    LAAAAAAQABAAAAInDH6hy+gMnZwGWgXqjXqvnHlfJ4Iit0lkk7RpOyEYa6g1mLzP
-    KQcFADs=
-  }
+  image create photo fe_addfile -data {
+R0lGODlhFgAWAKUwAHS37nK48H256oe4342325K33JK41pa40ni/+Hq/95+5znzB+H/C+IHC+LS6tLe6r4XE+IbF+IjG+IjG+ca7oYrH+Y3J+dW9io/K+ZDK+ZHL+eO+
+bfS/NvXANZbN+fbAM/jAM/vAKPrALfvAK/vALZfO+ZjO+aHS+q7Y+7Xc+7fd+7jd+8ro/Mvo/M7q/eH1/v//////////////////////////////////////////////
+/////////////////yH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAD8ALAAAAAAWABYAAAZ+wJ9wSCwai5mkUqk5IpdKTMrkHEKjLlap+rsmMa5Xy1P1ZsAvMflozqBW
+K9XJ2YbS68o7PqPH99sSf1ATFQ0AgkoWAQUHG4hJEAYcHySVRl4YCQMXlZ0kT1cLDiOenURmEwQdpZ+nXggPIaytQmYMAhQipaBXEQognlxVtD9BADs=
+}
+  image create photo fe_adddir -data {
+R0lGODlhFgAWAMZeAAqERACIRQqFRQuJRwyJSAyKSAWNSQCRSgqOSw+OSwWSTQiSTRKSTwKXUgaWUCeNSAuWURSXUxacVhecVhecVziUWxKgWRigWhqgWjiYThakXByk
+XS+fVRulXhylXh2lXkKaYhaqYR6pYTuhZEGiZ0SjaDGsXkKmajSsX1CqWtGPAF6qec6RHc6SH9uYAJWoSYivVNWcJ9mcHYm0VuWhAN7BRe3CNuDFRuDFSezDO+7FPP3E
+LOzHSv7FLf7GMO7JSu/JSf7HMf7INfrJOv7KOffLV/7LPv7MQ/rNSPzNSP7OR/nOXP/PTP/RUMXZzP/SVf7TXP/TWcbbzP/UXf/VXv/WYv/WZv/XZ9vo39vq4PD08fD1
+8vH18v3+/f//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////yH+EUNyZWF0ZWQgd2l0aCBHSU1QACH5BAEKAH8ALAAAAAAWABYAAAfhgH+Cg4SFhoeIiYqLgjSOj46Mfy6UlZaMKpmamjJLV5+gV1aDLC2mpy0x
+RVWsra6CUFSys7JTtre4U4JRvL2+v7+CT8PExcbGgk3Ky8zNzYJM0dLT1NSCStjZ2tpIPzxASUqCR+Tl5uU4MBwNGS81gkbx8vPxNykXExAMCA+CRP8AAxIZMqMDBhJY
+FCQgIOCPkIcQIwrRgcLDiRVbQFQYAOCPjyAgQ4rMEUJDFi5dtDgJ0PHPjh4wY8a0YeKDhRJaDhgg0HKRiA8YRkhZsFCSoA0YJDhgkKCAUUEYKERgMCgQADs=
+}
 
   proc readName ent {
     global widget
@@ -563,11 +568,11 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
   }
   set upz 1
   if { $::px2mm > 15} {
-    set upz 6
+    set upz 4
   } elseif { $::px2mm > 10} {
-    set upz 5
-  } elseif { $::px2mm > 5} {
     set upz 3
+  } elseif { $::px2mm > 5} {
+    set upz 2
   }
 #Масштабируем иконки с учетом разрешения
   if {$upz > 1} {
@@ -700,15 +705,8 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     set dir [expr {$direction ? "-decreasing" : "-increasing"}]
     #Оставляем .. в начале списка
     set r 0
-
-#    set r -1
-
-#    set data1 [lrange $data 1 end]
     set data1 [lrange $data 0 end]
-###############
-#    set listdir1 [lrange $listdir 1 end]
     set listdir1 [lrange $listdir 0 end]
-#####################
 
     # Now reshuffle the rows into the sorted order
     if {$::FE::folder(foldersfirst)} {
@@ -754,11 +752,11 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     place $fromw  -in $tow -relx $xtow -rely 1.0 -anchor $anchor
   }
 
-#  proc initfe {typew w initdir typefb otv msk} {}
   proc initfe {typefb otv args} {
 # 1: the configuration specs
 #
     catch {unset FE::data}
+
     set specs {
 	{-typew "" "" "window"}
 	{-widget "" "" ""}
@@ -768,15 +766,21 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 	{-initialfile "" "" ""}
 	{-parent "" "" "."}
 	{-title "" "" ""}
-	{-sepfolders "" "" 1}
-	{-foldersfirst "" "" 1}
+	{-sepfolders "" "" -1}
+	{-foldersfirst "" "" -1}
 	{-sort "" "" "#0"}
 	{-reverse "" "" 0}
-	{-details "" "" 0}
-	{-hidden "" "" 0}
-	{-width "" "" 0}
-	{-height "" "" 0}
+	{-details "" "" -1}
+	{-hidden "" "" -1}
+	{-width "" "" -10}
+	{-height "" "" -10}
+	{-x "" "" 5}
+	{-y "" "" 5}
+	{-relwidth "" "" 1.0}
+	{-relheight "" "" 1.0}
     }
+#place $w -in [winfo parent $w] -x 5 -y 5 -relwidth 1.0 -relheight 1.0 -width -10 -height -80
+
     tclParseConfigSpec FE::data $specs "" [lindex $args 0]
 #    parray FE::data
 
@@ -804,11 +808,23 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     if {$typefb == "dir"} {
 	set FE::folder(sepfolders) 0
     } else {
-	set FE::folder(sepfolders) $FE::data(-sepfolders)
+	if {$FE::data(-sepfolders) == -1} { 
+	    if { ![info exists FE::folder(sepfolders)]} {
+		set FE::folder(sepfolders) 0
+	    }
+	} else {
+	    set FE::folder(sepfolders) $FE::data(-sepfolders)
+	}
+	if {$FE::data(-details) == -1} {
+	    if {![info exists FE::folder(details)]} {
+		set FE::folder(details) 0
+	    }
+	} else {
+	    set FE::folder(details) $FE::data(-details)
+	}
     }
     set FE::folder(foldersfirst) $FE::data(-foldersfirst)
     set FE::folder(hissencb) $FE::data(-hidden)
-    set FE::folder(details) $FE::data(-details)
 #parray FE::folder
     if {$FE::folder(history) == ""} {
 	lappend FE::folder(history) $initdir
@@ -819,8 +835,7 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 
 #Главное окно неизменяемое на время работы проводника
 	frame $w -bg #d9D9D9
-#      white
-	all_busy_hold [winfo toplevel $w]
+	all_busy_hold [winfo parent $w]
 	destroy $w
 	frame $w -bg #d9D9D9
     } else {
@@ -829,6 +844,8 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
       } else {
         set tw $::scrwidth
       }
+      set tw $::scrwidth
+
       set th [expr $::scrheight - 100]
       set geometr $tw
       append geometr "x"
@@ -864,7 +881,6 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
         }
       }
       toplevel $w -bd 2  -relief groove -bg #d9d9d9
-#      white
       wm geometry $w $geometr
       if {$FE::data(-width) > 0 && $FE::data(-height) > 0} {
     	    set geom $FE::data(-width)
@@ -891,15 +907,21 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
       }
     }
     set fm "$w"
-	set f3 [ttk::panedwindow $w.f3 -orient horizontal]
+    set f3 [panedwindow $w.f3 -orient horizontal -sashwidth 2mm]
+#  -background red
 
 	array set fontinfo [font actual [[label $f3.dummy] cget -font]]
 	set font [list $fontinfo(-family) -14]
 	destroy $f3.dummy
-	$f3 add [ttk::frame $fm.dirs] -weight 1
+	$f3 add [ttk::frame $fm.dirs]
+#	 -weight 1
     set data(dirArea) [ttk::treeview $fm.dirs.t -columns {fullpath} -displaycolumns {} -xscrollcommand [list [namespace current]::hidescroll $fm.dirs.x]]
     eval "$fm.dirs.t heading {#0} -text {[mc {Folders}]} -image fe_downArrow -command {[namespace current]::columnSort $fm.dirs.t {#0} 1} "
-    $fm.dirs.t column "#0" -stretch 1 -width 150 -anchor w
+    if {$::typetlf} {
+	$fm.dirs.t column "#0" -stretch 1 -width 200 -anchor w
+    } else {
+	$fm.dirs.t column "#0" -stretch 1 -width 150 -anchor w
+    }
 	ttk::scrollbar $fm.dirs.y -command [list $fm.dirs.t yview]
 	ttk::scrollbar $fm.dirs.x -orient horizontal -command [list $fm.dirs.t xview]
     $fm.dirs.t configure -xscroll [list [namespace current]::hidescroll $fm.dirs.x ]
@@ -914,11 +936,14 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     eval "bind $fm.dirs.t <ButtonRelease-1> {[namespace current]::selectdir $fm.dirs.t $typew $typefb 1 $otv}"
     eval "bind $fm.dirs.t <ButtonPress-3> {[namespace current]::showContextMenu %W %x %y %X %Y $w $typefb}"
 
-	$f3 add [ttk::frame $fm.files] -weight 1
+	$f3 add [ttk::frame $fm.files]
+#	 -weight 1
     set FE::folder(panedwindow) $f3
     set FE::folder(panedir) $fm.dirs
     set FE::folder(panefile) $fm.files
-    eval "$FE::folder(panedwindow) forget 0"
+#    eval "$FE::folder(panedwindow) forget 0"
+    $f3 forget $fm.dirs
+
     ttk::scrollbar $fm.files.y -orient vertical -command "$fm.files.t yview"
     ttk::scrollbar $fm.files.x -orient horizontal -command "$fm.files.t xview"
     if {$typefb != "dir"} {
@@ -1004,19 +1029,16 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 	set data(reloadBtn) [ttk::button $f1.reload -style Toolbutton]
 	eval "$data(reloadBtn) configure -image fe_reload -command {[namespace current]::goupdate $fm $typefb}"
 	set data(newBtn) [ttk::button $f1.new -style Toolbutton]
-#	eval "$data(newBtn) configure -image fe_folder_new -command {[namespace current]::createdir dir $fm.tekfolder $fm $typefb}"
-	eval "$data(newBtn) configure -image adddir -command {[namespace current]::createdir dir $fm.tekfolder $fm $typefb}"
-#		-command [list ::ttk::dialog::file::NewDirCmd $win]
-	eval "bind $data(newBtn) <Enter> {[namespace current]::helptools $fm.helpview $data(newBtn) 0.0  {[mc {Create directory}]} nw}"
+	eval "$data(newBtn) configure -image fe_adddir -command {[namespace current]::createdir dir $fm.tekfolder $fm $typefb}"
+	eval "bind $data(newBtn) <Enter> {[namespace current]::helptools $fm.helpview $data(newBtn) 1.0  {[mc {Create directory}]} ne}"
 	eval "bind $data(newBtn) <Leave> {place forget $fm.helpview}"
     if {$typefb != "dir"} {
 	set data(newfileBtn) [ttk::button $f1.newfile -style Toolbutton]
-	eval "$data(newfileBtn) configure -image addfile -command {[namespace current]::createdir file $fm.tekfolder $fm $typefb}"
+	eval "$data(newfileBtn) configure -image fe_addfile -command {[namespace current]::createdir file $fm.tekfolder $fm $typefb}"
 	eval "bind  $data(newfileBtn) <Enter> {[namespace current]::helptools $fm.helpview $data(newfileBtn) 1.0 {[mc {Create an empty file}]} ne}"
 	eval "bind  $data(newfileBtn) <Leave> {place forget $fm.helpview}"
     }
     set data(hiddenBtn) [ttk::checkbutton $f1.hiddencb -style Toolbutton]
-    # -style Toolbutton
     set FE::folder(hiddenBtn) $data(hiddenBtn)
 
     set ::FE::folder(hiddencb) 0
@@ -1039,7 +1061,7 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 
 	set msg " "
 	eval [subst "$data(cfgMenu) add checkbutton -label \"[::msgcat::mc {Folders First}]\" \
-		-image  unchecked_tick16 -selectimage fe_tick16 -compound left \
+		-image  fe_unchecked_tick16 -selectimage fe_tick16 -compound left \
 		-variable ::FE::folder(foldersfirst) -indicatoron 0 \
 		-command {[namespace current]::columnSort $fm.files.t \$FE::folder(column) \$FE::folder(direction)}"]
 
@@ -1048,7 +1070,7 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 	  -menu $data(treeMenu) -image $image -compound left
 	foreach hcol  [$fm.files.t cget -displaycolumns] {
 	    $data(treeMenu) add checkbutton -label [::msgcat::mc "$hcol"] \
-	        -compound left -image unchecked_tick16 -selectimage fe_tick16 \
+	        -compound left -image fe_unchecked_tick16 -selectimage fe_tick16 \
 		-variable ::FE::folder(tree$hcol) -indicatoron 0 
 #Состав расширенного просмотра
 	    set ::FE::folder(tree$hcol) 1
@@ -1069,7 +1091,7 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 		-command {[namespace current]::detailedview $fm.files.t}"]
 	$data(cfgMenu) add separator
 	eval [subst "$data(cfgMenu) add checkbutton -label {[::msgcat::mc {Separate Folders}]} \
-		-image  unchecked_tick16 -selectimage fe_tick16 -compound left \
+		-image  fe_unchecked_tick16 -selectimage fe_tick16 -compound left \
 		-variable ::FE::folder(sepfolders) -indicatoron 0 \
 		-command {[namespace current]::gosepfolders $fm $typew $typefb}"]
 
@@ -1085,17 +1107,17 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 	pack $data(prevBtn) -side left -fill y
 	pack $data(nextBtn) -side left -fill y
 	pack $data(homeBtn) -side left -fill y
-	pack $data(reloadBtn) -side left -fill y
+	pack $f1.hiddencb -side left -fill y
+	pack $data(cfgBtn) -side left -fill y
 	pack $data(newBtn) -side left -fill y
 	if {$typefb != "dir"} {
 	    pack $data(newfileBtn) -side left -fill y
 	}
-	pack $data(cfgBtn) -side left -fill y
-	pack $f1.hiddencb -side left -fill y
+	pack $data(reloadBtn) -side left -fill y
 
 	set data(lang) [ttk::label $f1.lang -style Toolbutton]
 
-    if {[msgcat::mclocale] == "ru" } {
+    if {[string range [msgcat::mclocale] 0 1] == "ru" } {
 	$data(lang) configure -image  fe_ru_24x16
     } else {
 	$data(lang) configure -image fe_usa_24x16
@@ -1110,13 +1132,19 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 #Текущий каталог 
     set ftd [ttk::frame $fm.tekfolder]
     label $fm.tekfolder.lab -text "[mc {Current directory}]:" -bd 0 -anchor nw
+
+    set dirlist [lindex $FE::folder(history) 0]
+    foreach d $FE::folder(history) {
+        if {[lsearch -exact $dirlist $d] == -1} {
+    	    lappend dirlist $d
+        }
+    }
     if {![info exists initdir]} {
-	set dirlist "/"
 	if {[info exists ::env(HOME)] && ![string equal $::env(HOME) /]} {
-		lappend dirlist $::env(HOME)
+	    lappend dirlist $::env(HOME)
 	}
     } else {
-	set dirlist $initdir
+	lappend dirlist $initdir
     }
 
     ttk::combobox $fm.tekfolder.ldir -width 0 -values $dirlist -textvariable FE::folder(tek)
@@ -1141,7 +1169,6 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 		    }
 		}
 		lappend msk1 "$a ($lb)"
-#		lappend msk1 "$b"
 	    }
 	}
 	if {[llength $msk1] == 0} {
@@ -1165,7 +1192,6 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     labelframe $fm.seldir -text $ltit -bd 0 -labelanchor n
     entry $fm.seldir.entdir -relief sunken -bg white -highlightthickness 0 -highlightbackground skyblue -highlightcolor blue -readonlybackground white
     pack $fm.seldir.entdir -side right -anchor ne -fill x -expand 1
-#    $fm.seldir.entdir delete 0 end
     $fm.seldir.entdir configure -textvariable FE::folder(initialfile)
     if {$typefb != "filesave"} {
 	$fm.seldir.entdir configure -state readonly
@@ -1178,12 +1204,10 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     pack $fm.seldir -anchor se -expand 0 -fill both -side bottom
     pack [ttk::separator $fm.sepbut0] -side bottom -fill x -expand 0 -pady 0
     pack $fm.filter -anchor ne -expand 0 -fill both -side bottom
-    if {!$::typetlf} {
-	grid $fm.files.t $fm.files.y -sticky ns
-	grid $fm.files.x -sticky we
-	grid columnconfigure $fm.files 0 -weight 1
-	grid rowconfigure $fm.files 0 -weight 1
-    }
+    grid $fm.files.t $fm.files.y -sticky ns
+    grid $fm.files.x -sticky we
+    grid columnconfigure $fm.files 0 -weight 1
+    grid rowconfigure $fm.files 0 -weight 1
     
     grid $fm.files.t -sticky news -padx {2 0} -pady {0 0}
 #При использовании panedwindow добавляемые в панель компоненты (в данном случае $fm.fr и $fm.dirs) укаковывать (pack, greid, place) отдельно не надо
@@ -1217,10 +1241,8 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 #Настройка внешнего вида фрейма с проводником
 	$w configure -relief groove -borderwidth 3 -highlightbackground sienna \
 	    -highlightcolor chocolate  -highlightthickness 3
-#	    -highlightcolor skyblue  -highlightthickness 3
 #Размещение фреймаа с проводником по одноиу из методов pack/grid/place
-#	place $w -in $wplace -relx 0.15 -rely 0.5 -relwidth 0.75 -relheight 7.5
-	place $w -in . -relx 0.15 -rely 0.1 -relwidth 0.75 -relheight 0.75
+	place $w -in [winfo parent $w] -x $FE::data(-x) -y $FE::data(-y) -relwidth $FE::data(-relwidth) -relheight $FE::data(-relheight) -width $FE::data(-width) -height $FE::data(-height)
 
     }
     if {$typefb == "filesave"} {
@@ -1271,10 +1293,12 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 	set w1 [winfo toplevel $w]
     }
     if {!$::FE::folder(sepfolders)} {
-	eval "$FE::folder(panedwindow) forget 0"
+#	eval "$FE::folder(panedwindow) forget 0"
+	eval "$FE::folder(panedwindow) forget $FE::folder(panedir)"
 	$w1.files.t heading "#0" -text "[mc {Folders and files}]"
     } else {
-	eval "$FE::folder(panedwindow) insert 0 $FE::folder(panedir)"
+#	eval "$FE::folder(panedwindow) insert 0 $FE::folder(panedir)"
+	eval "$FE::folder(panedwindow) add $FE::folder(panedir) -before $FE::folder(panefile)"
 	$w1.files.t heading "#0" -text  [mc {Files}]
     }
     goupdate $w $typefb
@@ -1283,7 +1307,6 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
   proc goup {w typefb} {
     set tdir $FE::folder(tek)
     if {$tdir == [file dirname $tdir ]} {
-#	$FE::folder(upBtn) state disabled
 	return
     }
     set tdir [file dirname $tdir ]
@@ -1315,12 +1338,9 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     if {$tdir ==  $FE::folder(tek)} {
 	return
     } 
-#    $w.tekdir.entdir configure -state normal
-#    set tdir [$w.tekdir.entdir get]
     set FE::folder(prev) $FE::folder(tek)
     $FE::folder(prevBtn) state !disabled
 
-#    $w.tekdir.entdir configure -state readonly
     set rr [file readable "$tdir"]
     if {$rr == 0} {
       tk_messageBox -title "Просмотр папки" -icon info -message "Каталог не доступен (gohome):\n$tdir" -parent $w
@@ -1513,14 +1533,12 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
       $w1.tekfolder.ldir configure -value $ldir
 	if {[incr FE::folder(histpos)]} {
 		$FE::folder(prevBtn) state !disabled
-#		set data(selectFile) ""
 	}
 	$FE::folder(nextBtn) state disabled
     } else {
       set tekdir "[lindex $titem 0]"
     }
     if {$typefb == "dir"} {
-#	set FE::folder(initialfile) "[file tail $tekdir]"
 	$w1.seldir.entdir configure -state normal
 	$w1.seldir.entdir delete 0 end
 	$w1.seldir.entdir insert end "[file tail $tekdir]"
@@ -1543,7 +1561,7 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
         if {$FE::folder(initialfile) == ""} {
     	    return
         }
-        set ret $FE::folder(initialfile)
+        set ret [file join  $FE::folder(tek) $FE::folder(initialfile)]
       } else {
         return
       }
@@ -1592,7 +1610,6 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     } else {
 	set w1 [winfo toplevel $FE::folder(w)]
     }
-#    set w1 [winfo toplevel $tree]
     if {$FE::folder(sepfolders)} {
 	set wtree "$w1.dirs.t"
     } else {
@@ -1605,7 +1622,6 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 	set path $FE::folder(tek)
     } else {
 	set path "[$tree set $node fullpath]"
-#	set path [lindex $FE::folder(history) $FE::folder(histpos)]
     }
     #На первый уровень
     set node ""
@@ -1630,9 +1646,6 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     $tree delete [$tree children $node]
     set levelup [file dir $path ]
     set type [file type $levelup]
-#    set id [$tree insert $node end -id 0 -image fe_icondirup -text ".." -values [list $levelup $type]]
-#    $tree item $id -text ".."
-#    set ind 1
     set ind 0
     if {$FE::folder(sepfolders)} {
 	$wtree delete [$wtree children $node]
@@ -1651,8 +1664,6 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     }
     if {$typefb != "dir"} {
 	set files_list [list]
-#Старое
-#      set files_list [lsort -dictionary  [glob -nocomplain -types f -directory "$path" "$mask"] ]
 	set ind1 [string last "(" $mask]
 	set ind2 [string last ")" $mask]
 	incr ind1
@@ -1829,7 +1840,6 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
       }
     }
     file rename -force "[lindex $oldname 0]" "$newd"
-#    file rename -force "$oldn" "$newd"
     set FE::folder(initialfile) ""
     $fm.seldir.entdir configure -state normal
     $fm.seldir.entdir delete 0 end
@@ -1839,14 +1849,12 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     populateRoots "$fm.files.t" "$::tekPATH" $typefb
     set pass ""
   }
-#  proc fe_getsavefile {typew w tekdir msk} {}
   proc fe_getsavefile {args} {
     #Формируем случайную переменную
     set rand [expr int(rand() * 10000)]
     set rr "otv$rand"
     #Ответ будет создан в пространстве имен fileexplorer!!!
     variable $rr
-#    initfe $typew $w $tekdir filesave $rr $msk
     initfe filesave $rr $args
     set cmd [subst "vwait FE::$rr"]
     set w [winfo toplevel $FE::folder(w)]
@@ -1859,14 +1867,12 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     }
     return "$retok"
   }
-#  proc fe_getopenfile {typew w tekdir msk} {}
   proc fe_getopenfile {args} {
     #Формируем случайную переменную
     set rand [expr int(rand() * 10000)]
     set rr "otv$rand"
     #Ответ будет создан в пространстве имен fileexplorer!!!
     variable $rr
-#    initfe $typew $w $tekdir fileopen $rr $msk
     initfe fileopen $rr $args
     set cmd [subst "vwait FE::$rr"]
     set w [winfo toplevel $FE::folder(w)]
@@ -1879,14 +1885,12 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
     }
     return "$retok"
   }
-#  proc fe_choosedir {typew w tekdir} {}
   proc fe_choosedir {args} {
     #Формируем случайную переменную
     set rand [expr int(rand() * 10000)]
     set rr "otv$rand"
     #Ответ будет создан в пространстве имен fileexplorer!!!
     variable $rr
-#    initfe $typew $w $tekdir dir $rr ""
     initfe dir $rr $args
     set cmd [subst "vwait FE::$rr"]
     set w [winfo toplevel $FE::folder(w)]
@@ -1917,6 +1921,7 @@ RCErC+t5ev0G+IJgEdGMZSVQYS+e5l9h+80+zAmm+gAAAABJRU5ErkJggg==
 	if {$w == "." } { continue}
 	catch {tk busy hold $w}
     }
+    catch {tk busy forget $parent}
   }
   proc all_busy_forget {parent} {
     set widgets [info commands $parent*]
