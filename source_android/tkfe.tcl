@@ -566,6 +566,13 @@ FCQgIOCPkIcQIwrRgcLDiRVbQFQYAOCPjyAgQ4rMEUJDFi5dtDgJ0PHPjh4wY8a0YeKDhRJaDhgg0HKR
     #Высота 160 mm
     set ::scrheight [expr int(160 * $px2mm)]
   }
+####################
+set machine $tcl_platform(machine)
+set machArm [string first "arm" $machine]
+if {$machArm != -1} {
+    set ::typetlf 1
+}
+
   set upz 1
   if { $::px2mm > 15} {
     set upz 4

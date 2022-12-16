@@ -678,14 +678,27 @@ set ::typetlf 0
 if {$::scrwidth < $::scrheight} {
   set ::typetlf 1
 }
+####################
+set machine $tcl_platform(machine)
+set machArm [string first "arm" $machine]
+if {$machArm != -1} {
+    set ::typetlf 1
+}
 if {$::typetlf} {
-  set userpath $env(EXTERNAL_STORAGE)
-  set ::libcloud [file join $userpath "ls11cloud" "libls11cloud.so"]
+    set userpath $env(EXTERNAL_STORAGE)
   set bdfr 16
 } else {
-  set userpath $env(HOME)
-  set ::libcloud [file join $userpath "ls11cloud" "libls11cloud.so"]
+    set userpath $env(HOME)
   set bdfr 4
+}
+set ::libcloud ""
+#Место расположения регистрации облачного токена и его библиотеки
+set ::dstlib [file join $userpath "ls11cloud" "libls11cloud.so"]
+if {0} {
+#Рабочая область приложения
+      set myHOME1 $env(HOME)
+      set mm [file join $myHOME1 "libls11cloud.so"]
+tk_messageBox -title "typetlf" -icon error -message "machine=$machine machArm=$machArm typetlf=$::typetlf \n::dstlib=$::dstlib mm=$mm"
 }
 ttk::style element create RoundedFrame image \
     {frameBorderME focus frameBorderME} \
@@ -698,19 +711,6 @@ ttk::style configure RoundedFrame -padding {1mm 0 1mm 1mm}
 ttk::style configure RoundedFrame.Label -background wheat2
 ttk::style configure RoundedFrame -background  #bee9fd
 ttk::style configure Me.RoundedFrame -background  white
-
-
-if {[file exists $::libcloud]} {
-  set myHOME1 $env(HOME)
-  set mm [file join $myHOME1 "libls11cloud.so"]
-  file delete -force $mm
-  set err [catch {file copy -force $::libcloud $mm} res]
-  if {$err} {
-    tk_messageBox -title "Копирование биб-ки" -icon error -message "Установить не удалось."
-  } else {
-    set ::libcloud $mm
-  }
-}
 
 proc CaptureWindow {win {baseImg ""} {px 0} {py 0}} {
    # create the base image of win (the root of capturing process)
@@ -905,7 +905,8 @@ proc ::updatetok {} {
   if {$::pkcs11_module == ""} {
     tk_messageBox -title [mc "PKCS#11 library"] -icon error -message "Выберите библиотеку PKCS#11 для токена"
     set ::pkcs11_status -1
-    return  -1
+#    return  -1
+    return $result
   }
   if {[catch {set ::handle [pki::pkcs11::loadmodule "$::pkcs11_module"]} result]} {
     set cm [string first "TOKEN_NOT_RECOGNIZED" $result]
@@ -915,8 +916,8 @@ proc ::updatetok {} {
       return $result
     }
     set ::pkcs11_status -1
-    return -1
-    #    return $result
+#    return -1
+    return $result
   }
   #Список найденных токенов в слотах и сертификатов
   set ::slotid_tek -1
@@ -1082,21 +1083,21 @@ update
 set ::certfrompfx ""
 set ::sntlf "Неизвестно"
 
-if {$::scrwidth < $::scrheight} {
+#if {$::scrwidth < $::scrheight} {}
+if {$::typetlf} {
   #   wm overrideredirect . yes      ;# removes window decorations
   global env
   option add *Dialog.msg.wrapLength 750
   option add *Dialog.dtl.wrapLength 750
   set ::myHOME $env(EXTERNAL_STORAGE)
   #Шрифт для Androwish
-  set ::ftxt "Roboto Condensed Medium"
+  set ::ftxt "Roboto"
   set ::ftxt1 "Roboto"
   set ::dlx1 6
   set ::dlx2 4
   set ::dlx3 3
   set ::dlx4 2
 
-  set ::typetlf 1
   set lcc [file join $mydir Lcc_x86arm.so]
   set lrnd [file join $mydir Lrnd_x86arm.so]
   set cpu [borg osbuildinfo]
@@ -1148,7 +1149,6 @@ if {$::scrwidth < $::scrheight} {
   #wm overrideredirect . no      ;# moves window decorations
   wm iconphoto . icon11_24x24
   set ::myHOME $::env(HOME)
-  set ::typetlf 0
   #Шрифт для PC
   set ::ftxt "Nimbus Sans Narrow"
   set ::ftxt1 "Nimbus Sans Narrow"
@@ -1242,9 +1242,18 @@ proc butImg {img} {
     set imt2 [create_rectangle $fr.can "cloud" $x1 $y1 $x2 $y2  "#58a95a" 0.9 $wd "snow"]
     set cloud 0
     set savelib $::pkcs11_module
-    if {![file exists $::libcloud]} {
+    if {![file exists $::libcloud]} {}
+#tk_messageBox -title "CLOUD" -icon info -message "::libcloud=$::libcloud\n::pkcs11_module=$::pkcs11_module ::dstlib=$::dstlib"
+    if {![file exists $::dstlib]} {
       set tinfo "В настоящее время у вас \nнет облачного токена.\nНеобходимого его регистрация"
     } else {
+      global env
+      set myHOME1 $env(HOME)
+      set mm [file join $myHOME1 "libls11cloud.so"]
+      file delete -force $mm
+#Копируем библиотеку в рабочую область
+      set err [catch {file copy -force $::dstlib $mm} res]
+      set ::libcloud $mm
       set ::pkcs11_module $::libcloud
       #Высота строки
       set yfont [font metrics TkDefaultFont -linespace]
@@ -1272,7 +1281,13 @@ proc butImg {img} {
       place forget .linfo
       switch -- $::pkcs11_status {
         -1	{
-          set tinfo "\nОтсутствует библиотека\n"
+            set tinfo "\nОтсутствует библиотека\n$ret\n$::libcloud\nPKCS11=$::pkcs11_module"
+	    set cm [string first "ERROR_CRYPTOKY_ALREADY_INITIALIZED" $ret]
+	    if { [string first "ERROR_CRYPTOKY_ALREADY_INITIALIZED" $ret] != -1} {
+        	set tinfo "\nERROR_CRYPTOKY_ALREADY_INITIALIZED\n$ret\n$::libcloud\nPKCS11=$::pkcs11_module"
+	    } elseif { [string first "TOKEN_NOT_PRESENT" $ret] != -1} {
+        	set tinfo "\nTOKEN_NOT_PRESENT\n$ret\n$::libcloud\nPKCS11=$::pkcs11_module"
+	    }
         }
         0 {
           #		    set date [dateLIC]
@@ -1402,7 +1417,7 @@ proc butImg {img} {
     set other 0
     switch -- $::pkcs11_status {
       -1	{
-        set tinfo "\Плохая библиотека:\n$flib"
+        set tinfo "\Плохая библиотека:\n$flib\n$ret"
       }
       0 {
         set tinfo "Токен готов к использованию.\nМетка токена:\n$::slotid_teklab\n"
@@ -1447,9 +1462,12 @@ proc butImg {img} {
   } elseif {$img == "sw"} {
     global env
     if {$::typetlf} {
-      set ::pkcs11_module "libls11sw2016.so"
+	set userpath $env(EXTERNAL_STORAGE)
+        set ::pkcs11_module "libls11sw2016.so"
+#        set ::pkcs11_module [file join $userpath "libls11sw2016.so"]
     } else {
-      set ::pkcs11_module "./libls11sw2016.so"
+	set userpath $env(HOME)
+        set ::pkcs11_module [file join $userpath ".LS11SW2016" "libls11sw2016.so"]
     }
     if {$::tektoken != "sw"} {
       set fr $::rfr
@@ -1566,13 +1584,7 @@ proc create_rectangle  {canv img x1 y1 x2 y2 color alfa {wbd 0} {colorline black
 #Увеличить/уменьшить (отрицательное значение - уменьшение)
 proc scaleImage {im xfactor {yfactor 0}} {
   set mode -subsample
-  if {0} {
-    if {abs($xfactor) < 1} {
-      set xfactor [expr round(1./$xfactor)]
-    } elseif {$xfactor>=0 && $yfactor>=0} {
-      set mode -zoom
-    }
-  }
+
   if {$xfactor>=0 && $yfactor>=0} {
     set mode -zoom
   } else {
@@ -1664,6 +1676,18 @@ ttk::style configure Me.TRadiobutton  -background white -pad 0
 option add *Labelframe.background	gray97
 option add *Labelframe.borderwidth	0
 option add *Labelframe.relief	flat
+if {1} {
+#Возврат в основное меню
+	    set ::namescmd UXTY
+	    frame .retpage0
+	    set frret .retpage0
+	    eval "frame $frret.sep -bg #a0a0a0 -height $::intpx2mm -relief groove -bd $::intpx2mm"
+	    eval "label $frret.seplab -textvariable ::namecmd -bg skyblue -font {-family {$::ftxt} -size 12}"
+	    eval "button $frret.sepbut -text {Возврат в основное меню} -bg skyblue -command {butReturn}"
+	    pack $frret.sepbut -side bottom  
+	    pack $frret.seplab -side bottom -fill x -expand 1 -pady 1mm
+	    pack $frret.sep -side bottom  -fill x
+}
 
 image create photo tileand -data {
   R0lGODlhIgAiAOelAEWeR0WeSEaeR0aeSEWfRkWfR0WfSEafR0afSEafSUefSEefSUifSUWgSEifSkagSEmfSkagSUegSEegSUegSkigSUigSkigS0mgSkmgS0ihSkih
@@ -1836,24 +1860,24 @@ proc page_titul {fr  logo_manufacturer} {
   update
   set blogo [$fr.can bbox id_text1]
   set wexit [lindex $blogo 3]
-  set font_titul "-family {$::ftxt} -size 12"
+  set font_titul "-family {$::ftxt} -size 11"
   catch {font delete fontTEMP_titul2}
   eval font create fontTEMP_titul2  $font_titul
-  set allfunc "№ 63 ФЗ \"Об электронной подписи"
+  set allfunc "№ 63 ФЗ \"Об электронной подписи\""
   set funcWidthPx [font measure fontTEMP_titul2 "$allfunc"]
   set dlx [expr {($::scrwidth - $funcWidthPx) / 2}]
   set x1 [expr {int($::px2mm * 2)}]
-  $fr.can create text [expr $dlx + $::dlx1] [expr {$wexit + $x1}] -anchor nw -text "№ 63 ФЗ \"Об электронной подписи\nот 6 апреля 2011 года\"" -fill black -font fontTEMP_titul2
-  $fr.can create text $dlx [expr {$wexit + $x1}] -anchor nw -text "№ 63 ФЗ \"Об электронной подписи\nот 6 апреля 2011 года\"" -fill white -font fontTEMP_titul2 -tag id_text2
+  $fr.can create text [expr $dlx + $::dlx1] [expr {$wexit + $x1}] -anchor nw -text "№ 63 ФЗ \"Об электронной подписи\"\nот 6 апреля 2011 года" -fill black -font fontTEMP_titul2
+  $fr.can create text $dlx [expr {$wexit + $x1}] -anchor nw -text "№ 63 ФЗ \"Об электронной подписи\"\nот 6 апреля 2011 года" -fill white -font fontTEMP_titul2 -tag id_text2
 
   set blogo [$fr.can bbox id_text2]
   set wexit [lindex $blogo 3]
-  set font_titul "-family {$::ftxt} -size 10"
+  set font_titul "-family {$::ftxt} -size 10 -weight bold"
   catch {font delete fontTEMP_titul3}
   eval font create fontTEMP_titul3  $font_titul
-  $fr.can create text [expr $dlx + $::dlx4] [expr {$wexit + $::dlx1}] -text "Авторы: В.Н. Орлов\nhttp://soft.lissi.ru, http://www.lissi.ru\n+7(495)589-99-53\ne-mail: support@lissi.ru\n" \
+  $fr.can create text [expr {$dlx + $::dlx4}] [expr {$wexit + $::dlx1}] -text "Авторы: В.Н. Орлов\nhttp://soft.lissi.ru, http://www.lissi.ru\n+7(495)589-99-53\ne-mail: support@lissi.ru\n" \
   -anchor nw -fill black  -font fontTEMP_titul3
-  $fr.can create text $dlx [expr {$wexit + 0}] -text "Авторы: В.Н. Орлов\nhttp://soft.lissi.ru, http://www.lissi.ru\n+7(495)589-99-53\ne-mail: support@lissi.ru\n" \
+  $fr.can create text [expr {$dlx}] [expr {$wexit + 0}] -text "Авторы: В.Н. Орлов\nhttp://soft.lissi.ru, http://www.lissi.ru\n+7(495)589-99-53\ne-mail: support@lissi.ru\n" \
   -anchor nw -fill white -tag id_text3  -font fontTEMP_titul3
 
 
@@ -1970,12 +1994,15 @@ proc page_titul {fr  logo_manufacturer} {
 }
 
 proc butCliked {num fr} {
+  global but
   pack forget  .fr1
   set ::tekFrfunc $fr
   puts "butCliked=$num, fr=$fr"
+  set ::namecmd "$but($num)"
   if {$num == 3 && $::wizpagecsr == 0} {
     move "csr" [lindex $::pagescsr 0]
-    pack $fr -side top -anchor center -expand 1 -fill both  -padx 0 -pady 0
+#    pack $fr -side top -anchor center -expand 1 -fill both  -padx 0 -pady 0
+    pack $fr -anchor center -expand 1 -fill both -ipadx 0 -ipady 0 -padx 0 -pady 0 -side top
   } elseif {$num == 6} {
     $fr.fratext.fratext.text delete 1.0 end
     set ::listObjs [list ]
@@ -1983,18 +2010,26 @@ proc butCliked {num fr} {
     $fr.fratext.frhd.lobj delete 0 end
     $fr.fratext.frhd.lobj configure -values $::listObjs
     $fr.fratext.frhd.lobj configure -state readonly
-    pack $fr -side top -anchor center -expand 1 -fill both  -padx 0 -pady 0
+#    pack $fr -side top -anchor center -expand 1 -fill both  -padx 0 -pady 0
+    pack $fr -anchor center -expand 1 -fill both -ipadx 0 -ipady 0 -padx 0 -pady 0 -side top
   } else {
     if {$::typetlf} {
-      pack $fr -side top -anchor ne -expand 1 -fill both   -padx 0 -pady 0
+#      pack $fr -side top -anchor ne -expand 1 -fill both   -padx 0 -pady 0
+      pack $fr -anchor center -expand 1 -fill both -ipadx 0 -ipady 0 -padx 0 -pady 0 -side top
     } else {
-      pack $fr -side right -anchor ne -expand 1 -fill both   -padx 0 -pady 0
+#      pack $fr -side right -anchor ne -expand 1 -fill both   -padx 0 -pady 0
+       pack $fr -anchor center -expand 1 -fill both -ipadx 0 -ipady 0 -padx 0 -pady 0 -side top
     }
   }
+    pack .retpage0 -anchor center -expand 0 -fill x -ipadx 0 -ipady 0 -padx 0 -pady 0 -side bottom
+#    pack $fr -anchor center -expand 1 -fill both -ipadx 0 -ipady 0 -padx 0 -pady 0 -side top
+    pack $fr .retpage0 -in .
+
 }
 proc butReturn {} {
-  pack forget  $::tekFrfunc
-  pack .fr1 -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0
+    pack forget .retpage0
+    pack forget  $::tekFrfunc
+    pack .fr1 -side top -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0
 }
 
 namespace eval cagui {
@@ -2904,7 +2939,7 @@ proc aboutUtil {w type parse_csr} {
   $w.text configure -xscrollcommand [list $worig.hsb set]
   $worig.hsb configure -command [list $w.text xview]
 
-  $w.text tag configure tagAbout -foreground blue -font {Roboto 10 bold italic}
+  $w.text tag configure tagAbout -foreground blue -font {"Roboto" 10 bold italic}
 
   if {$type == 3} {
     pack forget $::tekFrfunc.fratext
@@ -4305,31 +4340,7 @@ proc create_unsignattrs {certs_hex digest_algo} {
             }
 
             if { $c == 0 } {
-              #################
-              if {0} {
-                array set crt_parse [pki::x509::parse_cert $bc2]
-                array set extcert $crt_parse(extensions)
-                if {[info exists extcert(2.5.29.37) ]} {
-                  set listusage [extkeyuse [lindex $extcert(2.5.29.37) 1]]
-                  set oc 0
-                  set i 0
-                  #		    for {set i 0 } { $i < [llength $listusage] } {incr i} {}
-                  if {[llength $listusage] == 1} {
-                    set oidt [string map {" " "."} [lindex $listusage $i]]
-                    #puts "OIDT=$oidt"
-                    if {"1.3.6.1.5.5.7.3.9" == $oidt} {
-                      set oc 1
-                    }
-                  }
-                  if {$oc == 0} {
-                    lappend listcafull $bc2
-                  }
-                }
-                }
               lappend listcafull $bc2
-              ###############
-
-              #puts "create_unsign BC len_cert=[string length $bc2]"
               }
             }
           }
@@ -5741,14 +5752,7 @@ proc create_new_signer {cert_hex content typekey} {
   [::asn::asnNull] \
   ]
   set listdigest "$listdigest$listdigest1"
-  if {0} {
-    set aa [dict create pkcs11_handle $::handle pkcs11_slotid $::slotid_tek]
-    if {$typekey == "pkcs11"} {
-      array set infopk [pki::pkcs11::pubkeyinfo $cert_hex  [list pkcs11_handle $::handle pkcs11_slotid $::slotid_tek]]
-    } else {
-      array set infopk [pki::pkcs11::pubkeyinfo $cert_hex ]
-    }
-  }
+
   if {$typekey == "pkcs11"} {
     array set infopk [pki::pkcs11::pubkeyinfo $cert_hex  [list pkcs11_handle $::handle pkcs11_slotid $::slotid_tek]]
   }
@@ -5898,12 +5902,6 @@ proc create_new_signer {cert_hex content typekey} {
       #		http::wait $token
       #puts "GETURL END 1"
       set stampfull [doneGet $token]
-      if {0} {
-        set fd [open "ADD_STAMPFULL.der" w]
-        chan configure $fd -translation binary
-        puts -nonewline $fd $stampfull
-        close $fd
-      }
 
       ::asn::asnGetSequence stampfull stamp
 
@@ -8112,7 +8110,8 @@ proc feselect {tdialog c typew titul tekdir var msk } {
     set c_orig $c
     if {$typew == "frame"} {
 	if {$c != ".fr1"} {
-	    set ydelta [winfo height $c.can]
+#	    set ydelta [winfo height $c.can]
+	    set ydelta [winfo height .retpage0]
 	} else {
 	    foreach {x0 y0 x1 y1} [.fr1.can bbox id_text0] {break}
 	    set y1 [expr {$y1 + 12}]
@@ -8993,8 +8992,8 @@ proc move {tpage page {offset 0}} {
   set newpage "$root$newnumber"
 
   pack $newpage -fill both -expand 1
-  pack forget .fn3.can
-  pack .fn3.can  -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0
+#  pack forget .fn3.can
+#  pack .fn3.can  -anchor center -expand 1 -fill both -side top  -padx 0 -pady 0
 
   set childnew [winfo children $newpage]
   set PP [lindex $childnew 0]
@@ -10092,11 +10091,13 @@ proc func_page7 {c} {
     {{PKCS12} {.p12}}
     {{All Files} *}
   }
+#  set c_orig $c
+if {1} {
   frame $c.fratext -borderwidth 0 -relief flat -bg #bee9fd
   pack $c.fratext -in $c -anchor center -expand 1 -fill both -side top
   set c_orig $c
   set c "$c.fratext"
-
+}
   labelframe $c.tok -text "Выберите токен PKCS11" -bd 0
   ttk::combobox $c.tok.listTok -textvariable ::nickTok -values $::listtok
   set ::nickTok [lindex $::listtok 0]
@@ -10112,13 +10113,13 @@ proc func_page7 {c} {
 
   frame $c.fr0 -bg white -bd 0
   label $c.fr0.lab -text "Файл с PKCS12" -bd 0 -padx 0 -pady 0 -anchor w -bg wheat
-  pack $c.fr0.lab  -side left -fill both -expand 1 -pady 0 -ipady 1
+  pack $c.fr0.lab  -side left -fill x -expand 1 -pady 0 -ipady 1 -padx 0
   ttk::checkbutton $c.fr0.mac -text " - не проверять mac" -variable ::nomacver -compound right -pad 0
   pack $c.fr0.mac  -padx $::intpx2mm -pady 0 -side right
-  pack $c.fr0 -fill both -side top -padx $::intpx2mm -expand 1
+  pack $c.fr0 -fill x -side top -padx $::intpx2mm 
 
   frame $c.fr00 -bg white -bd 0
-  pack $c.fr00 -fill both -side top -padx $::intpx2mm
+  pack $c.fr00 -fill x -side top -padx $::intpx2mm
   cagui::FileEntry $c.fr00.e1 -dialogtype open \
   -title "Файл с PKCS12" \
   -width 30 \
@@ -10215,7 +10216,7 @@ proc func_page7 {c} {
   pack $c.lfr1 -fill both -side top -padx $::intpx2mm
 
   eval "ttk::button  $c.b3 -command {::workOpP12 $c} -text {Выполнить операцию} -pad 0"
-  eval "pack $c.b3 -side top -padx $::intpx2mm -pady $::intpx2mm -anchor ne"
+  eval "pack $c.b3 -side top -padx $::intpx2mm -pady $::intpx2mm -anchor n"
 
   if {$c == ".fn7.fratext"} {
     trace variable pfx_fn w trace_pfx
@@ -10655,7 +10656,7 @@ proc contentabout {w} {
   }
 
   $w.text configure -background white
-  $w.text tag configure tagAbout -foreground blue -font {{Roboto Condensed Medium} 9}
+  $w.text tag configure tagAbout -foreground blue -font {{Roboto} 9}
   $w.text image create end -image creator_small
   $w.text insert end "\tCryptoArmPKCS\n" tagAbout
 
@@ -10800,7 +10801,7 @@ proc contentcreatetok {w} {
   }
 
   $w.text configure -background white
-  $w.text tag configure tagAbout -foreground blue -font {{Roboto Condensed Medium} 9}
+  $w.text tag configure tagAbout -foreground blue -font {{Roboto} 9}
   $w.text image create end -image creator_small
   $w.text insert end "\t\tCryptARMpkcs\n\n" tagAbout
 
@@ -11007,7 +11008,7 @@ proc func_page5 {w} {
   frame $w.fratext -borderwidth 0 -relief flat  -bg #bee9fd
   text $w.fratext.text -yscrollcommand [list $w.fratext.scr set]  \
   -insertbackground black -bg #f5f5f5 -highlightcolor skyblue -wrap word  -height 27
-  $w.fratext.text tag configure tagAbout -foreground blue -font {{Roboto Condensed Medium} 9}
+  $w.fratext.text tag configure tagAbout -foreground blue -font {{Roboto} 9}
   ttk::scrollbar $w.fratext.scr  -command [list $w.fratext.text yview]
   if {!$::typetlf} {
     pack $w.fratext.scr -anchor center -expand 0 -fill y -side right
@@ -11127,7 +11128,7 @@ proc func_page6 {w} {
   frame $w.fratext -borderwidth 0 -relief flat -bg white
   text $w.fratext.text -yscrollcommand [list $w.fratext.scr set]  \
   -insertbackground black -bg #f5f5f5 -highlightcolor skyblue -wrap word  -height 27
-  $w.fratext.text tag configure tagAbout -foreground blue -font {{Roboto Condensed Medium} 9}
+  $w.fratext.text tag configure tagAbout -foreground blue -font {{Roboto} 9}
   ttk::scrollbar $w.fratext.scr  -command [list $w.fratext.text yview]
   if {!$::typetlf} {
     pack $w.fratext.scr -anchor center -expand 0 -fill y -side right
@@ -11186,12 +11187,13 @@ proc page_func {fr tile titul functions} {
   #parray but
   #Создаем шрифт для кнопок
   if {$::typetlf} {
-    set feFONT_button "-family {Roboto} -size 9  -slant roman"
+    set feFONT_button "-family {Roboto} -size 9 -slant roman -weight bold"
     set widl 10
   } else {
     set feFONT_button "-family {Arial} -size 12  -slant roman"
     set widl 5
   }
+
   catch {font delete fontTEMP_drawer}
   eval font create fontTEMP_drawer  $feFONT_button
   #Вычисляем максимальныю длину текста
@@ -11227,7 +11229,7 @@ proc page_func {fr tile titul functions} {
   if {$titul != "" } {
     set allfunc $titul
     catch {font delete fontTEMP_titul}
-    set font_titul "-family {Roboto Condensed Medium} -size 15"
+    set font_titul "-family {Roboto} -size 14 -weight bold"
     eval font create fontTEMP_titul  $font_titul
     set funcWidthPx [font measure fontTEMP_titul "$allfunc"]
     set dlx [expr {($::::scrwidth - $funcWidthPx) / 2}]
@@ -11291,14 +11293,10 @@ proc page_func {fr tile titul functions} {
     #Линия перед текстом
     $fr.can create line \
     $xLocTextPx $yLineLocPx \
-    [expr $drawerWidthPx + $xLocTextPx] $yLineLocPx \
+    [expr {$drawerWidthPx + $xLocTextPx}] $yLineLocPx \
     -fill "#a0a0a0" -width $widl
-
     ## Put the text line on the canvas, with a tag.
-    $fr.can create text [expr $xLocTextPx + 5] $yLocTextPx \
-    -anchor w \
-    -font fontTEMP_drawer \
-    -text "$but($drawerCNT)"
+    $fr.can create text [expr $xLocTextPx + 5] $yLocTextPx -anchor w -font fontTEMP_drawer -text "$but($drawerCNT)" 
     #Прозрачный прямоугольник между двумя линиями - это и есть кнопка
     $fr.can create rect $xLocTextPx [expr $yLineLocPx + $widl]  [expr $drawerWidthPx + $xLocTextPx] [expr $yLineLocPx + $boxbut - $widl] \
     -width 0 \
@@ -11325,15 +11323,6 @@ proc page_func {fr tile titul functions} {
       set cmd [subst "$cmd"]
       eval $cmd
       set but1(0) "Возврат в основное меню"
-      frame .fn$drawerCNT.can
-      set frret .fn$drawerCNT.can
-      eval "frame $frret.sep -bg #a0a0a0 -width $::scrwidth -height $::intpx2mm -relief groove -bd $::intpx2mm"
-      eval "label $frret.seplab -text {$titul}  -bg skyblue -font {-family {$::ftxt} -size 12}"
-      eval "button $frret.sepbut -text {Возврат в основное меню} -bg skyblue -command {butReturn}"
-      pack $frret.sepbut -side bottom
-      pack $frret.seplab -side bottom -fill x -expand 1
-      pack $frret.sep -side bottom  -fill x
-      pack $frret -side bottom -fill both -expand 1
     }
 
     ## Get ready for the next text line.
@@ -11347,12 +11336,9 @@ proc page_func {fr tile titul functions} {
       if {[array size but] > 2 } {
         set yLineLocPx [ expr (( $drawerCNT ) * $drawerHeightPx + $boxbut)]
         #Линия перед текстом
-        $fr.can create line \
-        $xLocTextPx $yLineLocPx \
-        [expr $drawerWidthPx + $xLocTextPx] $yLineLocPx \
-        -fill "#a0a0a0" -width $widl
+        $fr.can create line $xLocTextPx $yLineLocPx [expr {$drawerWidthPx + $xLocTextPx}] $yLineLocPx -fill "#a0a0a0" -width $widl
         set seltok "Выберите рабочий токен"
-        $fr.can create text [expr $xLocTextPx + 5] $yLocTextPx -anchor w -font fontTEMP_drawer -text $seltok -fill blue
+	$fr.can create text [expr {$xLocTextPx + 5}] $yLocTextPx -anchor w -font fontTEMP_drawer -text $seltok -fill blue
         set yLineLocPx [ expr (( $drawerCNT + 1) * $drawerHeightPx + $boxbut)]
 
         set  wd [expr {int ($::px2mm / 2)}]
@@ -11366,16 +11352,14 @@ proc page_func {fr tile titul functions} {
         set y2 [expr $y1 + $sz]
         set imt1 [create_rectangle $fr.can "sw" $x1 $y1 $x2 $y2  "#58a95a" 0.9 $wd "snow"]
         set ::ysw [expr {($y1 + $y2) / 2 }]
-        $fr.can create text $x2 [expr {($y1 + $y2) / 2 }] \
-        -anchor w -font fontTEMP_drawer -text " - программный токен"  -tag sw
+        $fr.can create text $x2 [expr {($y1 + $y2) / 2 }] -anchor w -font fontTEMP_drawer -text " - программный токен"  -tag sw
         $fr.can bind sw <ButtonPress-1> {butImg sw}
         set y1 [expr {$yLineLocPx + $sz + $sz / 2}]
         set x2 [expr $x1 + $sz]
         set y2 [expr $y1 + $sz]
         set imt2 [create_rectangle $fr.can "cloud" $x1 $y1 $x2 $y2  "skyblue" 0.1 $wd "#58a95a"]
         set ::ycloud [expr {($y1 + $y2) / 2 }]
-        $fr.can create text $x2 [expr {($y1 + $y2) / 2 }] \
-        -anchor w -font fontTEMP_drawer -text " - облачный токен" -tag cloud
+        $fr.can create text $x2 [expr {($y1 + $y2) / 2 }] -anchor w -font fontTEMP_drawer -text " - облачный токен" -tag cloud
         $fr.can bind cloud <ButtonPress-1> {butImg cloud}
 
         set y1 [expr {$yLineLocPx + $sz * 2 + $sz }]
@@ -11383,8 +11367,7 @@ proc page_func {fr tile titul functions} {
         set y2 [expr $y1 + $sz]
         set imt3 [create_rectangle $fr.can "hw" $x1 $y1 $x2 $y2  "skyblue" 0.1 $wd "#58a95a"]
         set ::yhw [expr {($y1 + $y2) / 2 }]
-        $fr.can create text $x2 [expr {($y1 + $y2) / 2 }] \
-        -anchor w -font fontTEMP_drawer -text " - другой токен" -tag hw
+        $fr.can create text $x2 [expr {($y1 + $y2) / 2 }] -anchor w -font fontTEMP_drawer -text " - другой токен" -tag hw
         $fr.can bind hw <ButtonPress-1> {butImg hw}
       } else {
         $fr.can create line $xLocTextPx $yLineLocPx \
@@ -11407,6 +11390,7 @@ update
 incr i
 ttk::frame .fr$i -pad 0 -padding 0
 #Кнопки основного меню
+global but
 set but(0) "Стартовая страница"
 set but(1) "Подписать документ"
 set but(2) "Работаем с ЭП (PKCS7)"
