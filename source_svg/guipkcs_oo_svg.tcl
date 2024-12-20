@@ -6220,9 +6220,10 @@ proc feselectKDE {tdialog c typew titul tekdir var msk } {
     if {[tk windowingsystem] == "win32"} {
       #Перекодируем путь из кодировки ОС
       #Для MS Win это скорей всего cp1251
-      set tekdir [encoding convertfrom cp1251 $tekdir]
+#      set tekdir [encoding convertfrom cp1251 $tekdir]
       #Заменяем обратную косую в пути на нормальную косую
-#      set tekdir [string map {"\\" "/"} $tekdir1]
+      set tekdir [string map {"\\" "/"} $tekdir]
+
     }
 
 #Размещаем ниже титула - .st.labMain
@@ -10421,7 +10422,9 @@ proc ::selectLib { w ent  type list } {
     if {[tk windowingsystem] == "win32"} {
       #Перекодируем путь из кодировки ОС
       #Для MS Win это скорей всего cp1251
-      set tekdir [encoding convertfrom cp1251 $lastdir ]
+#      set tekdir [encoding convertfrom cp1251 $lastdir ]
+      set tekdir $lastdir
+
       #Заменяем обратную косую в пути на нормальную косую
       set lastdir [string map {"\\" "/"} $tekdir]
     }
