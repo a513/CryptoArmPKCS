@@ -9702,7 +9702,7 @@ foreach {a b} $::list_but {
   set a "::setTekFrame .st.fr1.fr2_list  .st.fr1.fr2_list$i $i"
 
 #  ttk::label .st.fr1.fra82.b$i -image vgrlines_24x24 -compound left -text "$b"  -padding -1 -background white
-  if {$i == 1 || $i == 3 || $i == 5 || $i == 7 || $i == 11 || $i == 12} {
+  if {$i == 1 || $i == 3 || $i == 5 || $i == 7 || $i == 12} {
     set labgl [cbutton new .st.fr1.fra82.b$i -type rect -strokewidth 0 -command {} -stroke {} -strokenormal {} -strokeenter "#f5f5f5" -width 2.8c -height 5m ]
     $labgl config -state disabled
   } else {
@@ -10063,7 +10063,7 @@ puts "cmdBrowser fillnormal=WHITE"
         }
     } 
     if {$::pkcs11_status == 1} {
-	foreach j [list 1 3 5 7 11 12] {
+	foreach j [list 1 3 5 7 12] {
 	    $::fra82b([set j]) config -fillnormal $::gfilnorm -fillenter $::gfilent -fillpress $::gfilpres
 	    $::fra82b([set j]) config -state disabled
 #	    .st.fr1.fra82.b$j configure -state disabled
@@ -12675,9 +12675,11 @@ proc ::setTekFrame {tekFr newTekFr i} {
   if {[.st.fr1.fra82.b$i cget -state] == "disabled"} {
     return
   }
+if {0} {
   if {$i != 0 && $i != 4 && $i != 6 && $i != 8 && $i != 9 && $i != 10 && $i < 11} {
     #    set prez [::updatetok]
   }
+}
   #  if {$::pressBut == $i} {}
   if {$::pressBut == $i && $i == 0} {
     return
