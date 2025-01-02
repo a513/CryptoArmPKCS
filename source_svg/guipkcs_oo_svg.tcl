@@ -2329,7 +2329,7 @@ proc wizard {tpage toplevel pages func} {
     lappend page_list $page.page
     lappend page_list [lindex $func $j]
     incr j
-    set cbut [cbutton new $page.p -type rect -text "< Предыдущее окно" -fontfamily "$::svgFont" -width 40m -fontsize 4m -rx 1m -command [list move $tpage $page.page -1]]
+    set cbut [cbutton new $page.p -type rect -text "Предыдущее окно" -fontfamily "$::svgFont" -width 40m -fontsize 4m -rx 1m -command [list move $tpage $page.page -1]]
     
 #    $cbut config  -command [list move $tpage $page.page -1]
 set iprev [[$cbut canvas] create group -m {{1 0} {0 1} {0 0}}]
