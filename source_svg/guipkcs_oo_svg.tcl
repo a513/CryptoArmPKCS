@@ -9660,7 +9660,7 @@ $labfn config -isvg "$tekfr.stfirst.labgl $ii" -ipad "0 9.5m 1m 6m" -fontfamily 
 
 $tekfr.stfirst.labgl delete $ii
 set labgl [ibutton new $tekfr.stfirst.br -text "" -fillnormal white  -command {} -strokewidth 0 -stroke {} -fillenter "#d9e8f6" -width 6.5m]
-$labgl config  -pad "1 0 0 0"
+$labgl config  -pad "0 0 0 0"
 eval "bind $tekfr.stfirst.br <Enter> {.helpupdate configure -text {Щелкните по мне};place .helpupdate -in $tekfr.stfirst.labgl -relx 0.5 -rely 1.0 -anchor ne}"
 bind $tekfr.stfirst.br <Leave> {place forget .helpupdate}
 
@@ -9681,7 +9681,7 @@ $tekfr.stfirst.br delete $ii
 
 pack $tekfr.stfirst.br -side left -pady 0 -anchor nw -fill none -expand 0
 #  -padx "0.25m 0"
-pack $tekfr.stfirst.labgl -side left -pady 0 -padx "1m 0m" -anchor ne -fill none -expand 0
+pack $tekfr.stfirst.labgl -side left -pady 0 -padx "0m 0m" -anchor ne -fill none -expand 0
 pack $tekfr.stfirst -side top -pady {2.5m 0} -padx 0 -anchor nw -fill both
 
 ###############
@@ -14438,8 +14438,9 @@ if {[string range $::tcl_platform(machine) 0 2] == "arm" || [tk windowingsystem]
     $cmenu1 config -fillnormal $g_norm
 }
 wm overrideredirect . 1
-wm state . withdraw
+#m state . withdraw
 update
+if {0} {
 after 200
 set xx [expr {[winfo rootx .st] - [winfo rootx .]}]
 set yy [expr {[winfo rooty .st] - [winfo y .]}]
@@ -14448,9 +14449,10 @@ if {[tk windowingsystem] != "win32"} {
 } else {
     place [$cmenu1 canvas] -in .st -x 0 -y 0 -relwidth 1 -relheight 1
 }
+}
+#m state . normal
+#update
 
-wm state . normal
-update
 set minw [winfo width .]
 set minh [winfo height .]
 wm minsize . $minw $minh
