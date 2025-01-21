@@ -3954,8 +3954,8 @@ set selkey [cframe new $c.c5 -type centry -stroke gray85 -fontsize 2m -rx 1m ]
     set chbt   [cbutton new $c.c$i -type check  -variable ::ku$k -text "$v" -height 4m]
 
     #    	    -pady 0
-#    eval "grid $c.c$i -row $ir -column $j -columnspan 1 -sticky w -padx 8  -pady {0 [expr $j * 3]}"
-    eval "grid $c.c$i -row $ir -column $j -columnspan 1 -sticky we -padx 8  -pady {0 1m}"
+#    eval "grid $c.c$i -row $ir -column $j -columnspan 1 -sticky we -padx 8  -pady {0 1m}"
+    eval "grid $c.c$i -row $ir -column $j -columnspan 1 -sticky nwse -padx 8  -pady {0 1m}"
     #    	    grid rowconfigure $c $i -weight 0
     incr i
     if {$j == 1} {
@@ -3966,6 +3966,12 @@ set selkey [cframe new $c.c5 -type centry -stroke gray85 -fontsize 2m -rx 1m ]
     }
     incr k
   }
+#Масштабирование кнопок использования ключа
+if {0} {
+    grid rowconfigure $c "8 9 10 11 12" -weight 1
+    grid columnconfigure $c "0 1" -weight 1
+}
+
   if {$tpage == "csr"} {
     incr ir
     checkbutton $c.egais -image egais_83x36 -text "Запрос на сертификат для ЕГАИС" -variable ::egais  -compound left  -bd 0 -bg skyblue
