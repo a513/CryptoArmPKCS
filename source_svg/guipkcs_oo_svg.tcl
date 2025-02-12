@@ -6925,8 +6925,7 @@ proc page_pkcs12 {c} {
   grid columnconfigure $c 0 -weight 1
   frame $c.frc  -bg snow
   set ::nomacver 0
-#  ttk::checkbutton $c.frc.mac -text "nomacver" -variable ::nomacver  -style My.TCheckbutton -compound left
-    set chbt1 [cbutton new $c.frc.mac -type check  -variable ::nomacver -text "nomacver" -filltext red]
+  set chbt1 [cbutton new $c.frc.mac -type check  -variable ::nomacver -text "nomacver" -textfill red]
 
   eval "bind $c.frc.mac <Enter> {.helpupdate configure -text {Не контролировать целостность};place .helpupdate -in $c.frc.mac -relx 1.0 -rely 1.0 -anchor n}"
   bind $c.frc.mac <Leave> {place forget .helpupdate}
